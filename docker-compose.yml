@@ -120,6 +120,7 @@ services:
 
       ANTHROPIC_AUTH_TOKEN: ${ANTHROPIC_AUTH_TOKEN:-}
       ANTHROPIC_BASE_URL: ${ANTHROPIC_BASE_URL:-https://api.anthropic.com}
+      API_PROXY: ${API_PROXY:-}
       DEFAULT_MODEL: ${DEFAULT_MODEL:-claude-sonnet-4-20250514}
 
       # Image used by the manager to spawn executor containers via docker.sock.
