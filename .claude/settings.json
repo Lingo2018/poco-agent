@@ -1,0 +1,22 @@
+{
+  "$schema": "https://claude.ai/code/settings-schema.json",
+  "permissions": {
+    "allow": [],
+    "deny": [
+      "Edit(*)",
+      "Write(*)",
+      "Bash(git commit*)",
+      "Bash(git push*)",
+      "Bash(rm *)",
+      "Bash(mv *)",
+      "NotebookEdit(*)"
+    ]
+  },
+  "rules": [
+    "This repository is a fork/copy from another source. The user wants to sync upstream updates and primarily uses this as-is.",
+    "CRITICAL: Any code modifications, file edits, or writes MUST be explicitly approved by the user BEFORE execution.",
+    "When asked to make changes, ALWAYS ask for explicit permission first and explain what changes will be made.",
+    "Read-only operations (Read, Glob, Grep, explore) are allowed without permission.",
+    "Configuration file changes (.env, docker-compose overrides) require user approval."
+  ]
+}

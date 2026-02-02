@@ -2,6 +2,39 @@
 
 This file provides guidance for AI coding agents working with code in this repository.
 
+## CRITICAL: Code Modification Authorization Rules
+
+**This repository is a fork/copy maintained for personal use. The owner syncs upstream updates and does NOT actively develop this codebase.**
+
+### Mandatory Rules for AI Agents:
+
+1. **NO UNAUTHORIZED CODE CHANGES**: Any modifications to source code files (`.py`, `.ts`, `.tsx`, `.js`, `.json`, etc.) MUST be explicitly approved by the user BEFORE execution.
+
+2. **ASK PERMISSION FIRST**: Before making ANY edit, write, or delete operation, you MUST:
+   - Explain what changes you intend to make
+   - Show the specific files and code that will be modified
+   - Wait for explicit user approval (e.g., "yes", "approved", "go ahead")
+
+3. **READ-ONLY BY DEFAULT**: The following operations are allowed WITHOUT permission:
+   - Reading files (Read, Glob, Grep)
+   - Exploring the codebase
+   - Analyzing code and providing explanations
+   - Suggesting fixes (but NOT implementing them without approval)
+
+4. **CONFIGURATION CHANGES REQUIRE APPROVAL**: Changes to `.env`, `docker-compose.yml`, or any configuration files also require explicit user permission.
+
+5. **GIT OPERATIONS RESTRICTED**: `git commit`, `git push`, `git reset`, and other destructive git commands require explicit user approval.
+
+### Example Interaction:
+```
+User: Fix the bug in api.py
+Agent: I found the issue. Here's the fix I would make:
+       [shows proposed changes]
+       Do you approve this change?
+User: Yes
+Agent: [makes the change]
+```
+
 ## Project Overview
 
 Poco is a multi-service AI agent execution platform that orchestrates Claude AI agents to perform coding tasks. The system consists of four main components:
