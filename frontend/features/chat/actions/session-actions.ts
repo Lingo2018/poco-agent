@@ -17,6 +17,8 @@ const configSchema = z
   .object({
     repo_url: z.string().optional().nullable(),
     git_branch: z.string().optional(),
+    git_token_env_key: z.string().optional().nullable(),
+    browser_enabled: z.boolean().optional(),
     mcp_config: z.record(z.string(), z.boolean()).optional(),
     skill_files: z.record(z.string(), z.unknown()).optional(),
     input_files: z.array(inputFileSchema).optional(),
@@ -134,6 +136,20 @@ export async function sendMessageAction(input: SendMessageInput) {
   };
 }
 
+const cancelSessionSchema = z.object({
+  sessionId: z.string().trim().min(1, "缺少会话 ID"),
+  reason: z.string().optional().nullable(),
+});
+
+export type CancelSessionInput = z.infer<typeof cancelSessionSchema>;
+
+export async function cancelSessionAction(input: CancelSessionInput) {
+  const { sessionId, reason } = cancelSessionSchema.parse(input);
+  return chatService.cancelSession(sessionId, {
+    reason: reason ?? undefined,
+  });
+}
+
 const deleteSessionSchema = z.object({
   sessionId: z.string().trim().min(1, "缺少会话 ID"),
 });
@@ -143,4 +159,16 @@ export type DeleteSessionInput = z.infer<typeof deleteSessionSchema>;
 export async function deleteSessionAction(input: DeleteSessionInput) {
   const { sessionId } = deleteSessionSchema.parse(input);
   await chatService.deleteSession(sessionId);
+}
+
+const renameSessionTitleSchema = z.object({
+  sessionId: z.string().trim().min(1, "缺少会话 ID"),
+  title: z.string().trim().min(1, "请输入会话名称").max(255, "会话名称过长"),
+});
+
+export type RenameSessionTitleInput = z.infer<typeof renameSessionTitleSchema>;
+
+export async function renameSessionTitleAction(input: RenameSessionTitleInput) {
+  const { sessionId, title } = renameSessionTitleSchema.parse(input);
+  return chatService.updateSession(sessionId, { title });
 }

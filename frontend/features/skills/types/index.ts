@@ -38,6 +38,15 @@ export interface SkillInstallUpdateInput {
   enabled?: boolean | null;
 }
 
+export interface SkillInstallBulkUpdateInput {
+  enabled: boolean;
+  install_ids?: number[] | null;
+}
+
+export interface SkillInstallBulkUpdateResponse {
+  updated_count: number;
+}
+
 export interface SkillImportCandidate {
   relative_path: string;
   skill_name: string | null;

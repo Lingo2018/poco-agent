@@ -2,7 +2,14 @@
 
 import * as React from "react";
 import { Badge } from "@/components/ui/badge";
-import { Zap, Server, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
+import {
+  Zap,
+  Server,
+  AppWindow,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+} from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -17,12 +24,15 @@ import type {
   SkillUse,
   McpStatusItem,
   ConfigSnapshot,
+  BrowserState,
 } from "@/features/chat/types";
+import { useT } from "@/lib/i18n/client";
 
 interface StatusBarProps {
   // Runtime execution data (deprecated, now using configSnapshot)
   skills?: SkillUse[];
   mcpStatuses?: McpStatusItem[];
+  browser?: BrowserState | null;
   // Configuration snapshot from session creation
   configSnapshot?: ConfigSnapshot | null;
 }
@@ -30,8 +40,10 @@ interface StatusBarProps {
 export function StatusBar({
   skills = [],
   mcpStatuses = [],
+  browser = null,
   configSnapshot,
 }: StatusBarProps) {
+  const { t } = useT("translation");
   const [mcpServers, setMcpServers] = React.useState<McpServer[]>([]);
   const [allSkills, setAllSkills] = React.useState<Skill[]>([]);
 
@@ -69,11 +81,23 @@ export function StatusBar({
       .filter((skill): skill is Skill => skill !== undefined);
   }, [configSnapshot?.skill_ids, allSkills]);
 
+  const visibleMcpStatuses = React.useMemo(() => {
+    // Hide built-in/internal MCP servers (e.g. executor-injected Playwright MCP).
+    return (mcpStatuses ?? []).filter((mcp) => {
+      const name = (mcp?.server_name || "").trim();
+      return !name.startsWith("__poco_");
+    });
+  }, [mcpStatuses]);
+
   // Prefer config snapshot data, fallback to runtime data
   const hasSkills = configuredSkills.length > 0 || skills.length > 0;
-  const hasMcp = configuredMcpServers.length > 0 || mcpStatuses.length > 0;
+  const hasMcp =
+    configuredMcpServers.length > 0 || visibleMcpStatuses.length > 0;
+  const hasBrowser = Boolean(
+    configSnapshot?.browser_enabled || browser?.enabled,
+  );
 
-  if (!hasSkills && !hasMcp) {
+  if (!hasSkills && !hasMcp && !hasBrowser) {
     return null;
   }
 
@@ -94,7 +118,7 @@ export function StatusBar({
           server_name: server.name,
           status: "configured" as const,
         }))
-      : mcpStatuses;
+      : visibleMcpStatuses;
 
   const getSkillStatusIcon = (status: string) => {
     if (status === "configured") {
@@ -127,6 +151,22 @@ export function StatusBar({
   return (
     <div className="flex items-center gap-2 px-4 py-2.5 border-t border-border bg-muted/20">
       <TooltipProvider delayDuration={200}>
+        {/* Browser Card */}
+        {hasBrowser && (
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-border/60 hover:border-border hover:shadow-sm transition-all cursor-pointer group">
+            <AppWindow className="size-3.5 text-foreground group-hover:text-foreground/80 transition-colors" />
+            <span className="text-xs font-medium text-foreground">
+              {t("chat.statusBar.browser")}
+            </span>
+            <Badge
+              variant="secondary"
+              className="text-xs h-5 px-1.5 bg-muted text-foreground"
+            >
+              {t("common.enabled")}
+            </Badge>
+          </div>
+        )}
+
         {/* Skills Card */}
         {hasSkills && (
           <Tooltip>
@@ -134,7 +174,9 @@ export function StatusBar({
               <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-border/60 hover:border-border hover:shadow-sm transition-all cursor-pointer group">
                 <Zap className="size-3.5 text-foreground group-hover:text-foreground/80 transition-colors" />
                 <span className="text-xs font-medium text-foreground">
-                  {configuredSkills.length > 0 ? "技能配置" : "技能使用"}
+                  {configuredSkills.length > 0
+                    ? t("chat.statusBar.skillsConfigured")
+                    : t("chat.statusBar.skillsUsed")}
                 </span>
                 <Badge
                   variant="secondary"
@@ -172,8 +214,8 @@ export function StatusBar({
                 <Server className="size-3.5 text-foreground group-hover:text-foreground/80 transition-colors" />
                 <span className="text-xs font-medium text-foreground">
                   {configuredMcpServers.length > 0
-                    ? "MCP 服务器配置"
-                    : "MCP 服务器"}
+                    ? t("chat.statusBar.mcpConfigured")
+                    : t("chat.statusBar.mcp")}
                 </span>
                 <Badge
                   variant="secondary"

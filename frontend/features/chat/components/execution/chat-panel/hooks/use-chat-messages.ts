@@ -238,7 +238,7 @@ export function useChatMessages({
     // Setup polling
     let interval: NodeJS.Timeout;
 
-    const isTerminal = ["completed", "failed", "stopped"].includes(
+    const isTerminal = ["completed", "failed", "stopped", "canceled"].includes(
       session.status,
     );
 
@@ -278,6 +278,13 @@ export function useChatMessages({
   // Determine if session is running/active
   const isSessionActive =
     session?.status === "running" || session?.status === "accepted";
+
+  // Reset typing state when session becomes inactive
+  useEffect(() => {
+    if (!isSessionActive) {
+      setIsTyping(false);
+    }
+  }, [isSessionActive]);
 
   // Calculate messages for display
   const displayMessages = useMemo(() => {

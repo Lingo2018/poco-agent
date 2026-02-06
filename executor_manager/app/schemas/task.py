@@ -21,6 +21,8 @@ class TaskConfig(BaseModel):
 
     repo_url: str | None = None
     git_branch: str = "main"
+    # Built-in browser capability toggle (Playwright MCP is injected internally by the executor).
+    browser_enabled: bool = False
     mcp_config: dict = Field(default_factory=dict)
     skill_files: dict = Field(default_factory=dict)
     input_files: list[InputFile] = Field(default_factory=list)
@@ -74,7 +76,7 @@ class TaskCancelRequest(BaseModel):
     """Cancel task request."""
 
     session_id: str
-    reason: str | None = "User cancelled"
+    reason: str | None = "User canceled"
 
 
 class ContainerDeleteRequest(BaseModel):

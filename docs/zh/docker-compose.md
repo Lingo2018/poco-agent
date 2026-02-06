@@ -29,10 +29,13 @@
 ./scripts/quickstart.sh
 ```
 
+脚本默认会进入交互模式，按提示输入 API Key（Anthropic 必填）并写入 `.env`。
+如果你需要在 CI 中运行，可使用 `--non-interactive` 和 `--anthropic-key`。
+
 脚本会：
 
 - 复制 `.env.example` -> `.env`（若不存在）
-- 自动检测并写入 `DOCKER_GID`；其余仅在传参时写入（如 `--data-dir` / `--s3-*` / `--cors-origins`）
+- 自动检测并写入 `DOCKER_GID`；交互模式会写入 API Key/模型配置；其余仅在传参时写入（如 `--data-dir` / `--s3-*` / `--cors-origins`）
 - 创建 `oss_data/` 与 `tmp_workspace/`；默认尝试将 `oss_data/` chown 为 `10001:10001`（RustFS 用户）
 - 为 `oss_data/` 与 `tmp_workspace/` 写入 `.gitignore`（内容为 `*`）
 - 默认拉取 executor 镜像并启动服务
@@ -45,7 +48,7 @@
 - `--no-init-bucket`：跳过创建 bucket
 - `--no-chown-rustfs`：跳过将 `oss_data/` 改为 `10001:10001`
 
-执行脚本后请检查并填写 `.env` 中的必需项（如 `ANTHROPIC_AUTH_TOKEN`）。
+执行脚本后请确认 `.env` 里已设置 `ANTHROPIC_AUTH_TOKEN`。
 
 如果你更偏好手动启动，继续按下方步骤执行。
 
@@ -91,7 +94,9 @@ docker compose up -d
 ```bash
 export BACKEND_IMAGE=ghcr.io/poco-ai/poco-backend:v0.1.0
 export EXECUTOR_MANAGER_IMAGE=ghcr.io/poco-ai/poco-executor-manager:v0.1.0
-export EXECUTOR_IMAGE=ghcr.io/poco-ai/poco-executor:v0.1.0
+export EXECUTOR_IMAGE=ghcr.io/poco-ai/poco-executor:lite
+# 可选：启用可视化浏览器（noVNC + Chrome）的 executor 镜像（用于 browser_enabled=true）
+# export EXECUTOR_BROWSER_IMAGE=ghcr.io/poco-ai/poco-executor:full
 export FRONTEND_IMAGE=ghcr.io/poco-ai/poco-frontend:v0.1.0
 
 docker compose up -d

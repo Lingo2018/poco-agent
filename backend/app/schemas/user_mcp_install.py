@@ -12,6 +12,15 @@ class UserMcpInstallUpdateRequest(BaseModel):
     enabled: bool | None = None
 
 
+class UserMcpInstallBulkUpdateRequest(BaseModel):
+    enabled: bool
+    install_ids: list[int] | None = None
+
+
+class UserMcpInstallBulkUpdateResponse(BaseModel):
+    updated_count: int
+
+
 class UserMcpInstallResponse(BaseModel):
     id: int
     user_id: str

@@ -1,24 +1,34 @@
 "use client";
 
 import * as React from "react";
-import { MessageSquare, Loader2 } from "lucide-react";
+import { MessageSquare, Loader2, Pencil } from "lucide-react";
 import { ChatMessageList } from "../../chat/chat-message-list";
 import { TodoList } from "./todo-list";
 import { StatusBar } from "./status-bar";
 import { PendingMessageList } from "./pending-message-list";
-import { ChatInput } from "./chat-input";
+import { ChatInput, type ChatInputRef } from "./chat-input";
 import { UserInputRequestCard } from "./user-input-request-card";
 import { PlanApprovalCard } from "./plan-approval-card";
-import { PanelHeader } from "@/components/shared/panel-header";
+import {
+  PanelHeader,
+  PanelHeaderAction,
+} from "@/components/shared/panel-header";
 import { useChatMessages } from "./hooks/use-chat-messages";
 import { usePendingMessages } from "./hooks/use-pending-messages";
 import { useUserInputRequests } from "./hooks/use-user-input-requests";
+import {
+  cancelSessionAction,
+  renameSessionTitleAction,
+} from "@/features/chat/actions/session-actions";
+import { RenameTaskDialog } from "@/features/projects/components/rename-task-dialog";
 import type {
   ExecutionSession,
   StatePatch,
   InputFile,
 } from "@/features/chat/types";
 import { useT } from "@/lib/i18n/client";
+import { toast } from "sonner";
+import { useTaskHistoryContext } from "@/features/projects/contexts/task-history-context";
 
 interface ChatPanelProps {
   session: ExecutionSession | null;
@@ -53,6 +63,10 @@ export function ChatPanel({
   onIconClick,
 }: ChatPanelProps) {
   const { t } = useT("translation");
+  const { refreshTasks } = useTaskHistoryContext();
+  const [isCancelling, setIsCancelling] = React.useState(false);
+  const [isRenameDialogOpen, setIsRenameDialogOpen] = React.useState(false);
+  const inputRef = React.useRef<ChatInputRef>(null);
 
   // Message management hook
   const {
@@ -85,6 +99,60 @@ export function ChatPanel({
 
   const activeUserInput = userInputRequests[0];
 
+  const isSessionCancelable =
+    session?.status === "running" || session?.status === "accepted";
+
+  const handleCancel = React.useCallback(async () => {
+    if (!session?.session_id) return;
+    if (!isSessionCancelable) return;
+    if (isCancelling) return;
+
+    const prevStatus = session.status;
+    setIsCancelling(true);
+    // Optimistically mark as terminal so polling/streaming stops immediately.
+    updateSession({ status: "canceled" });
+
+    try {
+      await cancelSessionAction({ sessionId: session.session_id });
+    } catch (error) {
+      console.error("[ChatPanel] Failed to cancel session:", error);
+      // Best-effort revert so the UI doesn't get stuck in a wrong terminal state.
+      updateSession({ status: prevStatus });
+    } finally {
+      setIsCancelling(false);
+    }
+  }, [
+    isCancelling,
+    isSessionCancelable,
+    session?.session_id,
+    session?.status,
+    updateSession,
+  ]);
+
+  const handleRename = React.useCallback(
+    async (newTitle: string) => {
+      if (!session?.session_id) return;
+      try {
+        await renameSessionTitleAction({
+          sessionId: session.session_id,
+          title: newTitle,
+        });
+        updateSession({ title: newTitle });
+        toast.success(t("task.toasts.renamed"));
+        await refreshTasks();
+      } catch (error) {
+        console.error("[ChatPanel] Failed to rename session title:", error);
+        toast.error(t("task.toasts.renameFailed"));
+      }
+    },
+    [refreshTasks, session?.session_id, t, updateSession],
+  );
+
+  // Handle edit message - load content into input
+  const handleEditMessage = React.useCallback((content: string) => {
+    inputRef.current?.setValueAndFocus(content);
+  }, []);
+
   // Handle send from input
   const handleSend = async (content: string, attachments?: InputFile[]) => {
     if (!session?.session_id) return;
@@ -112,11 +180,15 @@ export function ChatPanel({
     session?.config_snapshot &&
     ((session.config_snapshot.mcp_server_ids &&
       session.config_snapshot.mcp_server_ids.length > 0) ||
+      session.config_snapshot.browser_enabled === true ||
       (session.config_snapshot.skill_ids &&
         session.config_snapshot.skill_ids.length > 0));
   const hasSkills =
     statePatch?.skills_used && statePatch.skills_used.length > 0;
   const hasMcp = statePatch?.mcp_status && statePatch.mcp_status.length > 0;
+  const hasBrowser = Boolean(
+    session?.config_snapshot?.browser_enabled || statePatch?.browser?.enabled,
+  );
 
   return (
     <div className="flex flex-col h-full bg-background min-w-0">
@@ -128,8 +200,18 @@ export function ChatPanel({
           session?.new_message?.title ||
           t("chat.executionTitle")
         }
-        description={t("chat.emptyStateDesc")}
+        description={session?.title || t("chat.emptyStateDesc")}
         onIconClick={onIconClick}
+        action={
+          session?.session_id ? (
+            <PanelHeaderAction
+              onClick={() => setIsRenameDialogOpen(true)}
+              title={t("sidebar.rename")}
+            >
+              <Pencil className="size-4" />
+            </PanelHeaderAction>
+          ) : null
+        }
       />
 
       {/* Top Section: Todo List (full width) */}
@@ -155,16 +237,18 @@ export function ChatPanel({
             isTyping={showTypingIndicator}
             internalContextsByUserMessageId={internalContextsByUserMessageId}
             runUsageByUserMessageId={runUsageByUserMessageId}
+            onEditMessage={handleEditMessage}
           />
         )}
       </div>
 
       {/* Status Bar - Skills and MCP */}
-      {(hasConfigSnapshot || hasSkills || hasMcp) && (
+      {(hasConfigSnapshot || hasSkills || hasMcp || hasBrowser) && (
         <StatusBar
           configSnapshot={session?.config_snapshot}
           skills={statePatch?.skills_used}
           mcpStatuses={statePatch?.mcp_status}
+          browser={statePatch?.browser}
         />
       )}
 
@@ -205,8 +289,19 @@ export function ChatPanel({
 
       {/* Input */}
       <ChatInput
+        ref={inputRef}
         onSend={handleSend}
-        disabled={!session?.session_id || !!activeUserInput}
+        onCancel={handleCancel}
+        canCancel={isSessionCancelable || isCancelling}
+        isCancelling={isCancelling}
+        disabled={!session?.session_id || !!activeUserInput || isCancelling}
+      />
+
+      <RenameTaskDialog
+        open={isRenameDialogOpen}
+        onOpenChange={setIsRenameDialogOpen}
+        taskName={session?.title || ""}
+        onRename={handleRename}
       />
     </div>
   );

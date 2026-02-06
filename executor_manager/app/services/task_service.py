@@ -100,12 +100,14 @@ class TaskService:
             if container_id or container_mode == "persistent":
                 container_pool = TaskDispatcher.get_container_pool()
                 step_started = time.perf_counter()
+                browser_enabled = bool(config.get("browser_enabled"))
                 (
                     container_url,
                     container_id,
                 ) = await container_pool.get_or_create_container(
                     session_id=session_id,
                     user_id=user_id,
+                    browser_enabled=browser_enabled,
                     container_mode=container_mode,
                     container_id=container_id,
                 )
@@ -119,6 +121,7 @@ class TaskService:
                         "user_id": user_id,
                         "container_id": container_id,
                         "container_mode": container_mode,
+                        "browser_enabled": browser_enabled,
                     },
                 )
 

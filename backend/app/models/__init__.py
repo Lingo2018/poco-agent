@@ -4,12 +4,14 @@ from app.models.agent_message import AgentMessage
 from app.models.agent_run import AgentRun
 from app.models.agent_scheduled_task import AgentScheduledTask
 from app.models.agent_session import AgentSession
+from app.models.claude_md import UserClaudeMdSetting
 from app.models.env_var import UserEnvVar
 from app.models.mcp_server import McpServer
 from app.models.project import Project
 from app.models.skill import Skill
 from app.models.skill_import_job import SkillImportJob
 from app.models.slash_command import SlashCommand
+from app.models.sub_agent import SubAgent
 from app.models.tool_execution import ToolExecution
 from app.models.usage_log import UsageLog
 from app.models.user_mcp_install import UserMcpInstall
@@ -23,12 +25,14 @@ __all__ = [
     "AgentRun",
     "AgentScheduledTask",
     "AgentSession",
+    "UserClaudeMdSetting",
     "UserEnvVar",
     "McpServer",
     "Project",
     "Skill",
     "SkillImportJob",
     "SlashCommand",
+    "SubAgent",
     "ToolExecution",
     "UsageLog",
     "UserMcpInstall",

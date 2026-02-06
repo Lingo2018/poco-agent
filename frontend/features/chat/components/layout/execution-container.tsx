@@ -3,29 +3,64 @@
 import * as React from "react";
 import { ChatPanel } from "../execution/chat-panel/chat-panel";
 import { ArtifactsPanel } from "../execution/file-panel/artifacts-panel";
+import { ComputerPanel } from "../execution/computer-panel/computer-panel";
 import { MobileExecutionView } from "./mobile-execution-view";
 import { useExecutionSession } from "@/features/chat/hooks/use-execution-session";
 import { useTaskHistoryContext } from "@/features/projects/contexts/task-history-context";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
-import { Loader2 } from "lucide-react";
+import { Layers, Loader2, Monitor } from "lucide-react";
 
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { useT } from "@/lib/i18n/client";
 
 interface ExecutionContainerProps {
   sessionId: string;
 }
 
 export function ExecutionContainer({ sessionId }: ExecutionContainerProps) {
+  const { t } = useT("translation");
   const { refreshTasks } = useTaskHistoryContext();
   const { session, isLoading, error, updateSession } = useExecutionSession({
     sessionId,
     onPollingStop: refreshTasks,
   });
   const isMobile = useIsMobile();
+  const isSessionActive =
+    session?.status === "running" || session?.status === "accepted";
+  const browserEnabled = Boolean(
+    session?.config_snapshot?.browser_enabled ||
+    session?.state_patch?.browser?.enabled,
+  );
+
+  const defaultRightTab = isSessionActive ? "computer" : "artifacts";
+  const [rightTab, setRightTab] = React.useState<string>(defaultRightTab);
+  const didManualSwitchRef = React.useRef(false);
+  const prevDefaultRef = React.useRef<string>(defaultRightTab);
+  const lastSessionIdRef = React.useRef<string | null>(null);
+
+  // Reset right panel tab when session changes.
+  React.useEffect(() => {
+    if (lastSessionIdRef.current === sessionId) return;
+    lastSessionIdRef.current = sessionId;
+    didManualSwitchRef.current = false;
+    prevDefaultRef.current = defaultRightTab;
+    setRightTab(defaultRightTab);
+  }, [defaultRightTab, sessionId]);
+
+  // Smart default: switch to artifacts on completion only if user didn't manually switch.
+  React.useEffect(() => {
+    if (prevDefaultRef.current === defaultRightTab) return;
+    prevDefaultRef.current = defaultRightTab;
+    if (!didManualSwitchRef.current) {
+      setRightTab(defaultRightTab);
+    }
+  }, [defaultRightTab]);
 
   // Loading state
   if (isLoading) {
@@ -62,6 +97,29 @@ export function ExecutionContainer({ sessionId }: ExecutionContainerProps) {
   }
 
   // Desktop resizable layout
+  const tabsSwitch = (
+    <TabsList>
+      <TabsTrigger value="computer">
+        <Monitor className="size-4" />
+        {t("mobile.computer")}
+        {session?.status ? (
+          <Badge
+            variant={isSessionActive ? "secondary" : "outline"}
+            className="ml-1"
+          >
+            {isSessionActive
+              ? t("computer.status.live")
+              : t("computer.status.replay")}
+          </Badge>
+        ) : null}
+      </TabsTrigger>
+      <TabsTrigger value="artifacts">
+        <Layers className="size-4" />
+        {t("mobile.artifacts")}
+      </TabsTrigger>
+    </TabsList>
+  );
+
   return (
     <div className="flex h-screen overflow-hidden bg-background select-text">
       <ResizablePanelGroup direction="horizontal">
@@ -83,11 +141,41 @@ export function ExecutionContainer({ sessionId }: ExecutionContainerProps) {
         {/* Right panel - Artifacts (55%) */}
         <ResizablePanel defaultSize={55} minSize={20}>
           <div className="h-full flex flex-col bg-muted/30 min-w-0">
-            <ArtifactsPanel
-              fileChanges={session?.state_patch.workspace_state?.file_changes}
-              sessionId={sessionId}
-              sessionStatus={session?.status}
-            />
+            <Tabs
+              value={rightTab}
+              onValueChange={(value) => {
+                didManualSwitchRef.current = true;
+                setRightTab(value);
+              }}
+              className="h-full min-h-0 flex flex-col"
+            >
+              <div className="flex-1 min-h-0 overflow-hidden">
+                <TabsContent
+                  value="computer"
+                  className="h-full min-h-0 data-[state=inactive]:hidden"
+                >
+                  <ComputerPanel
+                    sessionId={sessionId}
+                    sessionStatus={session?.status}
+                    browserEnabled={browserEnabled}
+                    headerAction={tabsSwitch}
+                  />
+                </TabsContent>
+                <TabsContent
+                  value="artifacts"
+                  className="h-full min-h-0 data-[state=inactive]:hidden"
+                >
+                  <ArtifactsPanel
+                    fileChanges={
+                      session?.state_patch.workspace_state?.file_changes
+                    }
+                    sessionId={sessionId}
+                    sessionStatus={session?.status}
+                    headerAction={tabsSwitch}
+                  />
+                </TabsContent>
+              </div>
+            </Tabs>
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>

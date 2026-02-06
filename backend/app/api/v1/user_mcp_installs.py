@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 from app.core.deps import get_current_user_id, get_db
 from app.schemas.response import Response, ResponseSchema
 from app.schemas.user_mcp_install import (
+    UserMcpInstallBulkUpdateRequest,
+    UserMcpInstallBulkUpdateResponse,
     UserMcpInstallCreateRequest,
     UserMcpInstallResponse,
     UserMcpInstallUpdateRequest,
@@ -33,6 +35,16 @@ async def create_user_mcp_install(
 ) -> JSONResponse:
     result = service.create_install(db, user_id, request)
     return Response.success(data=result, message="MCP install created")
+
+
+@router.patch("/bulk", response_model=ResponseSchema[UserMcpInstallBulkUpdateResponse])
+async def bulk_update_user_mcp_installs(
+    request: UserMcpInstallBulkUpdateRequest,
+    user_id: str = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+) -> JSONResponse:
+    result = service.bulk_update_installs(db, user_id, request)
+    return Response.success(data=result, message="MCP installs updated")
 
 
 @router.patch("/{install_id}", response_model=ResponseSchema[UserMcpInstallResponse])

@@ -6,6 +6,7 @@ import {
   Mic,
   Plus,
   GitBranch,
+  Chrome,
   ListTodo,
   SquareTerminal,
   Clock,
@@ -22,6 +23,7 @@ import { playFileUploadSound } from "@/lib/utils/sound";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Tooltip,
   TooltipContent,
@@ -44,15 +46,22 @@ import {
   type RunScheduleMode,
 } from "@/features/home/components/run-schedule-dialog";
 import { useSlashCommandAutocomplete } from "@/features/chat/hooks/use-slash-command-autocomplete";
+import { useAppShell } from "@/components/shared/app-shell-context";
 
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 
 export type ComposerMode = "plan" | "task" | "scheduled";
 
+export type RepoUsageMode = "session" | "create_project";
+
 export interface TaskSendOptions {
   attachments?: InputFile[];
   repo_url?: string | null;
   git_branch?: string | null;
+  git_token_env_key?: string | null;
+  repo_usage?: RepoUsageMode | null;
+  project_name?: string | null;
+  browser_enabled?: boolean | null;
   run_schedule?: {
     schedule_mode: RunScheduleMode;
     timezone: string;
@@ -75,6 +84,8 @@ export function TaskComposer({
   onModeChange,
   onSend,
   isSubmitting,
+  allowProjectize = true,
+  onRepoDefaultsSave,
   onFocus,
   onBlur,
 }: {
@@ -85,10 +96,17 @@ export function TaskComposer({
   onModeChange: (mode: ComposerMode) => void;
   onSend: (options?: TaskSendOptions) => void | Promise<void>;
   isSubmitting?: boolean;
+  allowProjectize?: boolean;
+  onRepoDefaultsSave?: (payload: {
+    repo_url: string;
+    git_branch: string | null;
+    git_token_env_key: string | null;
+  }) => void | Promise<void>;
   onFocus?: () => void;
   onBlur?: () => void;
 }) {
   const { t } = useT("translation");
+  const { lng } = useAppShell();
   const isComposing = React.useRef(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = React.useState(false);
@@ -99,9 +117,14 @@ export function TaskComposer({
     textareaRef,
   });
 
+  const [browserEnabled, setBrowserEnabled] = React.useState(false);
+
   const [repoDialogOpen, setRepoDialogOpen] = React.useState(false);
   const [repoUrl, setRepoUrl] = React.useState("");
   const [gitBranch, setGitBranch] = React.useState("main");
+  const [gitTokenEnvKey, setGitTokenEnvKey] = React.useState("");
+  const [repoUsage, setRepoUsage] = React.useState<RepoUsageMode>("session");
+  const [projectName, setProjectName] = React.useState("");
 
   const [runScheduleOpen, setRunScheduleOpen] = React.useState(false);
   const [runScheduleMode, setRunScheduleMode] =
@@ -138,10 +161,68 @@ export function TaskComposer({
     if (derived) setScheduledName(derived);
   }, [mode, scheduledName, value]);
 
+  const envVarsHref = React.useMemo(() => {
+    const clean = (lng || "").trim();
+    return clean ? `/${clean}/capabilities/env-vars` : "/capabilities/env-vars";
+  }, [lng]);
+
+  const derivedProjectName = React.useMemo(() => {
+    const url = repoUrl.trim();
+    if (!url) return "";
+    try {
+      const parsed = new URL(url);
+      const host = parsed.hostname.toLowerCase();
+      if (host !== "github.com" && host !== "www.github.com") return "";
+      const parts = parsed.pathname.split("/").filter(Boolean);
+      if (parts.length < 2) return "";
+      const owner = parts[0];
+      let repo = parts[1];
+      if (repo.endsWith(".git")) repo = repo.slice(0, -4);
+      if (!owner || !repo) return "";
+      return `${owner}/${repo}`;
+    } catch {
+      return "";
+    }
+  }, [repoUrl]);
+
+  // Best-effort default project name when the user chooses "create project".
+  React.useEffect(() => {
+    if (!allowProjectize) return;
+    if (repoUsage !== "create_project") return;
+    if (projectName.trim()) return;
+    if (!derivedProjectName) return;
+    setProjectName(derivedProjectName);
+  }, [allowProjectize, derivedProjectName, projectName, repoUsage]);
+
   const scheduledSummary = React.useMemo(() => {
     const inferred = inferScheduleFromCron(scheduledCron);
     return formatScheduleSummary(inferred, t);
   }, [scheduledCron, t]);
+
+  const handleRepoSave = React.useCallback(async () => {
+    if (isSubmitting || isUploading) return;
+    const url = repoUrl.trim();
+    // Only persist when a non-empty repo URL is provided to avoid accidental clears.
+    if (url && onRepoDefaultsSave) {
+      try {
+        await onRepoDefaultsSave({
+          repo_url: url,
+          git_branch: gitBranch.trim() || null,
+          git_token_env_key: gitTokenEnvKey.trim() || null,
+        });
+      } catch (error) {
+        console.error("[TaskComposer] Failed to persist repo defaults", error);
+      }
+    }
+    setRepoDialogOpen(false);
+  }, [
+    gitBranch,
+    gitTokenEnvKey,
+    isSubmitting,
+    isUploading,
+    onRepoDefaultsSave,
+    repoUrl,
+  ]);
 
   const runScheduleSummary = React.useMemo(() => {
     if (runScheduleMode === "nightly")
@@ -160,6 +241,23 @@ export function TaskComposer({
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    const normalizedName = file.name.trim().toLowerCase();
+    if (
+      attachments.some(
+        (item) => (item.name || "").trim().toLowerCase() === normalizedName,
+      )
+    ) {
+      toast.error(
+        t("hero.toasts.duplicateFileName", {
+          name: file.name,
+        }),
+      );
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      return;
+    }
 
     if (file.size > MAX_FILE_SIZE) {
       toast.error(t("hero.toasts.fileTooLarge"));
@@ -202,6 +300,20 @@ export function TaskComposer({
 
     if (!file) return;
 
+    const normalizedName = file.name.trim().toLowerCase();
+    if (
+      attachments.some(
+        (item) => (item.name || "").trim().toLowerCase() === normalizedName,
+      )
+    ) {
+      toast.error(
+        t("hero.toasts.duplicateFileName", {
+          name: file.name,
+        }),
+      );
+      return;
+    }
+
     if (file.size > MAX_FILE_SIZE) {
       toast.error(t("hero.toasts.fileTooLarge"));
       return;
@@ -241,6 +353,13 @@ export function TaskComposer({
       attachments,
       repo_url: repoUrl.trim() || null,
       git_branch: gitBranch.trim() || null,
+      git_token_env_key: repoUrl.trim() ? gitTokenEnvKey.trim() || null : null,
+      repo_usage: allowProjectize ? repoUsage : null,
+      project_name:
+        allowProjectize && repoUsage === "create_project"
+          ? (projectName.trim() || derivedProjectName || "").trim() || null
+          : null,
+      browser_enabled: browserEnabled,
       run_schedule:
         mode === "scheduled"
           ? null
@@ -270,11 +389,17 @@ export function TaskComposer({
     setRunScheduledAt(null);
   }, [
     attachments,
+    allowProjectize,
+    browserEnabled,
+    derivedProjectName,
     gitBranch,
+    gitTokenEnvKey,
     isSubmitting,
     isUploading,
     mode,
     onSend,
+    projectName,
+    repoUsage,
     repoUrl,
     runScheduleMode,
     runScheduledAt,
@@ -316,7 +441,7 @@ export function TaskComposer({
             <DialogTitle>{t("hero.repo.dialogTitle")}</DialogTitle>
           </DialogHeader>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-[7fr_3fr]">
             <div className="space-y-2">
               <Label htmlFor="repo-url">{t("hero.repo.urlLabel")}</Label>
               <Input
@@ -335,6 +460,84 @@ export function TaskComposer({
                 placeholder={t("hero.repo.branchPlaceholder")}
               />
             </div>
+
+            {allowProjectize && mode !== "scheduled" ? (
+              <div className="space-y-2 md:col-span-2">
+                <Label>{t("hero.repo.usageLabel")}</Label>
+                <RadioGroup
+                  value={repoUsage}
+                  onValueChange={(value) =>
+                    setRepoUsage(value as RepoUsageMode)
+                  }
+                  className="gap-2"
+                >
+                  <label className="flex items-start gap-3 rounded-lg border border-border bg-background px-3 py-2.5">
+                    <RadioGroupItem value="session" className="mt-0.5" />
+                    <div className="min-w-0">
+                      <div className="text-sm font-medium text-foreground">
+                        {t("hero.repo.usage.session.title")}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {t("hero.repo.usage.session.help")}
+                      </div>
+                    </div>
+                  </label>
+
+                  <label className="flex items-start gap-3 rounded-lg border border-border bg-background px-3 py-2.5">
+                    <RadioGroupItem value="create_project" className="mt-0.5" />
+                    <div className="min-w-0">
+                      <div className="text-sm font-medium text-foreground">
+                        {t("hero.repo.usage.createProject.title")}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {t("hero.repo.usage.createProject.help")}
+                      </div>
+                    </div>
+                  </label>
+                </RadioGroup>
+              </div>
+            ) : null}
+
+            {allowProjectize &&
+            mode !== "scheduled" &&
+            repoUsage === "create_project" ? (
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="repo-project-name">
+                  {t("hero.repo.projectNameLabel")}
+                </Label>
+                <Input
+                  id="repo-project-name"
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
+                  placeholder={t("hero.repo.projectNamePlaceholder")}
+                />
+              </div>
+            ) : null}
+
+            {repoUrl.trim() ? (
+              <div className="space-y-2 md:col-span-2">
+                <div className="flex items-center justify-between gap-2">
+                  <Label htmlFor="repo-token-env-key">
+                    {t("hero.repo.tokenKeyLabel")}
+                  </Label>
+                  <a
+                    href={envVarsHref}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    {t("hero.repo.goToEnvVars")}
+                  </a>
+                </div>
+                <Input
+                  id="repo-token-env-key"
+                  value={gitTokenEnvKey}
+                  onChange={(e) => setGitTokenEnvKey(e.target.value)}
+                  placeholder={t("hero.repo.tokenKeyPlaceholder")}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {t("hero.repo.tokenKeyHelp")}
+                </p>
+              </div>
+            ) : null}
           </div>
 
           <DialogFooter>
@@ -345,7 +548,7 @@ export function TaskComposer({
             >
               {t("common.cancel")}
             </Button>
-            <Button type="button" onClick={() => setRepoDialogOpen(false)}>
+            <Button type="button" onClick={handleRepoSave}>
               {t("common.save")}
             </Button>
           </DialogFooter>
@@ -498,28 +701,9 @@ export function TaskComposer({
         </div>
       ) : null}
 
-      {mode === "scheduled" ? (
-        <div className="px-4 pb-3">
+      <div className="px-4 pb-3 min-h-[32px] flex items-center">
+        {mode === "scheduled" ? (
           <div className="flex flex-wrap items-center gap-2">
-            <Badge
-              variant="secondary"
-              role="button"
-              tabIndex={0}
-              className="cursor-pointer select-none"
-              onClick={() => setScheduledSettingsOpen(true)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  setScheduledSettingsOpen(true);
-                }
-              }}
-              aria-label={t("hero.modes.scheduled")}
-              title={t("hero.modes.scheduled")}
-            >
-              <Clock className="size-3" />
-              {scheduledSummary}
-            </Badge>
-
             {(scheduledName || "").trim().length > 0 ? (
               <Badge
                 variant="outline"
@@ -542,13 +726,13 @@ export function TaskComposer({
               </Badge>
             ) : null}
           </div>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
 
       {/* 底部工具栏 */}
       <div className="flex items-center justify-between px-3 pb-3">
         {/* 左侧：模式选择（Icon + Hover Label） */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-h-[32px]">
           <div className="flex items-center gap-1 rounded-2xl border border-border bg-muted/20 p-1">
             <Tooltip>
               <TooltipTrigger asChild>
@@ -604,8 +788,6 @@ export function TaskComposer({
                   title={t("hero.modes.scheduled")}
                   onClick={() => {
                     onModeChange("scheduled");
-                    // Open the schedule dialog directly to avoid occupying the composer UI.
-                    requestAnimationFrame(() => setScheduledSettingsOpen(true));
                   }}
                 >
                   <Clock className="size-4" />
@@ -618,6 +800,29 @@ export function TaskComposer({
                 </div>
               </TooltipContent>
             </Tooltip>
+          </div>
+
+          <div className="h-8 flex items-center">
+            {mode === "scheduled" ? (
+              <Badge
+                variant="secondary"
+                role="button"
+                tabIndex={0}
+                className="h-8 rounded-xl cursor-pointer select-none px-3 py-0"
+                onClick={() => setScheduledSettingsOpen(true)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setScheduledSettingsOpen(true);
+                  }
+                }}
+                aria-label={t("hero.modes.scheduled")}
+                title={t("hero.modes.scheduled")}
+              >
+                <Clock className="size-3" />
+                {scheduledSummary}
+              </Badge>
+            ) : null}
           </div>
         </div>
 
@@ -668,6 +873,26 @@ export function TaskComposer({
               </TooltipContent>
             </Tooltip>
           ) : null}
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                variant={browserEnabled ? "secondary" : "ghost"}
+                size="icon"
+                disabled={isSubmitting || isUploading}
+                className="size-9 rounded-xl hover:bg-accent"
+                aria-label={t("hero.browser.toggle")}
+                title={t("hero.browser.toggle")}
+                onClick={() => setBrowserEnabled((prev) => !prev)}
+              >
+                <Chrome className="size-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="top" sideOffset={8}>
+              {t("hero.browser.toggle")}
+            </TooltipContent>
+          </Tooltip>
 
           <Tooltip>
             <TooltipTrigger asChild>

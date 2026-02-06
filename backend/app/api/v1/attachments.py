@@ -15,13 +15,23 @@ router = APIRouter(prefix="/attachments", tags=["attachments"])
 
 storage_service = S3StorageService()
 
-_FILENAME_CLEAN = re.compile(r"[^a-zA-Z0-9._-]+")
+_CONTROL_CHARS = re.compile(r"[\x00-\x1f\x7f-\x9f]+")
 
 
-def _sanitize_filename(filename: str) -> str:
-    clean = os.path.basename(filename or "").strip()
-    clean = _FILENAME_CLEAN.sub("_", clean)
-    return clean or "upload.bin"
+def _normalize_upload_filename(filename: str) -> str:
+    """Normalize an upload filename for display and workspace staging."""
+    raw = (filename or "").strip().replace("\\", "/")
+    raw = raw.split("/")[-1].strip()
+
+    # Many multipart parsers decode header bytes as latin-1. If the client actually
+    # sent UTF-8 bytes, this results in mojibake. Best-effort fix.
+    try:
+        raw = raw.encode("latin-1").decode("utf-8")
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        pass
+
+    raw = _CONTROL_CHARS.sub("", raw).strip()
+    return raw or "upload.bin"
 
 
 def _get_file_size(file: UploadFile) -> int | None:
@@ -43,9 +53,10 @@ async def upload_attachment(
     settings = get_settings()
     max_size_bytes = settings.max_upload_size_mb * 1024 * 1024
 
-    filename = _sanitize_filename(file.filename or "")
+    original_name = _normalize_upload_filename(file.filename or "")
     attachment_id = str(uuid.uuid4())
-    key = f"attachments/{user_id}/{attachment_id}/{filename}"
+    # Use a stable object name to avoid any encoding/sanitization issues with filenames.
+    key = f"attachments/{user_id}/{attachment_id}/file"
 
     size = _get_file_size(file)
     if size is not None and size > max_size_bytes:
@@ -65,7 +76,7 @@ async def upload_attachment(
     payload = InputFile(
         id=attachment_id,
         type="file",
-        name=filename,
+        name=original_name,
         source=key,
         size=size,
         content_type=file.content_type,

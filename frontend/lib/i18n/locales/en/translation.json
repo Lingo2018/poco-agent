@@ -7,6 +7,7 @@
     "newTask": "New Task",
     "search": "Search",
     "library": "Capabilities",
+    "scheduledTasks": "Scheduled Tasks",
     "projects": "Projects",
     "newProject": "New Project",
     "newProjectPrompt": "Enter project name:",
@@ -61,7 +62,32 @@
       "urlLabel": "GitHub URL",
       "urlPlaceholder": "e.g. https://github.com/org/repo",
       "branchLabel": "Branch",
-      "branchPlaceholder": "e.g. main"
+      "branchPlaceholder": "e.g. main",
+      "usageLabel": "Usage",
+      "usage": {
+        "session": {
+          "title": "Use for this task only (no project)",
+          "help": "Best for quick reading/understanding; won't create a project"
+        },
+        "createProject": {
+          "title": "Create a project (long-term)",
+          "help": "Best for ongoing work; will be saved as the project's default repo"
+        }
+      },
+      "projectNameLabel": "Project name",
+      "projectNamePlaceholder": "e.g. owner/repo",
+      "tokenKeyLabel": "GitHub token env key (optional)",
+      "tokenKeyPlaceholder": "e.g. GITHUB_TOKEN",
+      "tokenKeyHelp": "Used for cloning private repos. Set the key value in Env Vars first.",
+      "goToEnvVars": "Go to Env Vars",
+      "toasts": {
+        "missingGithubUrl": "Please enter a GitHub URL",
+        "createProjectFailed": "Failed to create project. Please try again.",
+        "projectCreated": "Project created: {{name}}"
+      }
+    },
+    "browser": {
+      "toggle": "Browser"
     },
     "runSchedule": {
       "toggle": "Run time",
@@ -92,7 +118,9 @@
     "toasts": {
       "uploadSuccess": "File uploaded successfully",
       "uploadFailed": "File upload failed",
-      "fileTooLarge": "File too large, max 100MB supported"
+      "actionFailed": "Action failed, please try again",
+      "fileTooLarge": "File too large, max 100MB supported",
+      "duplicateFileName": "An attachment named {{name}} already exists. Please remove or rename it."
     },
     "mcpSelector": {
       "title": "Select MCP Servers",
@@ -102,6 +130,12 @@
       "selected": "{{count}}/{{total}} servers selected",
       "cancel": "Cancel",
       "confirm": "Confirm"
+    },
+    "warnings": {
+      "tooManyMcps": "Too many MCP servers enabled ({{count}}). This may slow down system loading and reduce performance.",
+      "tooManySkills": "Too many skills enabled ({{count}}). This may slow down system loading and reduce performance.",
+      "mcpLimitReached": "Enabling this MCP will exceed the recommended limit (3 servers). Too many MCPs may slow down system loading.",
+      "skillLimitReached": "Enabling this skill will exceed the recommended limit (5 skills). Too many skills may slow down system loading."
     }
   },
   "prompts": {
@@ -141,6 +175,8 @@
     "emptyState": "Start a new conversation",
     "emptyStateDesc": "Enter a message to start chatting with the AI assistant",
     "stopGenerating": "Stop Generating",
+    "cancelTask": "Cancel task",
+    "cancelTaskConfirm": "Cancel the current task?",
     "regenerate": "Regenerate",
     "model": "Model",
     "tokens": "Tokens",
@@ -177,13 +213,27 @@
     "subagentTranscript": "Subagent transcript",
     "input": "Input",
     "output": "Output",
-    "scrollToLatestMessage": "Jump to latest message"
+    "scrollToLatestMessage": "Jump to latest message",
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "copyMessage": "Copy message",
+    "editMessage": "Edit message",
+    "statusBar": {
+      "browser": "Browser",
+      "openDesktop": "Open desktop",
+      "desktopPreparing": "Preparing desktop link",
+      "skillsConfigured": "Skills (configured)",
+      "skillsUsed": "Skills",
+      "mcpConfigured": "MCP servers (configured)",
+      "mcp": "MCP servers"
+    }
   },
   "status": {
     "pending": "Pending",
     "running": "Running",
     "completed": "Completed",
     "failed": "Failed",
+    "canceled": "Canceled",
     "loading": "Loading...",
     "progress": "Progress"
   },
@@ -213,8 +263,58 @@
   },
   "mobile": {
     "chat": "Chat",
+    "computer": "Computer",
     "artifacts": "Artifacts",
     "status": "Status"
+  },
+  "computer": {
+    "title": "Poco Computer",
+    "description": "Watch browser and terminal steps while running",
+    "status": {
+      "live": "Live",
+      "replay": "Replay"
+    },
+    "tabs": {
+      "browser": "Browser",
+      "terminal": "Terminal"
+    },
+    "replay": {
+      "empty": "No replay steps yet",
+      "timeline": "Timeline",
+      "noSelection": "(no step selected)",
+      "stepCounter": "{{current}} / {{total}}",
+      "durationMs": "{{ms}} ms",
+      "durationSec": "{{sec}} s",
+      "controls": {
+        "first": "First",
+        "prev": "Prev",
+        "play": "Play",
+        "pause": "Pause",
+        "next": "Next",
+        "latest": "Latest"
+      },
+      "filter": {
+        "all": "All",
+        "browser": "Browser",
+        "terminal": "Terminal"
+      },
+      "limitHint": "Showing only the first {{limit}} steps"
+    },
+    "browser": {
+      "screenshotAlt": "Browser screenshot",
+      "screenshotLoading": "Loading screenshot...",
+      "screenshotUnavailable": "No screenshot available",
+      "steps": "Browser steps",
+      "noSteps": "No browser steps yet"
+    },
+    "terminal": {
+      "noSteps": "No terminal output yet",
+      "unknownCommand": "(unknown command)",
+      "noOutput": "(no output)",
+      "running": "Running...",
+      "exitCode": "Exit code {{code}}",
+      "killed": "Killed by timeout"
+    }
   },
   "artifacts": {
     "empty": {
@@ -253,7 +353,7 @@
   },
   "library": {
     "title": "Capabilities",
-    "subtitle": "Manage your skills, plugins and scheduled tasks",
+    "subtitle": "Manage your skills, plugins and tools",
     "comingSoon": "Coming Soon",
     "skillsStore": {
       "title": "Skills",
@@ -334,6 +434,46 @@
         "mcp": "MCP"
       }
     },
+    "personalization": {
+      "card": {
+        "title": "Personalization",
+        "description": "Set persistent preferences and instructions for all your tasks",
+        "feature1": "User-level global scope",
+        "feature2": "Custom instructions",
+        "feature3": "Update anytime, applied on the next run",
+        "action": "Open"
+      },
+      "header": {
+        "title": "Personalization",
+        "refresh": "Refresh",
+        "clear": "Clear",
+        "save": "Save",
+        "saving": "Saving…"
+      },
+      "customInstructions": {
+        "title": "Custom instructions",
+        "description": "These instructions influence how the agent responds and behaves across all future tasks.",
+        "hintScope": "This is global per user: new chats, continued chats, and scheduled tasks will all apply it.",
+        "hintSecrets": "Do not store API keys or other secrets here.",
+        "status": {
+          "enabled": "Enabled",
+          "disabled": "Disabled"
+        },
+        "editor": {
+          "label": "Instruction content",
+          "insertTemplate": "Insert example",
+          "placeholder": "e.g. Always respond in Chinese; keep a professional tone; prefer bullet points…",
+          "tip": "Tip: Turning it off means the instructions are not applied. You can still edit and save for later.",
+          "template": "# Custom Instructions Example\n\n## Output style\n- Always respond in Chinese\n- Prefer clear structure and bullet points\n\n## Coding rules\n- Code comments must be in English\n- Use type annotations for Python (3.12+)\n"
+        }
+      },
+      "toasts": {
+        "saved": "Saved",
+        "cleared": "Cleared",
+        "refreshed": "Refreshed",
+        "error": "Action failed, please retry"
+      }
+    },
     "slashCommands": {
       "card": {
         "title": "Slash Commands",
@@ -383,6 +523,63 @@
         "created": "Command created",
         "updated": "Command updated",
         "deleted": "Command deleted",
+        "error": "Action failed"
+      }
+    },
+    "subAgents": {
+      "card": {
+        "title": "Sub Agents",
+        "description": "Create reusable specialized sub agents for context isolation and parallelization.",
+        "feature1": "Isolated context to keep main chat clean",
+        "feature2": "Run multiple sub agents in parallel",
+        "feature3": "Limit tools/models for better control",
+        "action": "Manage Sub Agents"
+      },
+      "header": {
+        "title": "Sub Agents",
+        "add": "Add Sub Agent"
+      },
+      "searchPlaceholder": "Search sub agents...",
+      "summary": "Sub Agents",
+      "enabled": "Enabled",
+      "empty": "No sub agents yet",
+      "mode": {
+        "raw": "Markdown",
+        "structured": "Structured"
+      },
+      "models": {
+        "inherit": "Inherit"
+      },
+      "delete": {
+        "title": "Delete sub agent?",
+        "description": "After deletion, this sub agent will no longer be available in sessions."
+      },
+      "dialog": {
+        "createTitle": "Create sub agent",
+        "editTitle": "Edit sub agent"
+      },
+      "fields": {
+        "name": "Name",
+        "namePlaceholder": "code-reviewer",
+        "enabled": "Enabled",
+        "description": "Description",
+        "descriptionOptional": "Description (optional)",
+        "descriptionPlaceholder": "Used for quality, security, and maintainability reviews.",
+        "model": "Model",
+        "tools": "Tools",
+        "toolsPlaceholder": "Read, Grep, Glob",
+        "toolsHint": "Leave empty to inherit all available tools.",
+        "prompt": "System Prompt",
+        "promptPlaceholder": "You are an expert code reviewer...",
+        "rawMarkdown": "Markdown",
+        "rawMarkdownPlaceholder": "Paste the full .md here (YAML front matter required; name must match)",
+        "rawMarkdownHint": "Tip: raw mode is staged into ~/.claude/agents and loaded by the SDK."
+      },
+      "toasts": {
+        "loadError": "Failed to load sub agents",
+        "created": "Sub agent created",
+        "updated": "Sub agent updated",
+        "deleted": "Sub agent deleted",
         "error": "Action failed"
       }
     },
@@ -658,6 +855,7 @@
       "actions": {
         "enable": "Enable",
         "disable": "Disable",
+        "uninstall": "Uninstall",
         "settings": "Configure",
         "configure": "Configure MCP Server"
       },
@@ -682,8 +880,18 @@
       "toasts": {
         "enabled": "MCP server enabled",
         "disabled": "MCP server disabled",
+        "uninstalled": "MCP server uninstalled",
         "error": "Operation failed, please try again"
       }
+    }
+  },
+  "task": {
+    "renameDescription": "Enter a new task name",
+    "nameLabel": "Task name",
+    "namePlaceholder": "Enter task name",
+    "toasts": {
+      "renamed": "Task renamed",
+      "renameFailed": "Failed to rename task"
     }
   },
   "project": {
@@ -715,6 +923,16 @@
     "cancel": "Cancel",
     "create": "Create",
     "delete": "Delete",
-    "save": "Save"
+    "save": "Save",
+    "confirm": "Confirm",
+    "enabled": "Enabled"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {{page}}",
+    "of": "/ {{total}}",
+    "rowsPerPage": "Rows per page",
+    "items": "items"
   }
 }

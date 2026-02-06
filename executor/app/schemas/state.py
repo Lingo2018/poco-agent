@@ -44,10 +44,17 @@ class WorkspaceState(BaseModel):
     last_change: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
+class BrowserState(BaseModel):
+    """Browser/desktop capability state exposed to the UI."""
+
+    enabled: bool = False
+
+
 class AgentCurrentState(BaseModel):
     """Current execution state of the agent."""
 
     todos: list[TodoItem] = Field(default_factory=list)
     mcp_status: list[McpStatus] = Field(default_factory=list)
+    browser: BrowserState | None = None
     workspace_state: WorkspaceState | None = None
     current_step: str | None = None

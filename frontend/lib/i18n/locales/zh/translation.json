@@ -7,6 +7,7 @@
     "newTask": "新建任务",
     "search": "搜索",
     "library": "能力",
+    "scheduledTasks": "定时任务",
     "projects": "项目",
     "newProject": "新建项目",
     "newProjectPrompt": "请输入项目名称：",
@@ -61,7 +62,32 @@
       "urlLabel": "GitHub 链接",
       "urlPlaceholder": "例如：https://github.com/org/repo",
       "branchLabel": "分支",
-      "branchPlaceholder": "例如：main"
+      "branchPlaceholder": "例如：main",
+      "usageLabel": "用途",
+      "usage": {
+        "session": {
+          "title": "仅本次使用（不创建项目）",
+          "help": "适合快速阅读/理解代码；不会新增项目"
+        },
+        "createProject": {
+          "title": "创建为项目（长期维护）",
+          "help": "适合持续维护/多次任务；创建后将作为项目默认仓库"
+        }
+      },
+      "projectNameLabel": "项目名称",
+      "projectNamePlaceholder": "例如：owner/repo",
+      "tokenKeyLabel": "GitHub Token 环境变量 Key（可选）",
+      "tokenKeyPlaceholder": "例如：GITHUB_TOKEN",
+      "tokenKeyHelp": "用于克隆私有仓库；请先在「环境变量」中设置该 Key 的值",
+      "goToEnvVars": "去环境变量设置",
+      "toasts": {
+        "missingGithubUrl": "请输入 GitHub 地址",
+        "createProjectFailed": "创建项目失败，请稍后重试",
+        "projectCreated": "已创建项目：{{name}}"
+      }
+    },
+    "browser": {
+      "toggle": "浏览器"
     },
     "runSchedule": {
       "toggle": "发送时间",
@@ -92,7 +118,9 @@
     "toasts": {
       "uploadSuccess": "文件上传成功",
       "uploadFailed": "文件上传失败",
-      "fileTooLarge": "文件过大，最大支持 100MB"
+      "actionFailed": "操作失败，请重试",
+      "fileTooLarge": "文件过大，最大支持 100MB",
+      "duplicateFileName": "已存在同名附件：{{name}}，请先删除或重命名"
     },
     "mcpSelector": {
       "title": "选择 MCP 服务器",
@@ -102,6 +130,12 @@
       "selected": "已选择 {{count}}/{{total}} 个服务器",
       "cancel": "取消",
       "confirm": "确认"
+    },
+    "warnings": {
+      "tooManyMcps": "启用的 MCP 服务器过多（{{count}} 个），可能会导致系统加载变慢、性能下降。",
+      "tooManySkills": "启用的技能过多（{{count}} 个），可能会导致系统加载变慢、性能下降。",
+      "mcpLimitReached": "启用此 MCP 将超过推荐数量（3 个）。过多的 MCP 可能会导致系统加载变慢。",
+      "skillLimitReached": "启用此技能将超过推荐数量（5 个）。过多的技能可能会导致系统加载变慢。"
     }
   },
   "prompts": {
@@ -141,6 +175,8 @@
     "emptyState": "开始一个新对话",
     "emptyStateDesc": "输入消息开始与 AI 助手对话",
     "stopGenerating": "停止生成",
+    "cancelTask": "取消任务",
+    "cancelTaskConfirm": "确定要取消当前任务吗？",
     "regenerate": "重新生成",
     "model": "模型",
     "tokens": "Token",
@@ -177,13 +213,27 @@
     "subagentTranscript": "子代理过程",
     "input": "输入",
     "output": "输出",
-    "scrollToLatestMessage": "跳转到最新消息"
+    "scrollToLatestMessage": "跳转到最新消息",
+    "expand": "展开",
+    "collapse": "收起",
+    "copyMessage": "复制消息",
+    "editMessage": "编辑消息",
+    "statusBar": {
+      "browser": "浏览器",
+      "openDesktop": "打开桌面",
+      "desktopPreparing": "桌面链接准备中",
+      "skillsConfigured": "技能配置",
+      "skillsUsed": "技能使用",
+      "mcpConfigured": "MCP 服务器配置",
+      "mcp": "MCP 服务器"
+    }
   },
   "status": {
     "pending": "待处理",
     "running": "进行中",
     "completed": "已完成",
     "failed": "失败",
+    "canceled": "已取消",
     "loading": "加载中...",
     "progress": "进度"
   },
@@ -213,8 +263,58 @@
   },
   "mobile": {
     "chat": "对话",
+    "computer": "电脑",
     "artifacts": "产物",
     "status": "状态"
+  },
+  "computer": {
+    "title": "Poco 电脑",
+    "description": "运行中查看浏览器与终端过程",
+    "status": {
+      "live": "实时同步",
+      "replay": "回放"
+    },
+    "tabs": {
+      "browser": "浏览器",
+      "terminal": "终端"
+    },
+    "replay": {
+      "empty": "暂无回放",
+      "timeline": "时间线",
+      "noSelection": "（未选择步骤）",
+      "stepCounter": "{{current}} / {{total}}",
+      "durationMs": "{{ms}} ms",
+      "durationSec": "{{sec}} 秒",
+      "controls": {
+        "first": "从头",
+        "prev": "上一步",
+        "play": "播放",
+        "pause": "暂停",
+        "next": "下一步",
+        "latest": "到最新"
+      },
+      "filter": {
+        "all": "全部",
+        "browser": "浏览器",
+        "terminal": "终端"
+      },
+      "limitHint": "仅展示前 {{limit}} 步"
+    },
+    "browser": {
+      "screenshotAlt": "浏览器截图",
+      "screenshotLoading": "正在加载截图...",
+      "screenshotUnavailable": "暂无截图",
+      "steps": "浏览器步骤",
+      "noSteps": "暂无浏览器步骤"
+    },
+    "terminal": {
+      "noSteps": "暂无终端输出",
+      "unknownCommand": "（未知命令）",
+      "noOutput": "（无输出）",
+      "running": "运行中...",
+      "exitCode": "退出码 {{code}}",
+      "killed": "超时终止"
+    }
   },
   "artifacts": {
     "empty": {
@@ -253,7 +353,7 @@
   },
   "library": {
     "title": "能力",
-    "subtitle": "管理您的技能、插件和定时任务",
+    "subtitle": "管理您的技能、插件和工具",
     "comingSoon": "即将推出",
     "skillsStore": {
       "title": "Skills",
@@ -334,6 +434,46 @@
         "mcp": "MCP 变量"
       }
     },
+    "personalization": {
+      "card": {
+        "title": "个性化",
+        "description": "为你的所有任务设置长期生效的偏好与指令",
+        "feature1": "用户级全局生效",
+        "feature2": "自定义指令",
+        "feature3": "随时更新，下一次任务生效",
+        "action": "打开设置"
+      },
+      "header": {
+        "title": "个性化",
+        "refresh": "刷新",
+        "clear": "清空",
+        "save": "保存",
+        "saving": "保存中..."
+      },
+      "customInstructions": {
+        "title": "自定义指令",
+        "description": "这些指令会影响你后续所有任务的回复方式与行为。",
+        "hintScope": "该设置为用户级全局：创建新会话、继续会话、定时任务都会生效。",
+        "hintSecrets": "不要在这里存放 API Key 等敏感信息。",
+        "status": {
+          "enabled": "已启用",
+          "disabled": "未启用"
+        },
+        "editor": {
+          "label": "指令内容",
+          "insertTemplate": "插入示例",
+          "placeholder": "例如：始终用中文回答；保持专业语气；回答要点优先……",
+          "tip": "提示：关闭开关表示不应用该指令；你仍可编辑并保存内容以便之后启用。",
+          "template": "# 自定义指令示例\n\n## 输出风格\n- 始终使用中文回答\n- 结构清晰、要点优先\n\n## 编码规范\n- 代码注释使用英文\n- Python 使用类型标注（3.12+）\n"
+        }
+      },
+      "toasts": {
+        "saved": "已保存",
+        "cleared": "已清空",
+        "refreshed": "已刷新",
+        "error": "操作失败，请稍后重试"
+      }
+    },
     "slashCommands": {
       "card": {
         "title": "Slash Commands",
@@ -383,6 +523,63 @@
         "created": "命令已创建",
         "updated": "命令已更新",
         "deleted": "命令已删除",
+        "error": "操作失败"
+      }
+    },
+    "subAgents": {
+      "card": {
+        "title": "子代理",
+        "description": "创建可复用的专门化子代理，用于上下文隔离与并行化。",
+        "feature1": "独立上下文，减少主对话噪音",
+        "feature2": "多子代理并发，加速复杂任务",
+        "feature3": "可限制工具与模型，提高可控性",
+        "action": "管理子代理"
+      },
+      "header": {
+        "title": "子代理",
+        "add": "添加子代理"
+      },
+      "searchPlaceholder": "搜索子代理...",
+      "summary": "子代理",
+      "enabled": "已启用",
+      "empty": "暂无子代理",
+      "mode": {
+        "raw": "Markdown",
+        "structured": "结构化"
+      },
+      "models": {
+        "inherit": "继承"
+      },
+      "delete": {
+        "title": "删除子代理？",
+        "description": "删除后将无法在会话中使用该子代理。"
+      },
+      "dialog": {
+        "createTitle": "新增子代理",
+        "editTitle": "编辑子代理"
+      },
+      "fields": {
+        "name": "名称",
+        "namePlaceholder": "code-reviewer",
+        "enabled": "启用",
+        "description": "描述",
+        "descriptionOptional": "描述（可选）",
+        "descriptionPlaceholder": "用于质量、安全和可维护性审查。",
+        "model": "模型",
+        "tools": "工具限制",
+        "toolsPlaceholder": "Read, Grep, Glob",
+        "toolsHint": "留空表示继承所有可用工具。",
+        "prompt": "系统提示",
+        "promptPlaceholder": "你是一位代码审查专家...",
+        "rawMarkdown": "Markdown 内容",
+        "rawMarkdownPlaceholder": "在这里粘贴完整的 .md（必须包含 YAML 前言，且 name 与上方一致）",
+        "rawMarkdownHint": "提示：raw 模式会以文件形式写入 ~/.claude/agents，并由 SDK 自动加载。"
+      },
+      "toasts": {
+        "loadError": "加载子代理列表失败",
+        "created": "子代理已创建",
+        "updated": "子代理已更新",
+        "deleted": "子代理已删除",
         "error": "操作失败"
       }
     },
@@ -658,6 +855,7 @@
       "actions": {
         "enable": "启用",
         "disable": "停用",
+        "uninstall": "卸载",
         "settings": "设置",
         "configure": "配置 MCP 服务器"
       },
@@ -682,8 +880,18 @@
       "toasts": {
         "enabled": "已启用",
         "disabled": "已停用",
+        "uninstalled": "已卸载",
         "error": "操作失败，请稍后重试"
       }
+    }
+  },
+  "task": {
+    "renameDescription": "请输入新的任务名称",
+    "nameLabel": "任务名称",
+    "namePlaceholder": "请输入任务名称",
+    "toasts": {
+      "renamed": "已重命名任务",
+      "renameFailed": "重命名失败"
     }
   },
   "project": {
@@ -715,6 +923,16 @@
     "cancel": "取消",
     "create": "创建",
     "delete": "删除",
-    "save": "保存"
+    "save": "保存",
+    "confirm": "确定",
+    "enabled": "已开启"
+  },
+  "pagination": {
+    "previous": "上一页",
+    "next": "下一页",
+    "page": "第 {{page}} 页",
+    "of": "/ {{total}} 页",
+    "rowsPerPage": "每页显示",
+    "items": "条"
   }
 }

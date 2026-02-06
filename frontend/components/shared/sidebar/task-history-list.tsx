@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import {
   MoreHorizontal,
   FolderPlus,
+  Pencil,
   Trash2,
   GripVertical,
   Loader2,
@@ -40,6 +41,7 @@ interface DraggableTaskProps {
   task: TaskHistoryItem;
   lng?: string;
   onDeleteTask: (taskId: string) => Promise<void> | void;
+  onRenameClick?: (task: TaskHistoryItem) => void;
   onMoveClick: (task: TaskHistoryItem) => void;
   isSelectionMode?: boolean;
   isSelected?: boolean;
@@ -54,6 +56,7 @@ function DraggableTask({
   task,
   lng,
   onDeleteTask,
+  onRenameClick,
   onMoveClick,
   isSelectionMode,
   isSelected,
@@ -131,7 +134,7 @@ function DraggableTask({
     >
       <SidebarMenuButton
         className={cn(
-          "h-[36px] min-w-0 max-w-[calc(var(--sidebar-width)-16px)] w-full justify-start gap-3 rounded-[10px] px-3 py-[7.5px] text-left transition-colors hover:bg-sidebar-accent group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)] group-data-[collapsible=icon]:max-w-[var(--sidebar-width-icon)] group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:pr-0",
+          "h-[36px] min-w-0 max-w-[calc(var(--sidebar-width)-32px)] w-full justify-start gap-3 rounded-[10px] px-3 py-[7.5px] text-left transition-colors hover:bg-sidebar-accent overflow-hidden group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)] group-data-[collapsible=icon]:max-w-[var(--sidebar-width-icon)] group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:pr-0",
           !isSelectionMode && "pr-8", // Padding only when not in selection mode (for 'more' button space)
         )}
         tooltip={task.title}
@@ -142,7 +145,7 @@ function DraggableTask({
         asChild={isSelectionMode}
       >
         {isSelectionMode ? (
-          <div>
+          <div className="flex items-center gap-3 min-w-0 w-full">
             <div className="shrink-0 flex items-center justify-center">
               <Checkbox
                 checked={isSelected}
@@ -220,6 +223,17 @@ function DraggableTask({
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" side="right">
+            {onRenameClick && (
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRenameClick(task);
+                }}
+              >
+                <Pencil className="size-4" />
+                <span>{t("sidebar.rename")}</span>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
@@ -258,7 +272,7 @@ export function TaskHistoryList({
 }: {
   tasks: TaskHistoryItem[];
   onDeleteTask: (taskId: string) => Promise<void> | void;
-  onRenameTask?: (taskId: string, newName: string) => void;
+  onRenameTask?: (taskId: string, newName: string) => Promise<void> | void;
   onMoveTaskToProject?: (taskId: string, projectId: string | null) => void;
   projects?: Project[];
   isSelectionMode?: boolean;
@@ -279,8 +293,7 @@ export function TaskHistoryList({
   const [selectedTask, setSelectedTask] =
     React.useState<TaskHistoryItem | null>(null);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const _handleRenameClick = (task: TaskHistoryItem) => {
+  const handleRenameClick = (task: TaskHistoryItem) => {
     setSelectedTask(task);
     setRenameDialogOpen(true);
   };
@@ -311,6 +324,7 @@ export function TaskHistoryList({
             task={task}
             lng={lng}
             onDeleteTask={onDeleteTask}
+            onRenameClick={onRenameTask ? handleRenameClick : undefined}
             onMoveClick={handleMoveClick}
             isSelectionMode={isSelectionMode}
             isSelected={selectedTaskIds.has(task.id)}

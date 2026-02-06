@@ -53,6 +53,7 @@ export function ProjectPageClient({ projectId }: ProjectPageClientProps) {
       const inputFiles = options?.attachments ?? [];
       const repoUrl = (options?.repo_url || "").trim();
       const gitBranch = (options?.git_branch || "").trim() || "main";
+      const gitTokenEnvKey = (options?.git_token_env_key || "").trim();
       const runSchedule = options?.run_schedule ?? null;
       const scheduledTask = options?.scheduled_task ?? null;
       if (
@@ -68,6 +69,15 @@ export function ProjectPageClient({ projectId }: ProjectPageClientProps) {
       console.log("[Project] Sending task:", inputValue, { mode });
 
       try {
+        // Best-effort: persist repo defaults on the project for future runs.
+        if (repoUrl) {
+          await updateProject(projectId, {
+            repo_url: repoUrl,
+            git_branch: gitBranch,
+            ...(gitTokenEnvKey ? { git_token_env_key: gitTokenEnvKey } : {}),
+          });
+        }
+
         const config: TaskConfig & Record<string, unknown> = {};
         if (inputFiles.length > 0) {
           config.input_files = inputFiles;
@@ -75,6 +85,9 @@ export function ProjectPageClient({ projectId }: ProjectPageClientProps) {
         if (repoUrl) {
           config.repo_url = repoUrl;
           config.git_branch = gitBranch;
+          if (gitTokenEnvKey) {
+            config.git_token_env_key = gitTokenEnvKey;
+          }
         }
 
         if (mode === "scheduled") {
@@ -131,7 +144,17 @@ export function ProjectPageClient({ projectId }: ProjectPageClientProps) {
         setIsSubmitting(false);
       }
     },
-    [addTask, inputValue, isSubmitting, lng, mode, projectId, router, t],
+    [
+      addTask,
+      inputValue,
+      isSubmitting,
+      lng,
+      mode,
+      projectId,
+      router,
+      t,
+      updateProject,
+    ],
   );
 
   const handleQuickActionPick = React.useCallback(
@@ -190,6 +213,10 @@ export function ProjectPageClient({ projectId }: ProjectPageClientProps) {
             onModeChange={setMode}
             onSend={handleSendTask}
             isSubmitting={isSubmitting}
+            allowProjectize={false}
+            onRepoDefaultsSave={async (payload) => {
+              await updateProject(projectId, payload);
+            }}
           />
 
           <QuickActions onPick={handleQuickActionPick} />

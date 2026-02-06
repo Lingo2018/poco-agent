@@ -13,7 +13,7 @@ interface AppSidebarProps {
   taskHistory: TaskHistoryItem[];
   onNewTask?: () => void;
   onDeleteTask?: (taskId: string) => Promise<void> | void;
-  onRenameTask?: (taskId: string, newName: string) => void;
+  onRenameTask?: (taskId: string, newName: string) => Promise<void> | void;
   onMoveTaskToProject?: (taskId: string, projectId: string | null) => void;
   onCreateProject?: (name: string) => void;
   onRenameProject?: (projectId: string, newName: string) => void;

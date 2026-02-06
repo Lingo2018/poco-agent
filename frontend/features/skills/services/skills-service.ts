@@ -2,6 +2,8 @@ import { apiClient, API_ENDPOINTS } from "@/lib/api-client";
 import type {
   SkillInstallCreateInput,
   SkillInstallUpdateInput,
+  SkillInstallBulkUpdateInput,
+  SkillInstallBulkUpdateResponse,
   Skill,
   SkillCreateInput,
   SkillUpdateInput,
@@ -65,6 +67,15 @@ export const skillsService = {
   ): Promise<UserSkillInstall> => {
     return apiClient.patch<UserSkillInstall>(
       API_ENDPOINTS.skillInstall(installId),
+      input,
+    );
+  },
+
+  bulkUpdateInstalls: async (
+    input: SkillInstallBulkUpdateInput,
+  ): Promise<SkillInstallBulkUpdateResponse> => {
+    return apiClient.patch<SkillInstallBulkUpdateResponse>(
+      API_ENDPOINTS.skillInstallsBulk,
       input,
     );
   },

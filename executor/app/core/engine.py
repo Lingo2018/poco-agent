@@ -1,11 +1,13 @@
 import logging
 import os
+import re
 import time
 from datetime import datetime, timedelta, timezone
 
 from claude_agent_sdk import ClaudeAgentOptions
 from claude_agent_sdk.client import ClaudeSDKClient
 from claude_agent_sdk.types import (
+    AgentDefinition as SdkAgentDefinition,
     HookContext,
     HookInput,
     HookMatcher,
@@ -28,10 +30,13 @@ from app.core.observability.request_context import (
     set_trace_id,
 )
 from app.schemas.request import TaskConfig
+from app.schemas.state import BrowserState
+from app.utils.browser import format_viewport_size, parse_viewport_size
 
 load_dotenv()
 
 logger = logging.getLogger(__name__)
+_SUBAGENT_NAME_PATTERN = re.compile(r"^[A-Za-z0-9._-]+$")
 
 
 class AgentExecutor:
@@ -58,8 +63,11 @@ class AgentExecutor:
     async def execute(
         self, prompt: str, config: TaskConfig, *, permission_mode: str = "default"
     ):
-        await self.workspace.prepare(config)
-        ctx = ExecutionContext(self.session_id, str(self.workspace.work_path))
+        # Initialize context early so we can always report failures via callbacks,
+        # even if workspace preparation (e.g. repo clone) fails.
+        ctx = ExecutionContext(self.session_id, str(self.workspace.root_path))
+        if config.browser_enabled:
+            ctx.current_state.browser = BrowserState(enabled=True)
 
         request_id_token = set_request_id(self._request_id or generate_request_id())
         trace_id_token = set_trace_id(self._trace_id or generate_trace_id())
@@ -75,6 +83,8 @@ class AgentExecutor:
         )
 
         try:
+            await self.workspace.prepare(config)
+            ctx.cwd = str(self.workspace.work_path)
             await self.hooks.run_on_setup(ctx)
 
             # Slash commands must be sent as-is (no prefix text), otherwise the SDK may not
@@ -219,6 +229,35 @@ class AgentExecutor:
 
                 return PermissionResultAllow(updated_input=input_data)
 
+            mcp_servers = dict(config.mcp_config or {})
+            if config.browser_enabled:
+                mcp_servers = self._inject_playwright_mcp(mcp_servers)
+
+            agents: dict[str, SdkAgentDefinition] | None = None
+            if config.agents:
+                resolved: dict[str, SdkAgentDefinition] = {}
+                for name, definition in (config.agents or {}).items():
+                    if not isinstance(name, str):
+                        continue
+                    clean_name = name.strip()
+                    if (
+                        not clean_name
+                        or clean_name in {".", ".."}
+                        or not _SUBAGENT_NAME_PATTERN.fullmatch(clean_name)
+                    ):
+                        continue
+                    description = (definition.description or "").strip()
+                    prompt_text = (definition.prompt or "").strip()
+                    if not description or not prompt_text:
+                        continue
+                    resolved[clean_name] = SdkAgentDefinition(
+                        description=description,
+                        prompt=definition.prompt,
+                        tools=definition.tools,
+                        model=definition.model,
+                    )
+                agents = resolved or None
+
             options = ClaudeAgentOptions(
                 cwd=ctx.cwd,
                 resume=self.sdk_session_id,
@@ -228,17 +267,20 @@ class AgentExecutor:
                 allowed_tools=[
                     "Skill",
                     "Read",
+                    "Edit",
                     "Write",
                     "Bash",
                     "TodoWrite",
                     "Grep",
                     "Glob",
+                    "Task",
                 ],
-                mcp_servers=config.mcp_config,
+                mcp_servers=mcp_servers,
                 permission_mode=normalized_permission_mode,
                 model=os.environ["DEFAULT_MODEL"],
                 can_use_tool=can_use_tool,
                 hooks={"PreToolUse": [HookMatcher(matcher=None, hooks=[dummy_hook])]},
+                agents=agents,
             )
 
             async with ClaudeSDKClient(options=options) as client:
@@ -288,3 +330,49 @@ class AgentExecutor:
                 lines.append(f"- {display}")
         lines.append("Do not modify files under inputs/ unless the user asks.")
         return "\n".join(lines)
+
+    @staticmethod
+    def _inject_playwright_mcp(mcp_servers: dict) -> dict:
+        """Inject built-in Playwright MCP (CDP mode) for browser-enabled tasks.
+
+        This keeps the Playwright MCP concept/config hidden from end users: they only toggle `browser_enabled`, and the executor wires the MCP server internally.
+        """
+
+        # TODO: 这里的实现不够优雅
+        key = "__poco_playwright"
+        if key in mcp_servers:
+            return mcp_servers
+
+        cdp_endpoint = (
+            os.environ.get("POCO_BROWSER_CDP_ENDPOINT", "http://127.0.0.1:9222").strip()
+            or "http://127.0.0.1:9222"
+        )
+
+        viewport_raw = (os.environ.get("POCO_BROWSER_VIEWPORT_SIZE") or "").strip()
+        viewport = parse_viewport_size(viewport_raw) or (1366, 768)
+        viewport_size = format_viewport_size(*viewport)
+
+        # Wait for Chrome's CDP endpoint before starting the MCP server to avoid flakiness on startup.
+        wait_then_start = f"""
+python3 - <<'PY'
+import time
+import urllib.request
+
+url = {cdp_endpoint!r} + "/json/version"
+deadline = time.time() + 15
+while time.time() < deadline:
+    try:
+        with urllib.request.urlopen(url, timeout=0.5) as resp:
+            resp.read()
+        break
+    except Exception:
+        time.sleep(0.1)
+else:
+    raise SystemExit("CDP endpoint not ready: " + url)
+PY
+exec npx -y @playwright/mcp@latest --cdp-endpoint {cdp_endpoint!r} --caps vision --viewport-size {viewport_size!r}
+""".strip()
+
+        injected = dict(mcp_servers)
+        injected[key] = {"command": "bash", "args": ["-lc", wait_then_start]}
+        return injected

@@ -21,11 +21,13 @@ class CallbackHook(AgentHook):
         status: str,
         progress: int,
         new_message: Optional[Any] = None,
+        error_message: str | None = None,
     ) -> AgentCallbackRequest:
         return AgentCallbackRequest(
             session_id=context.session_id,
             status=status,
             progress=progress,
+            error_message=error_message,
             new_message=serialize_message(new_message),
             state_patch=context.current_state,
             sdk_session_id=self.sdk_session_id,
@@ -62,11 +64,19 @@ class CallbackHook(AgentHook):
         )
         progress = 100
 
+        error_message: str | None = None
+        if self.execution_error is not None:
+            detail = f"{type(self.execution_error).__name__}: {self.execution_error}"
+            if len(detail) > 2000:
+                detail = detail[:2000] + "..."
+            error_message = detail
+
         await self.client.send(
             self._build_report(
                 context=context,
                 status=status,
                 progress=progress,
+                error_message=error_message,
             )
         )
 

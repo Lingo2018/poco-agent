@@ -20,6 +20,11 @@ class CallbackService:
     """Service layer for callback processing."""
 
     @staticmethod
+    def _is_internal_mcp_server(name: str) -> bool:
+        clean = (name or "").strip()
+        return clean.startswith("__poco_")
+
+    @staticmethod
     def _is_ignored_workspace_path(path: str) -> bool:
         """Check whether a workspace-relative path should be ignored.
 
@@ -57,19 +62,42 @@ class CallbackService:
         cls, callback: AgentCallbackRequest
     ) -> AgentCallbackRequest:
         state = callback.state_patch
-        if not state or not state.workspace_state:
+        if not state:
             return callback
 
-        workspace_state = state.workspace_state
-        file_changes = workspace_state.file_changes or []
-        if not file_changes:
-            return callback
+        updated_state = state
+
+        # Hide built-in/internal MCP servers from the UI. End users should only see
+        # explicitly configured MCP servers.
+        if state.mcp_status:
+            filtered_mcp = [
+                m
+                for m in state.mcp_status
+                if not cls._is_internal_mcp_server(m.server_name)
+            ]
+            if len(filtered_mcp) != len(state.mcp_status):
+                updated_state = updated_state.model_copy(
+                    update={"mcp_status": filtered_mcp}
+                )
+
+        workspace_state = updated_state.workspace_state
+        if not workspace_state or not workspace_state.file_changes:
+            return (
+                callback
+                if updated_state is state
+                else callback.model_copy(update={"state_patch": updated_state})
+            )
+        file_changes = workspace_state.file_changes
 
         filtered_changes = [
             fc for fc in file_changes if not cls._is_ignored_workspace_path(fc.path)
         ]
         if len(filtered_changes) == len(file_changes):
-            return callback
+            return (
+                callback
+                if updated_state is state
+                else callback.model_copy(update={"state_patch": updated_state})
+            )
 
         total_added = sum(fc.added_lines for fc in filtered_changes)
         total_deleted = sum(fc.deleted_lines for fc in filtered_changes)
@@ -81,8 +109,10 @@ class CallbackService:
                 "total_deleted_lines": total_deleted,
             }
         )
-        new_state = state.model_copy(update={"workspace_state": new_workspace_state})
-        return callback.model_copy(update={"state_patch": new_state})
+        updated_state = updated_state.model_copy(
+            update={"workspace_state": new_workspace_state}
+        )
+        return callback.model_copy(update={"state_patch": updated_state})
 
     async def process_callback(
         self, callback: AgentCallbackRequest
@@ -195,6 +225,7 @@ class CallbackService:
             time=datetime.now(timezone.utc),
             status=callback.status,
             progress=100 if callback.status == "completed" else callback.progress,
+            error_message=callback.error_message,
             sdk_session_id=callback.sdk_session_id,
             workspace_files_prefix=result.workspace_files_prefix if result else None,
             workspace_manifest_key=result.workspace_manifest_key if result else None,

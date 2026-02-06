@@ -3,7 +3,10 @@ import {
   listTaskHistoryAction,
   moveTaskToProjectAction,
 } from "@/features/projects/actions/project-actions";
+import { renameSessionTitleAction } from "@/features/chat/actions/session-actions";
 import type { TaskHistoryItem } from "@/features/projects/types";
+import { useT } from "@/lib/i18n/client";
+import { toast } from "sonner";
 
 interface UseTaskHistoryOptions {
   initialTasks?: TaskHistoryItem[];
@@ -11,6 +14,7 @@ interface UseTaskHistoryOptions {
 
 export function useTaskHistory(options: UseTaskHistoryOptions = {}) {
   const { initialTasks = [] } = options;
+  const { t } = useT("translation");
   const [taskHistory, setTaskHistory] =
     useState<TaskHistoryItem[]>(initialTasks);
   const [isLoading, setIsLoading] = useState(!initialTasks.length);
@@ -101,12 +105,35 @@ export function useTaskHistory(options: UseTaskHistoryOptions = {}) {
     [],
   );
 
+  const renameTask = useCallback(
+    async (taskId: string, newTitle: string) => {
+      let previousTasks: TaskHistoryItem[] = [];
+      setTaskHistory((prev) => {
+        previousTasks = prev;
+        return prev.map((task) =>
+          task.id === taskId ? { ...task, title: newTitle } : task,
+        );
+      });
+
+      try {
+        await renameSessionTitleAction({ sessionId: taskId, title: newTitle });
+        toast.success(t("task.toasts.renamed"));
+      } catch (error) {
+        console.error("Failed to rename task", error);
+        setTaskHistory(previousTasks);
+        toast.error(t("task.toasts.renameFailed"));
+      }
+    },
+    [t],
+  );
+
   return {
     taskHistory,
     isLoading,
     addTask,
     removeTask,
     moveTask,
+    renameTask,
     refreshTasks: fetchTasks,
   };
 }

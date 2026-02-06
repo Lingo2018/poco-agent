@@ -29,10 +29,13 @@ If you're using local `rustfs` (`docker-compose.yml`), use the script to prepare
 ./scripts/quickstart.sh
 ```
 
+By default, the script runs in interactive mode and will prompt for your API keys (Anthropic is required) and write them into `.env`.
+Use `--non-interactive` and `--anthropic-key` if you need to run it in CI.
+
 The script will:
 
 - Copy `.env.example` -> `.env` if missing
-- Detects and writes `DOCKER_GID`; other keys are only written when flags are provided (e.g. `--data-dir` / `--s3-*` / `--cors-origins`)
+- Detects and writes `DOCKER_GID`; writes API keys/model settings in interactive mode; other keys are only written when flags are provided (e.g. `--data-dir` / `--s3-*` / `--cors-origins`)
 - Create `oss_data/` and `tmp_workspace/`; tries to chown `oss_data/` to `10001:10001` (RustFS user) by default
 - Write `.gitignore` into `oss_data/` and `tmp_workspace/` (content is `*`)
 - Pull the executor image and start services by default
@@ -45,7 +48,7 @@ Common flags:
 - `--no-init-bucket`: skip bucket creation
 - `--no-chown-rustfs`: skip chowning `oss_data/` to `10001:10001`
 
-After running the script, check `.env` and fill required values (e.g. `ANTHROPIC_AUTH_TOKEN`).
+After running the script, make sure `ANTHROPIC_AUTH_TOKEN` is set in `.env`.
 
 If you prefer manual steps, continue below.
 
@@ -91,7 +94,9 @@ To pin versions (e.g. `v0.1.0`):
 ```bash
 export BACKEND_IMAGE=ghcr.io/poco-ai/poco-backend:v0.1.0
 export EXECUTOR_MANAGER_IMAGE=ghcr.io/poco-ai/poco-executor-manager:v0.1.0
-export EXECUTOR_IMAGE=ghcr.io/poco-ai/poco-executor:v0.1.0
+export EXECUTOR_IMAGE=ghcr.io/poco-ai/poco-executor:lite
+# Optional: executor image with desktop/browser stack (used when browser_enabled=true)
+# export EXECUTOR_BROWSER_IMAGE=ghcr.io/poco-ai/poco-executor:full
 export FRONTEND_IMAGE=ghcr.io/poco-ai/poco-frontend:v0.1.0
 
 docker compose up -d

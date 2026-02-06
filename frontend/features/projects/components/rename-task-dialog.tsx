@@ -18,7 +18,7 @@ interface RenameTaskDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   taskName: string;
-  onRename: (newName: string) => void;
+  onRename: (newName: string) => Promise<void> | void;
 }
 
 /**
@@ -63,17 +63,17 @@ export function RenameTaskDialog({
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>{t("sidebar.rename")}</DialogTitle>
-            <DialogDescription>输入新的任务名称</DialogDescription>
+            <DialogDescription>{t("task.renameDescription")}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="task-name">任务名称</Label>
+              <Label htmlFor="task-name">{t("task.nameLabel")}</Label>
               <Input
                 ref={inputRef}
                 id="task-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="输入任务名称"
+                placeholder={t("task.namePlaceholder")}
                 onKeyDown={(e) => {
                   if (e.key === "Escape") {
                     onOpenChange(false);
@@ -88,13 +88,13 @@ export function RenameTaskDialog({
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              取消
+              {t("common.cancel")}
             </Button>
             <Button
               type="submit"
               disabled={!name.trim() || name.trim() === taskName}
             >
-              确定
+              {t("common.confirm")}
             </Button>
           </DialogFooter>
         </form>

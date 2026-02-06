@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Slot } from "@radix-ui/react-slot";
 import type { LucideIcon } from "lucide-react";
@@ -14,7 +14,7 @@ export interface PanelHeaderProps {
   /**
    * Main title text
    */
-  title: string;
+  title?: string;
   /**
    * Optional description text below the title
    */
@@ -22,7 +22,11 @@ export interface PanelHeaderProps {
   /**
    * Optional action button or element to display on the right side
    */
-  action?: ReactNode;
+  action?: React.ReactNode;
+  /**
+   * Optional content to replace the left side (title/icon/description)
+   */
+  content?: React.ReactNode;
   /**
    * Additional CSS classes for the container
    */
@@ -56,6 +60,7 @@ export function PanelHeader({
   title,
   description,
   action,
+  content,
   className,
   titleClassName,
   showIcon = true,
@@ -70,38 +75,46 @@ export function PanelHeader({
       )}
     >
       <div className="flex items-center gap-3 flex-1 min-w-0 overflow-hidden">
-        {Icon && showIcon && (
-          <div
-            onClick={onIconClick}
-            className={cn(
-              "flex h-9 w-9 items-center justify-center rounded-lg bg-muted shrink-0",
-              iconClassName,
-              onIconClick &&
-                "cursor-pointer hover:bg-muted/80 active:bg-muted/90",
+        {content ? (
+          content
+        ) : (
+          <>
+            {Icon && showIcon && (
+              <div
+                onClick={onIconClick}
+                className={cn(
+                  "flex h-9 w-9 items-center justify-center rounded-lg bg-muted shrink-0",
+                  iconClassName,
+                  onIconClick &&
+                    "cursor-pointer hover:bg-muted/80 active:bg-muted/90",
+                )}
+              >
+                <Icon className="h-5 w-5" />
+              </div>
             )}
-          >
-            <Icon className="h-5 w-5" />
-          </div>
+            <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
+              {title && (
+                <h2
+                  className={cn(
+                    "text-sm font-semibold min-w-0 max-w-full truncate overflow-hidden",
+                    titleClassName,
+                  )}
+                  title={title}
+                >
+                  {title}
+                </h2>
+              )}
+              {description && (
+                <p
+                  className="text-xs text-muted-foreground min-w-0 truncate"
+                  title={description}
+                >
+                  {description}
+                </p>
+              )}
+            </div>
+          </>
         )}
-        <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
-          <h2
-            className={cn(
-              "text-sm font-semibold min-w-0 max-w-full truncate overflow-hidden",
-              titleClassName,
-            )}
-            title={title}
-          >
-            {title}
-          </h2>
-          {description && (
-            <p
-              className="text-xs text-muted-foreground min-w-0 truncate"
-              title={description}
-            >
-              {description}
-            </p>
-          )}
-        </div>
       </div>
       {action && (
         <div className="flex items-center shrink-0 ml-2">{action}</div>
@@ -113,12 +126,9 @@ export function PanelHeader({
 /**
  * PanelHeaderAction Props
  */
-export interface PanelHeaderActionProps {
-  children: ReactNode;
+export interface PanelHeaderActionProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  children: React.ReactNode;
   asChild?: boolean;
-  className?: string;
-  onClick?: () => void;
-  disabled?: boolean;
 }
 
 /**
@@ -131,13 +141,14 @@ export function PanelHeaderAction({
   children,
   asChild = false,
   className,
-  onClick,
   disabled = false,
+  ...props
 }: PanelHeaderActionProps) {
   const Comp = asChild ? Slot : "button";
 
   return (
     <Comp
+      {...props}
       className={cn(
         "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
@@ -147,7 +158,6 @@ export function PanelHeaderAction({
         "h-8 w-8 p-0",
         className,
       )}
-      onClick={onClick}
       disabled={disabled}
     >
       {children}
@@ -159,7 +169,7 @@ export function PanelHeaderAction({
  * PanelHeaderButton Props
  */
 export interface PanelHeaderButtonProps {
-  children: ReactNode;
+  children: React.ReactNode;
   variant?: "default" | "ghost";
   size?: "default" | "sm" | "icon";
   className?: string;

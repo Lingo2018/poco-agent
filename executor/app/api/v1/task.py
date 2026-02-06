@@ -3,9 +3,12 @@ import logging
 from fastapi import APIRouter, BackgroundTasks
 
 from app.core.callback import CallbackClient
+from app.core.computer import ComputerClient
 from app.core.user_input import UserInputClient
 from app.core.engine import AgentExecutor
+from app.hooks.base import AgentHook
 from app.hooks.callback import CallbackHook
+from app.hooks.computer import BrowserScreenshotHook
 from app.hooks.run_snapshot import RunSnapshotHook
 from app.hooks.todo import TodoHook
 from app.hooks.workspace import WorkspaceHook
@@ -32,12 +35,15 @@ async def run_task(req: TaskRun, background_tasks: BackgroundTasks) -> dict:
         callback_url=req.callback_url, callback_base_url=req.callback_base_url
     )
     user_input_client = UserInputClient(base_url=base_url)
-    hooks = [
+    computer_client = ComputerClient(base_url=base_url)
+    hooks: list[AgentHook] = [
         WorkspaceHook(),
         TodoHook(),
         CallbackHook(client=callback_client),
-        RunSnapshotHook(run_id=req.run_id),
     ]
+    if req.config.browser_enabled:
+        hooks.append(BrowserScreenshotHook(client=computer_client))
+    hooks.append(RunSnapshotHook(run_id=req.run_id))
     executor = AgentExecutor(
         req.session_id,
         hooks,
@@ -58,6 +64,7 @@ async def run_task(req: TaskRun, background_tasks: BackgroundTasks) -> dict:
             "has_repo_url": bool((cfg.repo_url or "").strip()),
             "mcp_server_count": len(cfg.mcp_config or {}),
             "skill_count": len(cfg.skill_files or {}),
+            "subagent_count": len(cfg.agents or {}),
             "input_count": len(cfg.input_files or []),
         },
     )

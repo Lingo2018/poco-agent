@@ -8,6 +8,7 @@ import {
   Loader2,
   ChevronDown,
   ChevronRight,
+  AppWindow,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ToolUseBlock, ToolResultBlock } from "@/features/chat/types";
@@ -30,12 +31,86 @@ interface ToolStepProps {
   onToggle: () => void;
 }
 
+const POCO_PLAYWRIGHT_MCP_PREFIX = "mcp____poco_playwright__";
+
+function truncateMiddle(value: string, maxLen: number): string {
+  const text = value.trim();
+  if (text.length <= maxLen) return text;
+  if (maxLen <= 8) return text.slice(0, maxLen);
+  const head = Math.ceil((maxLen - 3) / 2);
+  const tail = Math.floor((maxLen - 3) / 2);
+  return `${text.slice(0, head)}...${text.slice(text.length - tail)}`;
+}
+
+function pickFirstString(
+  input: Record<string, unknown> | null | undefined,
+  keys: string[],
+): string | null {
+  if (!input) return null;
+  for (const key of keys) {
+    const value = input[key];
+    if (typeof value === "string") {
+      const trimmed = value.trim();
+      if (trimmed) return trimmed;
+    }
+  }
+  return null;
+}
+
 function ToolStep({ toolUse, toolResult, isOpen, onToggle }: ToolStepProps) {
   const { t } = useT("translation");
   const isCompleted = !!toolResult;
   const isError = toolResult?.is_error;
   const isLoading = !isCompleted;
   const isTaskTool = toolUse.name === "Task";
+
+  const playwrightBrowserMeta = React.useMemo(() => {
+    if (!toolUse.name.startsWith(POCO_PLAYWRIGHT_MCP_PREFIX)) return null;
+
+    const rawTool = toolUse.name
+      .slice(POCO_PLAYWRIGHT_MCP_PREFIX.length)
+      .trim();
+    if (!rawTool) return null;
+
+    const action = rawTool.startsWith("browser_")
+      ? rawTool.slice("browser_".length)
+      : rawTool;
+
+    const summary = (() => {
+      const input = toolUse.input;
+      if (action === "navigate") {
+        return pickFirstString(input, ["url", "href"]);
+      }
+      if (action === "click" || action === "hover") {
+        return pickFirstString(input, ["selector", "text", "role", "name"]);
+      }
+      if (action === "type" || action === "fill" || action === "press") {
+        return (
+          pickFirstString(input, ["selector", "role", "name", "text"]) ||
+          pickFirstString(input, ["key", "value"])
+        );
+      }
+      if (action === "screenshot") {
+        return pickFirstString(input, ["path", "filename"]);
+      }
+      return pickFirstString(input, [
+        "url",
+        "selector",
+        "text",
+        "role",
+        "name",
+        "value",
+        "query",
+        "path",
+      ]);
+    })();
+
+    return {
+      toolName: rawTool,
+      action,
+      summary: summary ? truncateMiddle(summary, 80) : null,
+    };
+  }, [toolUse.input, toolUse.name]);
 
   const taskMeta = React.useMemo(() => {
     if (!isTaskTool) return null;
@@ -74,6 +149,13 @@ function ToolStep({ toolUse, toolResult, isOpen, onToggle }: ToolStepProps) {
     return toolResult.content;
   }, [isTaskTool, toolResult]);
 
+  const toolLabel = playwrightBrowserMeta
+    ? `${t("chat.statusBar.browser")} (${playwrightBrowserMeta.toolName})`
+    : toolUse.name;
+
+  const toolDescription =
+    taskMeta?.description || playwrightBrowserMeta?.summary || null;
+
   return (
     <div className="border border-border/50 rounded-md bg-muted/30 overflow-hidden mb-2 last:mb-0">
       <Collapsible open={isOpen} onOpenChange={onToggle}>
@@ -89,13 +171,16 @@ function ToolStep({ toolUse, toolResult, isOpen, onToggle }: ToolStepProps) {
           </div>
 
           <div className="flex-1 min-w-0 flex items-center gap-2">
+            {playwrightBrowserMeta ? (
+              <AppWindow className="size-3.5 text-muted-foreground/80 shrink-0" />
+            ) : null}
             <span className="text-xs font-mono font-medium text-foreground truncate">
-              {toolUse.name}
+              {toolLabel}
               {taskMeta?.subagentType ? ` (${taskMeta.subagentType})` : ""}
             </span>
-            {taskMeta?.description ? (
+            {toolDescription ? (
               <span className="text-[11px] text-muted-foreground truncate">
-                {taskMeta.description}
+                {toolDescription}
               </span>
             ) : null}
           </div>

@@ -149,6 +149,31 @@ class BackendClient:
             data = response.json()
             return data.get("data", {}) or {}
 
+    async def resolve_subagents(
+        self, user_id: str, subagent_ids: list[int] | None
+    ) -> dict:
+        """Resolve enabled subagents for execution based on selected ids.
+
+        When `subagent_ids` is None, backend uses the user's enabled subagents
+        as defaults. An explicit empty list means "disable all subagents".
+        """
+        payload: dict = {}
+        if subagent_ids is not None:
+            payload["subagent_ids"] = subagent_ids
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"{self.base_url}/api/v1/internal/subagents/resolve",
+                json=payload,
+                headers={
+                    "X-Internal-Token": self.settings.internal_api_token,
+                    "X-User-Id": user_id,
+                    **self._trace_headers(),
+                },
+            )
+            response.raise_for_status()
+            data = response.json()
+            return data.get("data", {}) or {}
+
     async def resolve_slash_commands(
         self, user_id: str, names: list[str] | None = None
     ) -> dict[str, str]:
@@ -170,6 +195,22 @@ class BackendClient:
             if not isinstance(resolved, dict):
                 return {}
             return {str(k): str(v) for k, v in resolved.items() if isinstance(v, str)}
+
+    async def get_claude_md(self, user_id: str) -> dict:
+        """Fetch user-level CLAUDE.md settings for execution staging."""
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{self.base_url}/api/v1/internal/claude-md",
+                headers={
+                    "X-Internal-Token": self.settings.internal_api_token,
+                    "X-User-Id": user_id,
+                    **self._trace_headers(),
+                },
+            )
+            response.raise_for_status()
+            data = response.json()
+            result = data.get("data", {}) or {}
+            return result if isinstance(result, dict) else {}
 
     async def dispatch_due_scheduled_tasks(self, limit: int = 50) -> dict:
         """Trigger backend to dispatch due scheduled tasks into the run queue."""

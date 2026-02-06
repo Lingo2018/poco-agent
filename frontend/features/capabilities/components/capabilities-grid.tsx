@@ -5,10 +5,11 @@ import { useParams, useRouter } from "next/navigation";
 import {
   Puzzle,
   Server,
-  Clock,
   Sparkles,
   Key,
+  FileText,
   Command as CommandIcon,
+  Bot,
 } from "lucide-react";
 
 import { useT } from "@/lib/i18n/client";
@@ -84,6 +85,26 @@ export function CapabilitiesGrid() {
         comingSoon: false,
       },
       {
+        id: "personalization",
+        icon: <FileText className="size-6" />,
+        title: t("library.personalization.card.title", "个性化"),
+        description: t(
+          "library.personalization.card.description",
+          "为你的所有任务设置长期生效的偏好与指令",
+        ),
+        features: [
+          t("library.personalization.card.feature1", "用户级全局生效"),
+          t("library.personalization.card.feature2", "自定义指令"),
+          t(
+            "library.personalization.card.feature3",
+            "随时更新，下一次任务生效",
+          ),
+        ],
+        actionLabel: t("library.personalization.card.action", "打开设置"),
+        actionHref: "/capabilities/personalization",
+        comingSoon: false,
+      },
+      {
         id: "slash-commands",
         icon: <CommandIcon className="size-6" />,
         title: t("library.slashCommands.card.title", "Slash Commands"),
@@ -104,17 +125,20 @@ export function CapabilitiesGrid() {
         comingSoon: false,
       },
       {
-        id: "scheduled-tasks",
-        icon: <Clock className="size-6" />,
-        title: t("library.scheduledTasks.title"),
-        description: t("library.scheduledTasks.description"),
+        id: "sub-agents",
+        icon: <Bot className="size-6" />,
+        title: t("library.subAgents.card.title", "子代理"),
+        description: t(
+          "library.subAgents.card.description",
+          "创建可复用的专门化子代理，用于上下文隔离与并行化。",
+        ),
         features: [
-          t("library.scheduledTasks.feature1"),
-          t("library.scheduledTasks.feature2"),
-          t("library.scheduledTasks.feature3"),
+          t("library.subAgents.card.feature1", "独立上下文，减少主对话噪音"),
+          t("library.subAgents.card.feature2", "多子代理并发，加速复杂任务"),
+          t("library.subAgents.card.feature3", "可限制工具与模型，提高可控性"),
         ],
-        actionLabel: t("library.scheduledTasks.action"),
-        actionHref: "/capabilities/scheduled-tasks",
+        actionLabel: t("library.subAgents.card.action", "管理子代理"),
+        actionHref: "/capabilities/sub-agents",
         comingSoon: false,
       },
       {

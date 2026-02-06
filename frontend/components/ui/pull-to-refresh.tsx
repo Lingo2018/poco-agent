@@ -15,7 +15,6 @@ export function PullToRefresh({
   onRefresh,
   children,
   threshold = 80,
-  isLoading: externalLoading = false,
 }: PullToRefreshProps) {
   const [, setPullDistance] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -28,7 +27,6 @@ export function PullToRefresh({
   });
 
   const contentRef = useRef<HTMLDivElement>(null);
-  const isGlobalLoading = externalLoading || isRefreshing;
 
   const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
     // Only allow pull to refresh if we're at the top of the container
@@ -109,26 +107,6 @@ export function PullToRefresh({
       onMouseDown={handleTouchStart}
       onTouchStart={handleTouchStart}
     >
-      {/* Global Loading Bar at the very top */}
-      <div className="absolute top-0 left-0 right-0 z-50 h-0.5 overflow-hidden">
-        {isGlobalLoading && (
-          <motion.div
-            initial={{ x: "-100%" }}
-            animate={{ x: "100%" }}
-            transition={{
-              repeat: Infinity,
-              duration: 1.5,
-              ease: "linear",
-            }}
-            className="h-full w-1/2"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent, currentColor, transparent)",
-            }}
-          />
-        )}
-      </div>
-
       <motion.div
         style={{
           height: pullDistanceSpring,

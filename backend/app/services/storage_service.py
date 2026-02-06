@@ -118,6 +118,30 @@ class S3StorageService:
                 details={"key": key, "error": str(exc)},
             ) from exc
 
+    def exists(self, key: str) -> bool:
+        """Return whether the object exists in storage."""
+        try:
+            self.client.head_object(Bucket=self.bucket, Key=key)
+            return True
+        except ClientError as exc:
+            error = exc.response.get("Error", {}) if hasattr(exc, "response") else {}
+            code = str(error.get("Code", "")).strip()
+            if code in {"404", "NoSuchKey", "NotFound"}:
+                return False
+            logger.error(f"Failed to head object {key}: {exc}")
+            raise AppException(
+                error_code=ErrorCode.EXTERNAL_SERVICE_ERROR,
+                message="Failed to check object existence",
+                details={"key": key, "error": str(exc)},
+            ) from exc
+        except BotoCoreError as exc:
+            logger.error(f"Failed to head object {key}: {exc}")
+            raise AppException(
+                error_code=ErrorCode.EXTERNAL_SERVICE_ERROR,
+                message="Failed to check object existence",
+                details={"key": key, "error": str(exc)},
+            ) from exc
+
     def upload_fileobj(
         self,
         *,

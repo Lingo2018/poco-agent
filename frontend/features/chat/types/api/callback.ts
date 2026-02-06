@@ -39,9 +39,14 @@ export interface WorkspaceState {
   last_change: string; // ISO datetime
 }
 
+export interface BrowserState {
+  enabled: boolean;
+}
+
 export interface AgentCurrentState {
   todos?: TodoItem[];
   mcp_status?: McpStatus[];
+  browser?: BrowserState | null;
   workspace_state?: WorkspaceState | null;
   current_step?: string | null;
 }
@@ -53,6 +58,7 @@ export interface AgentCurrentState {
 export interface ApiStatePatch {
   todos?: TodoItem[];
   mcp_status?: McpStatus[];
+  browser?: BrowserState | null;
   workspace_state?: WorkspaceState | null;
   current_step?: string | null;
 }

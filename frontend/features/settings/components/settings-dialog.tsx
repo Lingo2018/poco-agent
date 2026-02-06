@@ -2,6 +2,8 @@
 
 import { useTheme } from "next-themes";
 import { useUserAccount } from "@/features/user/hooks/use-user-account";
+import { useRouter } from "next/navigation";
+import { useAppShell } from "@/components/shared/app-shell-context";
 
 import * as React from "react";
 import {
@@ -27,6 +29,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { PullToRefresh } from "@/components/ui/pull-to-refresh";
+import { ScheduledTasksHeader } from "@/features/scheduled-tasks/components/scheduled-tasks-header";
+import { ScheduledTasksTable } from "@/features/scheduled-tasks/components/scheduled-tasks-table";
+import { CreateScheduledTaskDialog } from "@/features/scheduled-tasks/components/create-scheduled-task-dialog";
+import { ScheduledTaskEditDialog } from "@/features/scheduled-tasks/components/scheduled-task-edit-dialog";
+import { useScheduledTasksStore } from "@/features/scheduled-tasks/hooks/use-scheduled-tasks-store";
+import type { ScheduledTask } from "@/features/scheduled-tasks/types";
 
 interface SettingsDialogProps {
   open: boolean;
@@ -46,6 +55,16 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const { profile, credits, isLoading } = useUserAccount();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
+  const router = useRouter();
+  const { lng } = useAppShell();
+
+  // Scheduled tasks state
+  const [createTaskOpen, setCreateTaskOpen] = React.useState(false);
+  const [editTaskOpen, setEditTaskOpen] = React.useState(false);
+  const [editingTask, setEditingTask] = React.useState<ScheduledTask | null>(
+    null,
+  );
+  const scheduledTasksStore = useScheduledTasksStore();
 
   React.useEffect(() => {
     setMounted(true);
@@ -94,7 +113,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
             <div className="rounded-xl border border-border bg-card overflow-hidden">
               <div className="p-4 flex items-center justify-between border-b border-border border-dashed">
                 <span className="font-medium">
-                  {isLoading ? "..." : profile?.planName}
+                  {profile?.planName}
                 </span>
                 <Button
                   size="sm"
@@ -105,40 +124,37 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
               </div>
               <div className="p-4 space-y-5">
                 {/* Credits */}
-                <div>
-                  <div className="flex items-center justify-between mb-1">
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <Sparkles className="size-4" />
-                      <span className="text-sm">积分</span>
+                      <span className="text-sm font-medium">积分</span>
                       <HelpCircle className="size-3.5 opacity-50" />
                     </div>
-                    <div className="font-mono text-lg font-medium">
-                      {isLoading ? "..." : credits?.total?.toLocaleString()}
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground/60">
-                    <span>免费积分</span>
-                    <span className="font-mono">
-                      {isLoading ? "..." : credits?.free?.toLocaleString()}
+                    <span className="text-xl font-bold tracking-tight">
+                      {credits?.total}
                     </span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground/60 pl-6">
+                    <span>免费积分</span>
+                    <span>{credits?.free}</span>
                   </div>
                 </div>
 
                 {/* Daily Refresh */}
-                <div>
-                  <div className="flex items-center justify-between mb-1">
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <RefreshCw className="size-4" />
-                      <span className="text-sm">每日刷新积分</span>
+                      <span className="text-sm font-medium">每日刷新积分</span>
                       <HelpCircle className="size-3.5 opacity-50" />
                     </div>
-                    <div className="font-mono text-lg font-medium">
-                      {isLoading ? "..." : credits?.dailyRefreshCurrent}
-                    </div>
+                    <span className="text-xl font-bold tracking-tight">
+                      {credits?.dailyRefreshCurrent}
+                    </span>
                   </div>
-                  <div className="text-xs text-muted-foreground/60">
-                    每天 {credits?.refreshTime} 刷新为{" "}
-                    {credits?.dailyRefreshMax}
+                  <div className="text-xs text-muted-foreground/60 pl-6">
+                    每天 {credits?.refreshTime} 刷新为 {credits?.dailyRefreshMax}
                   </div>
                 </div>
               </div>
@@ -183,10 +199,85 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
         );
       case "scheduled":
         return (
-          <div className="p-6">
-            <div className="text-center text-muted-foreground py-10">
-              暂无定时任务
+          <div className="flex flex-1 flex-col overflow-hidden min-h-0">
+            <div className="px-6 pt-4 pb-2 shrink-0">
+              <ScheduledTasksHeader
+                onAddClick={() => setCreateTaskOpen(true)}
+              />
             </div>
+            <PullToRefresh
+              onRefresh={scheduledTasksStore.refresh}
+              isLoading={scheduledTasksStore.isLoading}
+            >
+              <div className="flex flex-1 flex-col px-6 py-6 overflow-auto min-h-0">
+                <div className="w-full max-w-6xl mx-auto">
+                  <ScheduledTasksTable
+                    tasks={scheduledTasksStore.tasks}
+                    savingId={scheduledTasksStore.savingId}
+                    onToggleEnabled={async (task) => {
+                      await scheduledTasksStore.updateTask(
+                        task.scheduled_task_id,
+                        {
+                          enabled: !task.enabled,
+                        },
+                      );
+                    }}
+                    onOpen={(task) => {
+                      router.push(
+                        `/${lng}/capabilities/scheduled-tasks/${task.scheduled_task_id}`,
+                      );
+                    }}
+                    onEdit={(task) => {
+                      setEditingTask(task);
+                      setEditTaskOpen(true);
+                    }}
+                    onTrigger={async (task) => {
+                      const resp = await scheduledTasksStore.triggerTask(
+                        task.scheduled_task_id,
+                      );
+                      if (resp?.session_id) {
+                        router.push(`/${lng}/chat/${resp.session_id}`);
+                      }
+                    }}
+                    onDelete={async (task) => {
+                      await scheduledTasksStore.removeTask(
+                        task.scheduled_task_id,
+                      );
+                    }}
+                  />
+                </div>
+              </div>
+            </PullToRefresh>
+            <CreateScheduledTaskDialog
+              open={createTaskOpen}
+              onOpenChange={setCreateTaskOpen}
+              onCreate={async (input) => {
+                const created = await scheduledTasksStore.createTask(input);
+                if (created) {
+                  router.push(
+                    `/${lng}/capabilities/scheduled-tasks/${created.scheduled_task_id}`,
+                  );
+                }
+              }}
+              isSaving={scheduledTasksStore.savingId === "create"}
+            />
+            <ScheduledTaskEditDialog
+              open={editTaskOpen}
+              onOpenChange={setEditTaskOpen}
+              task={editingTask}
+              isSaving={
+                !!editingTask &&
+                scheduledTasksStore.savingId === editingTask.scheduled_task_id
+              }
+              onSave={async (payload) => {
+                if (!editingTask) return;
+                await scheduledTasksStore.updateTask(
+                  editingTask.scheduled_task_id,
+                  payload,
+                );
+                await scheduledTasksStore.refresh();
+              }}
+            />
           </div>
         );
       case "connectors":
@@ -204,7 +295,10 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="!max-w-[1000px] w-[90vw] p-0 gap-0 overflow-hidden !h-[75vh] min-h-[500px] max-h-[800px] bg-background text-foreground flex flex-col">
+      <DialogContent
+        className="!max-w-[1000px] w-[90vw] p-0 gap-0 overflow-hidden !h-[75vh] min-h-[500px] max-h-[800px] bg-background text-foreground flex flex-col"
+        showCloseButton={false}
+      >
         <DialogHeader className="sr-only">
           <DialogTitle>设置</DialogTitle>
         </DialogHeader>
@@ -246,11 +340,13 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
           {/* Right Content */}
           <div className="flex-1 bg-background flex flex-col min-w-0 min-h-0">
-            <div className="flex items-center justify-between p-5 pb-2 shrink-0">
-              <h2 className="text-xl font-semibold">
-                {SIDEBAR_ITEMS.find((i) => i.id === activeTab)?.label}
-              </h2>
-            </div>
+            {activeTab !== "scheduled" && (
+              <div className="flex items-center justify-between p-5 pb-2 shrink-0">
+                <h2 className="text-xl font-semibold">
+                  {SIDEBAR_ITEMS.find((i) => i.id === activeTab)?.label}
+                </h2>
+              </div>
+            )}
             {renderContent()}
           </div>
         </div>

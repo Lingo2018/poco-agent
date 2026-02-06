@@ -77,6 +77,19 @@ class ToolExecutionRepository:
         )
 
     @staticmethod
+    def list_unfinished_by_session(
+        session_db: Session, session_id: uuid.UUID
+    ) -> list[ToolExecution]:
+        """Lists tool executions that have not produced a ToolResultBlock yet."""
+        return (
+            session_db.query(ToolExecution)
+            .filter(ToolExecution.session_id == session_id)
+            .filter(ToolExecution.tool_output.is_(None))
+            .order_by(ToolExecution.created_at.asc())
+            .all()
+        )
+
+    @staticmethod
     def list_by_message(session_db: Session, message_id: int) -> list[ToolExecution]:
         """Lists tool executions for a message."""
         return (

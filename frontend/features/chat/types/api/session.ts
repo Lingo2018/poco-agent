@@ -11,6 +11,7 @@ export interface SessionCreateRequest {
 export interface SessionUpdateRequest {
   status?: string | null;
   sdk_session_id?: string | null;
+  title?: string | null;
   workspace_archive_url?: string | null;
   state_patch?: ApiStatePatch | null;
   workspace_files_prefix?: string | null;
@@ -18,6 +19,18 @@ export interface SessionUpdateRequest {
   workspace_archive_key?: string | null;
   workspace_export_status?: string | null;
   project_id?: string | null;
+}
+
+export interface SessionCancelRequest {
+  reason?: string | null;
+}
+
+export interface SessionCancelResponse {
+  session_id: string;
+  status: string;
+  canceled_runs: number;
+  expired_user_input_requests: number;
+  executor_cancelled: boolean;
 }
 
 export interface SessionResponse {
@@ -86,10 +99,16 @@ export interface InputFile {
 export interface TaskConfig {
   repo_url?: string | null;
   git_branch?: string; // defaults to "main"
+  /** Env var key holding a GitHub token (e.g. "GITHUB_TOKEN"). */
+  git_token_env_key?: string | null;
+  /** Built-in browser capability toggle (Playwright MCP is injected internally). */
+  browser_enabled?: boolean;
   /** MCP server enable/disable toggles (true=enabled, false=disabled).
    *  Servers not in this object use their default enabled state from user installations.
    */
   mcp_config?: Record<string, boolean>;
+  /** Optional explicit subagent selection (by id). */
+  subagent_ids?: number[];
   skill_files?: Record<string, unknown>;
   input_files?: InputFile[];
 }

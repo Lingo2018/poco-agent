@@ -95,7 +95,16 @@ class Settings(BaseSettings):
     )
     max_executor_containers: int = Field(default=10, alias="MAX_EXECUTOR_CONTAINERS")
     executor_image: str = Field(
-        default="opencowork/executor:latest", alias="EXECUTOR_IMAGE"
+        default="ghcr.io/poco-ai/poco-executor:lite", alias="EXECUTOR_IMAGE"
+    )
+    # Optional: dedicated executor image with desktop/browser stack enabled.
+    # When set, tasks with browser_enabled=true will use this image instead of EXECUTOR_IMAGE.
+    executor_browser_image: str | None = Field(
+        default="ghcr.io/poco-ai/poco-executor:full", alias="EXECUTOR_BROWSER_IMAGE"
+    )
+    # Default desktop viewport used by the Playwright MCP inside executor containers.
+    poco_browser_viewport_size: str = Field(
+        default="1366x768", alias="POCO_BROWSER_VIEWPORT_SIZE"
     )
     # When the manager spawns executor containers via the Docker daemon, it maps the executor
     # service to a host port and then calls back into it. This host must be reachable from the
@@ -104,7 +113,6 @@ class Settings(BaseSettings):
     executor_published_host: str = Field(
         default="localhost", alias="EXECUTOR_PUBLISHED_HOST"
     )
-
     workspace_root: str = Field(
         default="/var/lib/opencowork/workspaces", alias="WORKSPACE_ROOT"
     )

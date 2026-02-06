@@ -85,6 +85,23 @@ export function ChatInput({
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const normalizedName = file.name.trim().toLowerCase();
+    if (
+      attachments.some(
+        (item) => (item.name || "").trim().toLowerCase() === normalizedName,
+      )
+    ) {
+      toast.error(
+        t("hero.toasts.duplicateFileName", {
+          name: file.name,
+        }),
+      );
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      return;
+    }
+
     if (file.size > MAX_FILE_SIZE) {
       toast.error(t("hero.toasts.fileTooLarge", "文件过大，最大支持 100MB"));
       if (fileInputRef.current) {
@@ -119,6 +136,20 @@ export function ChatInput({
       ?.getAsFile();
 
     if (!file) return;
+
+    const normalizedName = file.name.trim().toLowerCase();
+    if (
+      attachments.some(
+        (item) => (item.name || "").trim().toLowerCase() === normalizedName,
+      )
+    ) {
+      toast.error(
+        t("hero.toasts.duplicateFileName", {
+          name: file.name,
+        }),
+      );
+      return;
+    }
 
     if (file.size > MAX_FILE_SIZE) {
       toast.error(t("hero.toasts.fileTooLarge", "文件过大，最大支持 100MB"));

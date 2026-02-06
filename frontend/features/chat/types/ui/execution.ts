@@ -4,7 +4,12 @@
 
 import type { ApiStatePatch } from "../api/callback";
 
-export type ExecutionStatus = "accepted" | "running" | "completed" | "failed";
+export type ExecutionStatus =
+  | "accepted"
+  | "running"
+  | "completed"
+  | "failed"
+  | "canceled";
 
 export type ArtifactType =
   | "text"
@@ -49,6 +54,7 @@ export interface NewMessage {
 export interface ConfigSnapshot {
   mcp_server_ids?: number[];
   skill_ids?: number[];
+  browser_enabled?: boolean;
 }
 
 /**
@@ -73,4 +79,5 @@ export interface ExecutionSession {
   config_snapshot?: ConfigSnapshot | null;
   task_name?: string;
   user_prompt?: string;
+  title?: string | null;
 }

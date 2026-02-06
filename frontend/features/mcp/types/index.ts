@@ -37,3 +37,12 @@ export interface UserMcpInstallCreateInput {
 export interface UserMcpInstallUpdateInput {
   enabled?: boolean | null;
 }
+
+export interface McpInstallBulkUpdateInput {
+  enabled: boolean;
+  install_ids?: number[] | null;
+}
+
+export interface McpInstallBulkUpdateResponse {
+  updated_count: number;
+}

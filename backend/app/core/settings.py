@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     port: int = Field(default=8000)
 
     database_url: str = Field(default="sqlite:///./opencowork.db")
+    db_pool_size: int = Field(default=5)
+    db_max_overflow: int = Field(default=10)
+    db_pool_timeout_seconds: int = Field(default=30)
 
     cors_origins: list[str] = Field(
         default=["http://localhost:3000", "http://127.0.0.1:3000"]

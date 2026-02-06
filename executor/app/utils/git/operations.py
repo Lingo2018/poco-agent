@@ -133,7 +133,9 @@ def _run_git_command(
     """
     try:
         full_command = ["git", *command]
-        merged_env = {**os.environ, **env} if env else None
+        merged_env = {**os.environ, **(env or {})}
+        # Ensure git never blocks on interactive prompts inside the executor.
+        merged_env["GIT_TERMINAL_PROMPT"] = "0"
 
         result = subprocess.run(
             full_command,
@@ -971,6 +973,7 @@ def fetch(
     cwd: str | Path | None = None,
     all_branches: bool = False,
     prune: bool = False,
+    env: dict[str, str] | None = None,
 ) -> None:
     """
     Fetch from remote repository.
@@ -997,7 +1000,7 @@ def fetch(
         if branch:
             args.append(branch)
 
-    _run_git_command(args, cwd=cwd, check=True)
+    _run_git_command(args, cwd=cwd, check=True, env=env)
 
 
 def pull(
@@ -1085,6 +1088,7 @@ def clone(
     depth: int | None = None,
     single_branch: bool = False,
     bare: bool = False,
+    env: dict[str, str] | None = None,
 ) -> Path:
     """
     Clone a repository.
@@ -1119,7 +1123,7 @@ def clone(
     if path:
         args.append(str(path))
 
-    _run_git_command(args, check=True)
+    _run_git_command(args, check=True, env=env)
 
     repo_path = Path(path) if path else Path(url.split("/")[-1].replace(".git", ""))
     return repo_path.resolve()

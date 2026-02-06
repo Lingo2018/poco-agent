@@ -146,7 +146,9 @@ class CallbackService:
                 if not tool_use_id:
                     continue
 
-                tool_output = {"content": result_content} if result_content else None
+                # Persist an explicit tool_output payload even when the tool returns an empty/None content.
+                # This lets the UI reliably treat the tool step as "done" once a ToolResultBlock arrives.
+                tool_output = {"content": result_content}
                 existing = ToolExecutionRepository.get_by_session_and_tool_use_id(
                     session_db=session_db,
                     session_id=session_id,
@@ -285,6 +287,15 @@ class CallbackService:
                 message="Session not found yet",
             )
 
+        # Once a session is canceled, ignore subsequent callbacks so we don't keep
+        # persisting new messages/tool executions for a task that the user asked to stop.
+        if db_session.status == "canceled":
+            return CallbackResponse(
+                session_id=str(db_session.id),
+                status=db_session.status,
+                callback_status=callback.status,
+            )
+
         derived_sdk_session_id = callback.sdk_session_id
         if (
             not derived_sdk_session_id
@@ -303,7 +314,11 @@ class CallbackService:
         ):
             update_data["sdk_session_id"] = derived_sdk_session_id
 
-        if callback.status in [CallbackStatus.COMPLETED, CallbackStatus.FAILED]:
+        # Do not override a user-canceled session back to completed/failed.
+        if db_session.status != "canceled" and callback.status in [
+            CallbackStatus.COMPLETED,
+            CallbackStatus.FAILED,
+        ]:
             update_data["status"] = callback.status.value
 
         if callback.state_patch is not None:
@@ -366,6 +381,10 @@ class CallbackService:
                 db_run.finished_at = datetime.now(timezone.utc)
                 if callback.status == CallbackStatus.COMPLETED:
                     db_run.progress = 100
+                    db_run.last_error = None
+                elif callback.status == CallbackStatus.FAILED:
+                    if callback.error_message:
+                        db_run.last_error = callback.error_message
 
             self._sync_scheduled_task_last_status(db, db_run)
             db.commit()

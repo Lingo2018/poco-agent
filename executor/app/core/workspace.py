@@ -1,11 +1,15 @@
 import logging
 import os
 import shutil
+import stat
+import tempfile
 from pathlib import Path
+from urllib.parse import urlparse
 
 from app.schemas.request import TaskConfig
 from app.utils.git.operations import (
     GitCommandError,
+    GitError,
     clone,
     init_repository,
     is_repository,
@@ -49,6 +53,7 @@ class WorkspaceManager:
 
         self.persistent_claude_data = self.root_path / ".claude_data"
         self.system_claude_home = Path.home() / ".claude"
+        self._git_askpass_path: str | None = None
 
     async def prepare(self, config: TaskConfig):
         if not self.root_path.exists():
@@ -74,42 +79,109 @@ class WorkspaceManager:
         # Restore system ~/.claude if it was symlinked
         if self.system_claude_home.is_symlink():
             self.system_claude_home.unlink()
+        # Best-effort cleanup for temporary askpass helper.
+        if self._git_askpass_path:
+            try:
+                Path(self._git_askpass_path).unlink(missing_ok=True)
+            except Exception:
+                pass
+            self._git_askpass_path = None
 
     def _prepare_repository(self, config: TaskConfig) -> Path:
         repo_url = (config.repo_url or "").strip()
         if repo_url:
-            return self._ensure_cloned_repo(repo_url, config.git_branch)
+            return self._ensure_cloned_repo(
+                repo_url,
+                config.git_branch,
+                git_token=(config.git_token or "").strip() or None,
+            )
 
         self._ensure_git_repo(self.root_path)
         return self.root_path
 
-    def _ensure_cloned_repo(self, repo_url: str, branch: str | None) -> Path:
+    def _ensure_cloned_repo(
+        self,
+        repo_url: str,
+        branch: str | None,
+        *,
+        git_token: str | None,
+    ) -> Path:
         repo_path = self._derive_repo_path(repo_url)
+        git_env = self._build_git_env(repo_url, git_token)
 
         if repo_path.exists() and is_repository(repo_path):
-            self._checkout_branch(repo_path, branch)
+            self._checkout_branch(repo_path, branch, env=git_env)
             return repo_path
-
-        if not repo_path.exists():
-            try:
-                return clone(repo_url, path=repo_path, branch=branch)
-            except Exception as exc:
-                if branch:
-                    try:
-                        return clone(repo_url, path=repo_path)
-                    except Exception as fallback_exc:
-                        logger.warning(
-                            f"Failed to clone repo {repo_url} with default branch: {fallback_exc}"
-                        )
-                else:
-                    logger.warning(f"Failed to clone repo {repo_url}: {exc}")
 
         if repo_path.exists() and not is_repository(repo_path):
-            self._ensure_git_repo(repo_path)
-            return repo_path
+            raise RuntimeError(
+                f"Target path exists but is not a git repository: {repo_path}"
+            )
 
-        self._ensure_git_repo(self.root_path)
-        return self.root_path
+        try:
+            return clone(repo_url, path=repo_path, branch=branch, env=git_env)
+        except (GitCommandError, GitError, OSError) as exc:
+            detail = str(exc)
+            # Keep the error message compact for the UI.
+            if len(detail) > 2000:
+                detail = detail[:2000] + "…"
+            raise RuntimeError(
+                f"Failed to clone repository: {repo_url}. {detail}"
+            ) from exc
+
+    def _build_git_env(self, repo_url: str, git_token: str | None) -> dict[str, str]:
+        """Build a per-command env map for git operations.
+
+        Notes:
+        - The token is injected by Executor Manager at runtime and must never be persisted.
+        - We only apply the token to https://github.com/* URLs to avoid credential leakage.
+        """
+        env: dict[str, str] = {"GIT_TERMINAL_PROMPT": "0"}
+        if not git_token:
+            return env
+
+        try:
+            parsed = urlparse(repo_url)
+        except Exception:
+            return env
+
+        host = (parsed.netloc or "").strip().lower()
+        if parsed.scheme not in ("http", "https") or host not in {
+            "github.com",
+            "www.github.com",
+        }:
+            return env
+
+        askpass = self._ensure_git_askpass()
+        env.update(
+            {
+                "GIT_ASKPASS": askpass,
+                # Used by the askpass script.
+                "POCO_GIT_USERNAME": "x-access-token",
+                "POCO_GIT_TOKEN": git_token,
+            }
+        )
+        return env
+
+    def _ensure_git_askpass(self) -> str:
+        """Create a reusable askpass helper script (no secrets embedded)."""
+        if self._git_askpass_path and Path(self._git_askpass_path).exists():
+            return self._git_askpass_path
+
+        script = """#!/bin/sh
+prompt=\"$1\"
+case \"$prompt\" in
+  *Username*) echo \"${POCO_GIT_USERNAME:-x-access-token}\" ;;
+  *) echo \"${POCO_GIT_TOKEN:-}\" ;;
+esac
+"""
+        fd, path = tempfile.mkstemp(prefix="poco-git-askpass-", text=True)
+        os.close(fd)
+        p = Path(path)
+        p.write_text(script, encoding="utf-8")
+        p.chmod(stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
+        self._git_askpass_path = path
+        return path
 
     def _derive_repo_path(self, repo_url: str) -> Path:
         clean = repo_url.split("?", 1)[0].split("#", 1)[0].rstrip("/")
@@ -130,17 +202,21 @@ class WorkspaceManager:
             logger.warning(f"Failed to init git repository at {path}: {exc}")
 
     @staticmethod
-    def _checkout_branch(path: Path, branch: str | None) -> None:
+    def _checkout_branch(
+        path: Path, branch: str | None, *, env: dict[str, str] | None = None
+    ) -> None:
         if not branch:
             return
         try:
-            fetch(remote="origin", branch=branch, cwd=path)
-        except Exception:
-            pass
-        try:
+            fetch(remote="origin", branch=branch, cwd=path, env=env)
             checkout(branch, cwd=path)
-        except GitCommandError:
-            pass
+        except (GitCommandError, GitError, OSError) as exc:
+            detail = str(exc)
+            if len(detail) > 2000:
+                detail = detail[:2000] + "…"
+            raise RuntimeError(
+                f"Failed to checkout branch '{branch}' for repo at {path}. {detail}"
+            ) from exc
 
     def _ensure_git_excludes(self, repo_path: Path) -> None:
         if not is_repository(repo_path):

@@ -23,6 +23,8 @@ class ErrorCode(Enum):
     PROJECT_NOT_FOUND = (14001, "Project not found")
     SLASH_COMMAND_NOT_FOUND = (15001, "Slash command not found")
     SLASH_COMMAND_ALREADY_EXISTS = (15002, "Slash command already exists")
+    SUBAGENT_NOT_FOUND = (16001, "Subagent not found")
+    SUBAGENT_ALREADY_EXISTS = (16002, "Subagent already exists")
 
     INTERNAL_ERROR = (50000, "Internal server error")
     DATABASE_ERROR = (50101, "Database operation failed")

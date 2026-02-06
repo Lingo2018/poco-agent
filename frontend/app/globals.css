@@ -251,6 +251,111 @@
     display: none;
     /* Chrome, Safari and Opera */
   }
+
+  /* Skeleton animations - 骨架屏动画 */
+
+  /*
+   * Modern gradient shimmer effect
+   * Uses background-position animation for a smooth, performant shimmer
+   * Reference: https://frontend-hero.com/how-to-create-skeleton-loader
+   */
+  .skeleton-shimmer {
+    /* Gradient background with stronger highlight contrast */
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted) / 0.4) 0%,
+      hsl(var(--muted) / 0.4) 45%,
+      white 50%,
+      hsl(var(--muted) / 0.4) 55%,
+      hsl(var(--muted) / 0.4) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer-gradient 1.5s ease-in-out infinite;
+  }
+
+  @keyframes shimmer-gradient {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  /* Dark mode shimmer with lighter highlight */
+  .dark .skeleton-shimmer {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted) / 0.3) 0%,
+      hsl(var(--muted) / 0.3) 45%,
+      hsl(var(--muted-foreground) / 0.2) 50%,
+      hsl(var(--muted) / 0.3) 55%,
+      hsl(var(--muted) / 0.3) 100%
+    );
+  }
+
+  /*
+   * Accessibility: Reduced motion support
+   * For users who prefer reduced motion, use a subtle pulse instead
+   */
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton-shimmer {
+      animation: skeleton-pulse 2s ease-in-out infinite;
+    }
+  }
+
+  /* Subtle pulse animation for reduced motion preference */
+  @keyframes skeleton-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.6;
+    }
+  }
+
+  /* Legacy shimmer animation (deprecated, kept for compatibility) */
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  /* Pulse animation - simple breathing effect */
+  @keyframes skeleton-pulse-alt {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  /* Wave animation - elegant wave sweep effect */
+  @keyframes skeleton-wave {
+    0% {
+      transform: translateX(-100%) skewX(-15deg);
+    }
+    100% {
+      transform: translateX(100%) skewX(-15deg);
+    }
+  }
+
+  /* Gradient pulse - combines gradient and pulse */
+  @keyframes skeleton-gradient-pulse {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
 }
 
 /* 

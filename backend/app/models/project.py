@@ -1,7 +1,7 @@
 import uuid
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, String, text
+from sqlalchemy import Boolean, String, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models import Base, TimestampMixin
@@ -19,6 +19,11 @@ class Project(Base, TimestampMixin):
     )
     user_id: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
+    # Default git repository context for this project (GitHub-only in v1).
+    repo_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    git_branch: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    # Store env var key (e.g. "GITHUB_TOKEN"), not the secret itself.
+    git_token_env_key: Mapped[str | None] = mapped_column(String(255), nullable=True)
     is_deleted: Mapped[bool] = mapped_column(
         Boolean, default=False, server_default=text("false"), nullable=False
     )

@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 from app.core.deps import get_current_user_id, get_db
 from app.schemas.response import Response, ResponseSchema
 from app.schemas.user_skill_install import (
+    UserSkillInstallBulkUpdateRequest,
+    UserSkillInstallBulkUpdateResponse,
     UserSkillInstallCreateRequest,
     UserSkillInstallResponse,
     UserSkillInstallUpdateRequest,
@@ -33,6 +35,18 @@ async def create_skill_install(
 ) -> JSONResponse:
     result = service.create_install(db, user_id, request)
     return Response.success(data=result, message="Skill install created")
+
+
+@router.patch(
+    "/bulk", response_model=ResponseSchema[UserSkillInstallBulkUpdateResponse]
+)
+async def bulk_update_skill_installs(
+    request: UserSkillInstallBulkUpdateRequest,
+    user_id: str = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+) -> JSONResponse:
+    result = service.bulk_update_installs(db, user_id, request)
+    return Response.success(data=result, message="Skill installs updated")
 
 
 @router.patch("/{install_id}", response_model=ResponseSchema[UserSkillInstallResponse])

@@ -15,7 +15,12 @@ class ToolExecutionService:
     """Service layer for tool execution queries."""
 
     def get_tool_executions(
-        self, db: Session, session_id: uuid.UUID
+        self,
+        db: Session,
+        session_id: uuid.UUID,
+        *,
+        limit: int = 500,
+        offset: int = 0,
     ) -> list[ToolExecution]:
         """Gets all tool executions for a session.
 
@@ -26,7 +31,12 @@ class ToolExecutionService:
         Returns:
             List of tool executions ordered by creation time
         """
-        executions = ToolExecutionRepository.list_by_session(db, session_id)
+        executions = ToolExecutionRepository.list_by_session(
+            db,
+            session_id,
+            limit=max(1, int(limit)),
+            offset=max(0, int(offset)),
+        )
         logger.debug(
             f"Retrieved {len(executions)} tool executions for session {session_id}"
         )

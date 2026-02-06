@@ -8,12 +8,15 @@ export const API_ENDPOINTS = {
   sessions: "/sessions",
   sessionsWithTitles: "/sessions/list-with-titles",
   session: (sessionId: string) => `/sessions/${sessionId}`,
+  sessionCancel: (sessionId: string) => `/sessions/${sessionId}/cancel`,
   sessionState: (sessionId: string) => `/sessions/${sessionId}/state`,
   sessionMessages: (sessionId: string) => `/sessions/${sessionId}/messages`,
   sessionMessagesWithFiles: (sessionId: string) =>
     `/sessions/${sessionId}/messages-with-files`,
   sessionToolExecutions: (sessionId: string) =>
     `/sessions/${sessionId}/tool-executions`,
+  sessionBrowserScreenshot: (sessionId: string, toolUseId: string) =>
+    `/sessions/${sessionId}/computer/browser/${toolUseId}`,
   sessionUsage: (sessionId: string) => `/sessions/${sessionId}/usage`,
   sessionWorkspaceFiles: (sessionId: string) =>
     `/sessions/${sessionId}/workspace/files`,
@@ -32,6 +35,9 @@ export const API_ENDPOINTS = {
   // Runs
   runsBySession: (sessionId: string) => `/runs/session/${sessionId}`,
 
+  // User-level persistent custom instructions
+  customInstructions: "/claude-md",
+
   // Attachments
   attachmentsUpload: "/attachments/upload",
 
@@ -46,6 +52,7 @@ export const API_ENDPOINTS = {
   // MCP Installs (User)
   mcpInstalls: "/mcp-installs",
   mcpInstall: (installId: number) => `/mcp-installs/${installId}`,
+  mcpInstallsBulk: "/mcp-installs/bulk",
 
   // Skills
   skills: "/skills",
@@ -57,10 +64,15 @@ export const API_ENDPOINTS = {
   // Skill Installs (User)
   skillInstalls: "/skill-installs",
   skillInstall: (installId: number) => `/skill-installs/${installId}`,
+  skillInstallsBulk: "/skill-installs/bulk",
 
   // Slash Commands
   slashCommands: "/slash-commands",
   slashCommand: (commandId: number) => `/slash-commands/${commandId}`,
+
+  // Sub Agents
+  subAgents: "/subagents",
+  subAgent: (subAgentId: number) => `/subagents/${subAgentId}`,
 
   // Callback
   callback: "/callback",

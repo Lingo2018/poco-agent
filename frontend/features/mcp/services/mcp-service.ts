@@ -3,6 +3,8 @@ import type {
   McpServer,
   McpServerCreateInput,
   McpServerUpdateInput,
+  McpInstallBulkUpdateInput,
+  McpInstallBulkUpdateResponse,
   UserMcpInstall,
   UserMcpInstallCreateInput,
   UserMcpInstallUpdateInput,
@@ -63,6 +65,15 @@ export const mcpService = {
   ): Promise<UserMcpInstall> => {
     return apiClient.patch<UserMcpInstall>(
       API_ENDPOINTS.mcpInstall(installId),
+      input,
+    );
+  },
+
+  bulkUpdateInstalls: async (
+    input: McpInstallBulkUpdateInput,
+  ): Promise<McpInstallBulkUpdateResponse> => {
+    return apiClient.patch<McpInstallBulkUpdateResponse>(
+      API_ENDPOINTS.mcpInstallsBulk,
       input,
     );
   },

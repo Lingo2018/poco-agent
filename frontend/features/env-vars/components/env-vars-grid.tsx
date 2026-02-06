@@ -13,6 +13,8 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { SkeletonShimmer } from "@/components/ui/skeleton-shimmer";
+import { StaggeredList } from "@/components/ui/staggered-entrance";
 import { useT } from "@/lib/i18n/client";
 import type { EnvVar } from "@/features/env-vars/types";
 
@@ -21,6 +23,7 @@ const EMPTY_ENV_VARS: EnvVar[] = [];
 interface EnvVarsGridProps {
   envVars?: EnvVar[];
   savingKey?: string | null;
+  isLoading?: boolean;
   onDelete?: (id: number) => void;
   onEdit?: (envVar: EnvVar) => void;
   onOverrideSystem?: (key: string) => void;
@@ -46,7 +49,7 @@ function EnvVarsSection({
       {hint ? (
         <p className="px-1 text-xs text-muted-foreground/80">{hint}</p>
       ) : null}
-      <div className="space-y-2">{children}</div>
+      <div className="space-y-4">{children}</div>
     </section>
   );
 }
@@ -54,6 +57,7 @@ function EnvVarsSection({
 export function EnvVarsGrid({
   envVars: propEnvVars,
   savingKey,
+  isLoading = false,
   onDelete,
   onEdit,
   onOverrideSystem,
@@ -79,9 +83,13 @@ export function EnvVarsGrid({
     [userVars],
   );
 
+  if (isLoading && !vars.length) {
+    return <SkeletonShimmer count={5} itemClassName="min-h-[64px]" gap="md" />;
+  }
+
   if (!vars.length) {
     return (
-      <div className="text-sm text-muted-foreground border border-dashed border-border/50 rounded-lg p-6 text-center">
+      <div className="text-sm text-muted-foreground border border-dashed border-border/50 rounded-xl px-4 py-6 text-center">
         {t("library.envVars.empty", "暂未配置任何环境变量")}
       </div>
     );
@@ -98,67 +106,69 @@ export function EnvVarsGrid({
             "系统变量仅展示是否已设置；可通过创建同名个人变量来覆盖",
           )}
         >
-          {systemVars.map((envVar) => {
-            const isOverridden = userKeys.has(envVar.key);
-            const isBusy = savingKey === envVar.key;
-            return (
-              <div
-                key={envVar.id}
-                className="flex flex-col gap-2 rounded-lg border border-border/50 bg-background p-4 md:flex-row md:items-center md:justify-between"
-              >
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-sm">{envVar.key}</span>
-                    <Badge variant="outline" className="text-xs">
-                      {t("library.envVars.scope.system", "系统")}
-                    </Badge>
-                    <div className="flex items-center">
-                      {envVar.is_set ? (
-                        <span title={t("library.envVars.status.set", "已设置")}>
-                          <CheckCircle2 className="size-4 text-muted-foreground" />
-                        </span>
-                      ) : (
-                        <span
-                          title={t("library.envVars.status.unset", "未设置")}
-                        >
-                          <CircleOff className="size-4 text-muted-foreground" />
-                        </span>
+          <StaggeredList
+            items={systemVars}
+            show={!isLoading}
+            keyExtractor={(envVar) => envVar.id}
+            staggerDelay={50}
+            duration={400}
+            renderItem={(envVar) => {
+              const isOverridden = userKeys.has(envVar.key);
+              const isBusy = savingKey === envVar.key;
+              return (
+                <div className="flex items-center gap-4 rounded-xl border border-border/40 bg-muted/20 px-4 py-3 min-h-[64px]">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-mono text-sm">{envVar.key}</span>
+                      <Badge variant="outline" className="text-xs text-muted-foreground">
+                        {t("library.envVars.scope.system", "系统")}
+                      </Badge>
+                      <div className="flex items-center">
+                        {envVar.is_set ? (
+                          <span title={t("library.envVars.status.set", "已设置")}>
+                            <CheckCircle2 className="size-4 text-muted-foreground" />
+                          </span>
+                        ) : (
+                          <span title={t("library.envVars.status.unset", "未设置")}>
+                            <CircleOff className="size-4 text-muted-foreground" />
+                          </span>
+                        )}
+                      </div>
+                      {isOverridden && (
+                        <Badge variant="secondary" className="text-xs">
+                          {t("library.envVars.status.overridden", "已被个人覆盖")}
+                        </Badge>
                       )}
                     </div>
-                    {isOverridden && (
-                      <Badge variant="secondary" className="text-xs">
-                        {t("library.envVars.status.overridden", "已被个人覆盖")}
-                      </Badge>
+                    {envVar.description && (
+                      <p className="mt-1 text-xs text-muted-foreground break-words">
+                        {envVar.description}
+                      </p>
                     )}
                   </div>
-                  {envVar.description && (
-                    <p className="mt-1 text-xs text-muted-foreground break-words">
-                      {envVar.description}
-                    </p>
-                  )}
-                </div>
 
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-2"
-                    onClick={() => onOverrideSystem?.(envVar.key)}
-                    disabled={isBusy}
-                  >
-                    {isBusy ? (
-                      <Loader2 className="size-4 animate-spin" />
-                    ) : (
-                      <User className="size-4" />
-                    )}
-                    {isOverridden
-                      ? t("library.envVars.actions.editOverride", "更新个人值")
-                      : t("library.envVars.actions.override", "覆盖")}
-                  </Button>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-2"
+                      onClick={() => onOverrideSystem?.(envVar.key)}
+                      disabled={isBusy}
+                    >
+                      {isBusy ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        <User className="size-4" />
+                      )}
+                      {isOverridden
+                        ? t("library.envVars.actions.editOverride", "更新个人值")
+                        : t("library.envVars.actions.override", "覆盖")}
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            }}
+          />
         </EnvVarsSection>
       )}
 
@@ -171,70 +181,74 @@ export function EnvVarsGrid({
             "个人变量不会在前端展示明文；更新时请输入新值（留空表示不修改）",
           )}
         >
-          {userVars.map((envVar) => {
-            const overridesSystem = systemKeys.has(envVar.key);
-            const isBusy = savingKey === envVar.key;
-            return (
-              <div
-                key={envVar.id}
-                className="flex flex-col gap-2 rounded-lg border border-border/50 bg-background p-4 md:flex-row md:items-center md:justify-between"
-              >
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-sm">{envVar.key}</span>
-                    <Badge variant="outline" className="text-xs">
-                      {t("library.envVars.scope.user", "个人")}
-                    </Badge>
-                    <div className="flex items-center">
-                      <span title={t("library.envVars.status.set", "已设置")}>
-                        <CheckCircle2 className="size-4 text-muted-foreground" />
-                      </span>
-                    </div>
-                    {overridesSystem && (
-                      <Badge variant="secondary" className="text-xs">
-                        {t(
-                          "library.envVars.status.overridesSystem",
-                          "覆盖系统",
-                        )}
+          <StaggeredList
+            items={userVars}
+            show={!isLoading}
+            keyExtractor={(envVar) => envVar.id}
+            staggerDelay={50}
+            duration={400}
+            renderItem={(envVar) => {
+              const overridesSystem = systemKeys.has(envVar.key);
+              const isBusy = savingKey === envVar.key;
+              return (
+                <div className="flex items-center gap-4 rounded-xl border border-border/70 bg-card px-4 py-3 min-h-[64px]">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-mono text-sm">{envVar.key}</span>
+                      <Badge variant="outline" className="text-xs text-muted-foreground">
+                        {t("library.envVars.scope.user", "个人")}
                       </Badge>
+                      <div className="flex items-center">
+                        <span title={t("library.envVars.status.set", "已设置")}>
+                          <CheckCircle2 className="size-4 text-muted-foreground" />
+                        </span>
+                      </div>
+                      {overridesSystem && (
+                        <Badge variant="secondary" className="text-xs">
+                          {t(
+                            "library.envVars.status.overridesSystem",
+                            "覆盖系统",
+                          )}
+                        </Badge>
+                      )}
+                    </div>
+                    {envVar.description && (
+                      <p className="mt-1 text-xs text-muted-foreground break-words">
+                        {envVar.description}
+                      </p>
                     )}
                   </div>
-                  {envVar.description && (
-                    <p className="mt-1 text-xs text-muted-foreground break-words">
-                      {envVar.description}
-                    </p>
-                  )}
-                </div>
 
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-2"
-                    onClick={() => onEdit?.(envVar)}
-                    disabled={isBusy}
-                  >
-                    {isBusy ? (
-                      <Loader2 className="size-4 animate-spin" />
-                    ) : (
-                      <Pencil className="size-4" />
-                    )}
-                    {t("library.envVars.actions.edit", "更新")}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-9 text-muted-foreground hover:text-destructive"
-                    onClick={() => onDelete?.(envVar.id)}
-                    title={t("common.delete", "删除")}
-                    disabled={isBusy}
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-2"
+                      onClick={() => onEdit?.(envVar)}
+                      disabled={isBusy}
+                    >
+                      {isBusy ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        <Pencil className="size-4" />
+                      )}
+                      {t("library.envVars.actions.edit", "更新")}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-8 text-muted-foreground hover:text-destructive"
+                      onClick={() => onDelete?.(envVar.id)}
+                      title={t("common.delete", "删除")}
+                      disabled={isBusy}
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            }}
+          />
         </EnvVarsSection>
       )}
     </div>

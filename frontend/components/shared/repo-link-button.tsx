@@ -35,7 +35,6 @@ export function RepoLinkButton({
         title={REPO_URL}
       >
         <Github className="size-4" />
-        <span className="hidden sm:inline">{t("header.repoName")}</span>
       </a>
     </Button>
   );

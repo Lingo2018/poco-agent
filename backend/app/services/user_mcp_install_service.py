@@ -6,6 +6,8 @@ from app.models.user_mcp_install import UserMcpInstall
 from app.repositories.mcp_server_repository import McpServerRepository
 from app.repositories.user_mcp_install_repository import UserMcpInstallRepository
 from app.schemas.user_mcp_install import (
+    UserMcpInstallBulkUpdateRequest,
+    UserMcpInstallBulkUpdateResponse,
     UserMcpInstallCreateRequest,
     UserMcpInstallResponse,
     UserMcpInstallUpdateRequest,
@@ -31,6 +33,12 @@ class UserMcpInstallService:
             db, user_id, request.server_id
         )
         if existing:
+            if existing.is_deleted:
+                existing.is_deleted = False
+                existing.enabled = request.enabled
+                db.commit()
+                db.refresh(existing)
+                return self._to_response(existing)
             raise AppException(
                 error_code=ErrorCode.BAD_REQUEST,
                 message="MCP install already exists for server",
@@ -55,7 +63,11 @@ class UserMcpInstallService:
         request: UserMcpInstallUpdateRequest,
     ) -> UserMcpInstallResponse:
         install = UserMcpInstallRepository.get_by_id(db, install_id)
-        if not install or install.user_id != user_id:
+        if (
+            not install
+            or install.user_id != user_id
+            or getattr(install, "is_deleted", False)
+        ):
             raise AppException(
                 error_code=ErrorCode.NOT_FOUND,
                 message=f"MCP install not found: {install_id}",
@@ -68,6 +80,21 @@ class UserMcpInstallService:
         db.refresh(install)
         return self._to_response(install)
 
+    def bulk_update_installs(
+        self,
+        db: Session,
+        user_id: str,
+        request: UserMcpInstallBulkUpdateRequest,
+    ) -> UserMcpInstallBulkUpdateResponse:
+        updated_count = UserMcpInstallRepository.bulk_set_enabled(
+            db,
+            user_id=user_id,
+            enabled=request.enabled,
+            install_ids=request.install_ids,
+        )
+        db.commit()
+        return UserMcpInstallBulkUpdateResponse(updated_count=updated_count)
+
     def delete_install(self, db: Session, user_id: str, install_id: int) -> None:
         install = UserMcpInstallRepository.get_by_id(db, install_id)
         if not install or install.user_id != user_id:
@@ -75,7 +102,8 @@ class UserMcpInstallService:
                 error_code=ErrorCode.NOT_FOUND,
                 message=f"MCP install not found: {install_id}",
             )
-        UserMcpInstallRepository.delete(db, install)
+        install.is_deleted = True
+        install.enabled = False
         db.commit()
 
     @staticmethod

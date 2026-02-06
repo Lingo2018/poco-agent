@@ -25,8 +25,14 @@ export function AppShell({
   const { projects, addProject, updateProject, removeProject } = useProjects(
     {},
   );
-  const { taskHistory, addTask, removeTask, moveTask, refreshTasks } =
-    useTaskHistory({});
+  const {
+    taskHistory,
+    addTask,
+    removeTask,
+    moveTask,
+    renameTask,
+    refreshTasks,
+  } = useTaskHistory({});
 
   const deleteProject = useProjectDeletion({
     taskHistory,
@@ -92,6 +98,7 @@ export function AppShell({
               projects={projects}
               taskHistory={taskHistory}
               onDeleteTask={removeTask}
+              onRenameTask={renameTask}
               onMoveTaskToProject={moveTask}
               onCreateProject={addProject}
               onRenameProject={handleRenameProject}

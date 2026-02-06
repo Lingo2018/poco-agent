@@ -2,6 +2,7 @@ import logging
 import re
 import time
 from typing import Any
+from urllib.parse import urlparse
 
 from app.core.errors.error_codes import ErrorCode
 from app.core.errors.exceptions import AppException
@@ -10,6 +11,7 @@ from app.services.backend_client import BackendClient
 
 _ENV_PATTERN = re.compile(r"\$\{([^}]+)\}")
 logger = logging.getLogger(__name__)
+_GITHUB_HOSTS = {"github.com", "www.github.com"}
 
 
 def _resolve_env_value(value: Any, env_map: dict[str, str]) -> Any:
@@ -106,6 +108,39 @@ class ConfigResolver:
         input_files = config_snapshot.get("input_files") or []
 
         step_started = time.perf_counter()
+        try:
+            resolved_subagents = await self._resolve_effective_subagents(
+                user_id, config_snapshot
+            )
+        except Exception as exc:
+            logger.warning(f"Failed to resolve subagents for user {user_id}: {exc}")
+            resolved_subagents = {}
+        structured_agents = (
+            resolved_subagents.get("structured_agents")
+            if isinstance(resolved_subagents, dict)
+            else None
+        )
+        raw_agents = (
+            resolved_subagents.get("raw_agents")
+            if isinstance(resolved_subagents, dict)
+            else None
+        )
+        structured_count = (
+            len(structured_agents) if isinstance(structured_agents, dict) else 0
+        )
+        raw_count = len(raw_agents) if isinstance(raw_agents, dict) else 0
+        logger.info(
+            "timing",
+            extra={
+                "step": "config_resolve_subagents",
+                "duration_ms": int((time.perf_counter() - step_started) * 1000),
+                "subagents_structured": structured_count,
+                "subagents_raw": raw_count,
+                **ctx,
+            },
+        )
+
+        step_started = time.perf_counter()
         resolved_mcp = self._resolve_mcp(mcp_config, env_map)
         resolved_skills = self._resolve_skills(skill_files, env_map)
         resolved_inputs = _resolve_env_value(input_files, env_map)
@@ -123,6 +158,15 @@ class ConfigResolver:
         resolved["mcp_config"] = resolved_mcp
         resolved["skill_files"] = resolved_skills
         resolved["input_files"] = resolved_inputs
+        if isinstance(structured_agents, dict):
+            # Expose as `agents` to match ClaudeAgentOptions (programmatic subagents).
+            resolved["agents"] = structured_agents
+        if isinstance(raw_agents, dict):
+            # Raw markdown agents are staged into the workspace by SubAgentStager.
+            resolved["subagent_raw_agents"] = raw_agents
+        resolved_git = self._resolve_git_token(resolved, env_map)
+        if resolved_git:
+            resolved.update(resolved_git)
 
         logger.info(
             "timing",
@@ -133,6 +177,40 @@ class ConfigResolver:
             },
         )
         return resolved
+
+    @staticmethod
+    def _resolve_git_token(config_snapshot: dict, env_map: dict[str, str]) -> dict:
+        """Resolve git token for private GitHub repos.
+
+        We only store the env var key (git_token_env_key) in persisted snapshots.
+        The secret value is resolved here at runtime and passed to the executor.
+        """
+        token_key = str(config_snapshot.get("git_token_env_key") or "").strip()
+        if not token_key:
+            return {}
+
+        repo_url = str(config_snapshot.get("repo_url") or "").strip()
+        if not repo_url:
+            return {}
+
+        try:
+            parsed = urlparse(repo_url)
+        except Exception:
+            return {}
+
+        host = (parsed.netloc or "").strip().lower()
+        if parsed.scheme not in ("http", "https") or host not in _GITHUB_HOSTS:
+            # Safety: never resolve and forward GitHub token to unknown hosts.
+            return {}
+
+        token = env_map.get(token_key)
+        if not token:
+            raise AppException(
+                error_code=ErrorCode.ENV_VAR_NOT_FOUND,
+                message=f"Env var not found: {token_key} (required for private GitHub repo)",
+            )
+
+        return {"git_token": token}
 
     async def _get_env_map(self, user_id: str) -> dict[str, str]:
         return await self.backend_client.get_env_map(user_id=user_id)
@@ -179,6 +257,18 @@ class ConfigResolver:
 
         legacy = config_snapshot.get("skill_files")
         return legacy if isinstance(legacy, dict) else {}
+
+    async def _resolve_effective_subagents(
+        self, user_id: str, config_snapshot: dict
+    ) -> dict:
+        subagent_ids: list[int] | None
+        if "subagent_ids" not in config_snapshot:
+            subagent_ids = None
+        else:
+            subagent_ids = self._normalize_ids(config_snapshot.get("subagent_ids"))
+        return await self.backend_client.resolve_subagents(
+            user_id=user_id, subagent_ids=subagent_ids
+        )
 
     @staticmethod
     def _normalize_ids(value: Any) -> list[int]:

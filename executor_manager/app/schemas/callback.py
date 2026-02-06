@@ -51,11 +51,18 @@ class WorkspaceState(BaseModel):
     last_change: datetime
 
 
+class BrowserState(BaseModel):
+    """Browser/desktop capability state exposed to the UI."""
+
+    enabled: bool = False
+
+
 class AgentCurrentState(BaseModel):
     """Agent current state."""
 
     todos: list[TodoItem] = Field(default_factory=list)
     mcp_status: list[McpStatus] = Field(default_factory=list)
+    browser: BrowserState | None = None
     workspace_state: WorkspaceState | None = None
     current_step: str | None = None
 
@@ -67,6 +74,7 @@ class AgentCallbackRequest(BaseModel):
     time: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     status: CallbackStatus
     progress: int
+    error_message: str | None = None
     new_message: object | None = None
     state_patch: AgentCurrentState | None = None
     sdk_session_id: str | None = None

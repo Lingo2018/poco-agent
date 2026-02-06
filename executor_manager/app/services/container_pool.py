@@ -32,6 +32,8 @@ class ContainerPool:
         self,
         session_id: str,
         user_id: str,
+        *,
+        browser_enabled: bool = False,
         container_mode: str = "ephemeral",
         container_id: str | None = None,
     ) -> tuple[str, str]:
@@ -40,6 +42,7 @@ class ContainerPool:
         Args:
             session_id: Session ID
             user_id: User ID
+            browser_enabled: Whether this container needs the desktop/browser stack (noVNC/Chrome).
             container_mode: ephemeral | persistent
             container_id: Existing container ID to reuse
 
@@ -57,24 +60,51 @@ class ContainerPool:
             container = self.containers[container_id]
             self.session_to_container[session_id] = container_id
 
-            port_info = container.ports["8000/tcp"][0]
-            logger.info(
-                "timing",
-                extra={
-                    "step": "container_reuse_total",
-                    "duration_ms": int((time.perf_counter() - overall_started) * 1000),
-                    "session_id": session_id,
-                    "user_id": user_id,
-                    "container_id": container_id,
-                    "container_mode": container_mode,
-                },
-            )
-            return f"http://{published_host}:{port_info['HostPort']}", container_id
+            # Best-effort refresh port mappings.
+            try:
+                container.reload()
+            except Exception:
+                pass
+
+            # If the caller now requires browser support but the existing container was created
+            # without it, recreate the container (most common when upgrading a persistent container).
+            if browser_enabled and not self._is_browser_enabled_container(container):
+                logger.info(
+                    "container_reuse_mismatch_recreate",
+                    extra={
+                        "session_id": session_id,
+                        "user_id": user_id,
+                        "container_id": container_id,
+                        "container_mode": container_mode,
+                        "browser_enabled": True,
+                    },
+                )
+                await self.delete_container(container_id)
+            else:
+                port_info = container.ports["8000/tcp"][0]
+                logger.info(
+                    "timing",
+                    extra={
+                        "step": "container_reuse_total",
+                        "duration_ms": int(
+                            (time.perf_counter() - overall_started) * 1000
+                        ),
+                        "session_id": session_id,
+                        "user_id": user_id,
+                        "container_id": container_id,
+                        "container_mode": container_mode,
+                        "browser_enabled": bool(browser_enabled),
+                    },
+                )
+                return (
+                    f"http://{published_host}:{port_info['HostPort']}",
+                    container_id,
+                )
 
         container_id = f"exec-{session_id[:8]}"
         container_name = f"executor-{session_id[:8]}"
 
-        # 清理可能存在的同名容器
+        # Remove stale container with the same name (best-effort).
         step_started = time.perf_counter()
         removed_stale = False
         try:
@@ -121,25 +151,33 @@ class ContainerPool:
             "container_id": container_id,
             "user": user_id,
             "container_mode": container_mode,
+            "browser_enabled": "true" if browser_enabled else "false",
         }
 
         step_started = time.perf_counter()
+        image = self._resolve_executor_image(browser_enabled=browser_enabled)
+        ports = {"8000/tcp": None}
+        environment = {
+            "ANTHROPIC_AUTH_TOKEN": self.settings.anthropic_token,
+            "ANTHROPIC_BASE_URL": self.settings.anthropic_base_url,
+            "DEFAULT_MODEL": self.settings.default_model,
+            "WORKSPACE_PATH": "/workspace",
+            "USER_ID": user_id,
+            "SESSION_ID": session_id,
+            "ALL_PROXY": self.settings.api_proxy or "",
+            "HTTPS_PROXY": self.settings.api_proxy or "",
+            "HTTP_PROXY": self.settings.api_proxy or "",
+        }
+        if browser_enabled:
+            environment["POCO_BROWSER_VIEWPORT_SIZE"] = (
+                self.settings.poco_browser_viewport_size
+            )
         container = self.docker_client.containers.run(
-            image=self.settings.executor_image,
+            image=image,
             name=container_name,
-            environment={
-                "ANTHROPIC_AUTH_TOKEN": self.settings.anthropic_token,
-                "ANTHROPIC_BASE_URL": self.settings.anthropic_base_url,
-                "DEFAULT_MODEL": self.settings.default_model,
-                "WORKSPACE_PATH": "/workspace",
-                "USER_ID": user_id,
-                "SESSION_ID": session_id,
-                "ALL_PROXY": self.settings.api_proxy or "",
-                "HTTPS_PROXY": self.settings.api_proxy or "",
-                "HTTP_PROXY": self.settings.api_proxy or "",
-            },
+            environment=environment,
             volumes={workspace_volume: {"bind": "/workspace", "mode": "rw"}},
-            ports={"8000/tcp": None},
+            ports=ports,
             detach=True,
             auto_remove=True,
             labels=labels,
@@ -154,7 +192,8 @@ class ContainerPool:
                 "user_id": user_id,
                 "container_id": container_id,
                 "container_name": container_name,
-                "image": self.settings.executor_image,
+                "image": image,
+                "browser_enabled": bool(browser_enabled),
             },
         )
 
@@ -204,6 +243,26 @@ class ContainerPool:
             },
         )
         return executor_url, container_id
+
+    def _resolve_executor_image(self, *, browser_enabled: bool) -> str:
+        """Pick executor image based on browser requirement."""
+        if not browser_enabled:
+            return self.settings.executor_image
+        candidate = (self.settings.executor_browser_image or "").strip()
+        if candidate:
+            return candidate
+        # Backward-compatible fallback: may not have a desktop stack, but keeps the system running.
+        logger.warning(
+            "executor_browser_image_not_configured_falling_back",
+            extra={"executor_image": self.settings.executor_image},
+        )
+        return self.settings.executor_image
+
+    @staticmethod
+    def _is_browser_enabled_container(container: "Container") -> bool:
+        labels = getattr(container, "labels", None) or {}
+        raw = str(labels.get("browser_enabled", "")).strip().lower()
+        return raw in {"true", "1", "yes"}
 
     def _wait_for_container_ready(
         self,
@@ -353,20 +412,110 @@ class ContainerPool:
             pass
 
     async def cancel_task(self, session_id: str) -> None:
-        """Cancel task and stop container."""
+        """Cancel task and stop the executor container.
+
+        Note: container bookkeeping is in-memory. When the service restarts or runs with
+        multiple workers, the session->container mapping may be missing. In that case,
+        fall back to resolving the container by Docker labels/name.
+        """
         logger.info(f"Cancelling task for session {session_id}")
 
         container_id = self.session_to_container.pop(session_id, None)
-        if not container_id:
+        containers_to_stop: list["Container"] = []
+        seen: set[str] = set()
+
+        tracked = self.containers.pop(container_id, None) if container_id else None
+        if tracked is not None:
+            containers_to_stop.append(tracked)
+            cid = getattr(tracked, "id", None)
+            if isinstance(cid, str) and cid:
+                seen.add(cid)
+
+        def _extend_unique(found: list["Container"]) -> None:
+            for c in found:
+                cid = getattr(c, "id", None)
+                if not isinstance(cid, str) or not cid:
+                    continue
+                if cid in seen:
+                    continue
+                seen.add(cid)
+                containers_to_stop.append(c)
+
+        # Prefer exact match by full session_id label.
+        try:
+            found = self.docker_client.containers.list(
+                all=True, filters={"label": f"session_id={session_id}"}
+            )
+            _extend_unique(found)
+        except Exception:
+            pass
+
+        # Best-effort: if we know the logical container_id label, try to locate by that label too.
+        if container_id:
+            try:
+                found = self.docker_client.containers.list(
+                    all=True, filters={"label": f"container_id={container_id}"}
+                )
+                _extend_unique(found)
+            except Exception:
+                pass
+
+        # Fallback to deterministic name (used by get_or_create_container).
+        try:
+            name = f"executor-{session_id[:8]}"
+            found = self.docker_client.containers.get(name)
+            _extend_unique([found])
+        except docker.errors.NotFound:
+            pass
+        except Exception:
+            pass
+
+        if not containers_to_stop:
+            logger.info(
+                "cancel_task_no_container_found",
+                extra={"session_id": session_id, "container_id": container_id},
+            )
             return
 
-        if container_id in self.containers:
-            container = self.containers.pop(container_id)
+        for container in containers_to_stop:
+            labels = getattr(container, "labels", None) or {}
+            logical_id = labels.get("container_id")
             try:
                 container.stop(timeout=10)
-                logger.info(f"Container {container_id} stopped")
+                logger.info(
+                    "container_stopped",
+                    extra={
+                        "session_id": session_id,
+                        "container_id": logical_id or container_id,
+                        "docker_id": container.id,
+                        "container_name": container.name,
+                    },
+                )
+            except docker.errors.NotFound:
+                # Best-effort: the container may have already been removed (auto_remove=True).
+                pass
             except Exception as e:
-                logger.error(f"Failed to stop container {container_id}: {e}")
+                logger.error(
+                    "container_stop_failed",
+                    extra={
+                        "session_id": session_id,
+                        "container_id": logical_id or container_id,
+                        "docker_id": getattr(container, "id", None),
+                        "container_name": getattr(container, "name", None),
+                        "error": str(e),
+                    },
+                )
+
+            # Clean up any stale bookkeeping for this logical container_id.
+            if isinstance(logical_id, str) and logical_id:
+                self.containers.pop(logical_id, None)
+                bound_sessions = [
+                    sid
+                    for sid, cid in self.session_to_container.items()
+                    if cid == logical_id
+                ]
+                for sid in bound_sessions:
+                    self.session_to_container.pop(sid, None)
 
     def get_container_stats(self) -> dict[str, int | list[dict]]:
         """Get container statistics."""

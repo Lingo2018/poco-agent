@@ -13,7 +13,9 @@ from app.services.executor_client import ExecutorClient
 from app.services.config_resolver import ConfigResolver
 from app.services.skill_stager import SkillStager
 from app.services.attachment_stager import AttachmentStager
+from app.services.claude_md_stager import ClaudeMdStager
 from app.services.slash_command_stager import SlashCommandStager
+from app.services.sub_agent_stager import SubAgentStager
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +31,9 @@ class RunPullService:
         self.config_resolver = ConfigResolver(self.backend_client)
         self.skill_stager = SkillStager()
         self.attachment_stager = AttachmentStager()
+        self.claude_md_stager = ClaudeMdStager()
         self.slash_command_stager = SlashCommandStager()
+        self.subagent_stager = SubAgentStager()
 
         self.worker_id = f"{socket.gethostname()}:{os.getpid()}"
         self._semaphore = asyncio.Semaphore(self.settings.max_concurrent_tasks)
@@ -271,13 +275,73 @@ class RunPullService:
                 },
             )
 
+            # Stage user-level CLAUDE.md (persistent instructions) into ~/.claude.
             step_started = time.perf_counter()
+            try:
+                claude_md = await self.backend_client.get_claude_md(user_id=user_id)
+                enabled = bool(claude_md.get("enabled"))
+                content = (
+                    claude_md.get("content")
+                    if isinstance(claude_md.get("content"), str)
+                    else ""
+                )
+                staged_md = self.claude_md_stager.stage(
+                    user_id=user_id,
+                    session_id=session_id,
+                    enabled=enabled,
+                    content=content,
+                )
+                bytes_val = staged_md.get("bytes", 0)
+                logger.info(
+                    "timing",
+                    extra={
+                        "step": "run_dispatch_stage_claude_md",
+                        "duration_ms": int((time.perf_counter() - step_started) * 1000),
+                        "enabled": bool(staged_md.get("enabled")),
+                        "bytes": int(bytes_val) if isinstance(bytes_val, int) else 0,
+                        **ctx,
+                    },
+                )
+            except Exception as exc:
+                # Best-effort: don't block execution if CLAUDE.md staging fails.
+                logger.warning(
+                    f"Failed to stage CLAUDE.md for session {session_id}: {exc}"
+                )
+
+            step_started = time.perf_counter()
+            raw_agents_val = resolved_config.pop("subagent_raw_agents", None)
+            raw_agents = raw_agents_val if isinstance(raw_agents_val, dict) else {}
+            try:
+                staged_agents = self.subagent_stager.stage_raw_agents(
+                    user_id=user_id,
+                    session_id=session_id,
+                    raw_agents=raw_agents,
+                )
+                logger.info(
+                    "timing",
+                    extra={
+                        "step": "run_dispatch_stage_subagents",
+                        "duration_ms": int((time.perf_counter() - step_started) * 1000),
+                        "subagents_requested": len(raw_agents),
+                        "subagents_staged": len(staged_agents),
+                        **ctx,
+                    },
+                )
+            except Exception as exc:
+                # Best-effort: keep tasks running even if staging fails.
+                logger.warning(
+                    f"Failed to stage subagents for session {session_id}: {exc}"
+                )
+
+            step_started = time.perf_counter()
+            browser_enabled = bool(resolved_config.get("browser_enabled"))
             (
                 executor_url,
                 container_id,
             ) = await self.container_pool.get_or_create_container(
                 session_id=session_id,
                 user_id=user_id,
+                browser_enabled=browser_enabled,
                 container_mode=container_mode,
                 container_id=container_id,
             )
@@ -288,6 +352,7 @@ class RunPullService:
                     "duration_ms": int((time.perf_counter() - step_started) * 1000),
                     "container_mode": container_mode,
                     "container_id": container_id,
+                    "browser_enabled": browser_enabled,
                     **ctx,
                 },
             )

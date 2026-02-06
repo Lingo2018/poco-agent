@@ -1,11 +1,9 @@
 "use client";
 
-import { ArrowLeft, Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Clock, Plus } from "lucide-react";
 
 import { useT } from "@/lib/i18n/client";
 import { Button } from "@/components/ui/button";
-import { useAppShell } from "@/components/shared/app-shell-context";
 
 interface ScheduledTasksHeaderProps {
   onAddClick?: () => void;
@@ -15,26 +13,26 @@ export function ScheduledTasksHeader({
   onAddClick,
 }: ScheduledTasksHeaderProps) {
   const { t } = useT("translation");
-  const router = useRouter();
-  const { lng } = useAppShell();
 
   return (
-    <header className="flex h-16 shrink-0 items-center justify-between border-b border-border/50 bg-background/50 px-6 backdrop-blur-sm sticky top-0 z-10">
-      <div className="flex items-center gap-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => router.push(`/${lng}/capabilities`)}
-          className="mr-2"
-        >
-          <ArrowLeft className="size-5" />
-        </Button>
-        <span className="text-lg font-bold tracking-tight">
-          {t("library.scheduledTasks.page.title")}
-        </span>
+    <header className="flex h-auto min-h-[64px] shrink-0 items-center justify-between border-b border-border/50 bg-background/50 px-6 py-4 backdrop-blur-sm sticky top-0 z-10">
+      <div className="flex items-center gap-3 min-w-0 flex-1">
+        <div className="flex items-center justify-center p-2 rounded-lg bg-muted text-foreground shrink-0">
+          <Clock className="size-5" />
+        </div>
+        <div className="flex flex-col gap-1 min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <span className="text-lg font-bold tracking-tight">
+              {t("library.scheduledTasks.page.title")}
+            </span>
+          </div>
+          <span className="text-sm text-muted-foreground">
+            {t("library.scheduledTasks.description")}
+          </span>
+        </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 shrink-0 ml-4">
         <Button
           variant="ghost"
           size="sm"

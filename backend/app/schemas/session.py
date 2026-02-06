@@ -12,12 +12,19 @@ class TaskConfig(BaseModel):
 
     repo_url: str | None = None
     git_branch: str = "main"
+    # Optional env var key holding a GitHub token (e.g. "GITHUB_TOKEN").
+    git_token_env_key: str | None = None
+    # Built-in browser capability toggle (Playwright MCP is injected internally by the executor).
+    browser_enabled: bool = False
     # MCP server enable/disable toggles (true=enabled, false=disabled).
     # Servers not in this dict use their default enabled state from user installations.
     mcp_config: dict[str, bool] = Field(default_factory=dict)
     # Skill enable/disable toggles (true=enabled, false=disabled).
     # Skills not in this dict use their default enabled state from user installations.
     skill_config: dict[str, bool] = Field(default_factory=dict)
+    # Optional explicit subagent selection (by id). When omitted, backend resolves
+    # enabled subagents as defaults.
+    subagent_ids: list[int] = Field(default_factory=list)
     input_files: list[InputFile] = Field(default_factory=list)
 
 
@@ -33,6 +40,7 @@ class SessionUpdateRequest(BaseModel):
 
     status: str | None = None
     sdk_session_id: str | None = None
+    title: str | None = None
     workspace_archive_url: str | None = None
     project_id: UUID | None = None
     state_patch: dict[str, Any] | None = None
@@ -71,3 +79,19 @@ class SessionStateResponse(BaseModel):
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+
+
+class SessionCancelRequest(BaseModel):
+    """Request to cancel a session (cancel all unfinished runs)."""
+
+    reason: str | None = None
+
+
+class SessionCancelResponse(BaseModel):
+    """Session cancel response."""
+
+    session_id: UUID
+    status: str
+    canceled_runs: int = 0
+    expired_user_input_requests: int = 0
+    executor_cancelled: bool = False

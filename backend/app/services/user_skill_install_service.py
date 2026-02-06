@@ -6,6 +6,8 @@ from app.models.user_skill_install import UserSkillInstall
 from app.repositories.skill_repository import SkillRepository
 from app.repositories.user_skill_install_repository import UserSkillInstallRepository
 from app.schemas.user_skill_install import (
+    UserSkillInstallBulkUpdateRequest,
+    UserSkillInstallBulkUpdateResponse,
     UserSkillInstallCreateRequest,
     UserSkillInstallResponse,
     UserSkillInstallUpdateRequest,
@@ -32,6 +34,12 @@ class UserSkillInstallService:
             db, user_id, request.skill_id
         )
         if existing:
+            if existing.is_deleted:
+                existing.is_deleted = False
+                existing.enabled = request.enabled
+                db.commit()
+                db.refresh(existing)
+                return self._to_response(existing)
             raise AppException(
                 error_code=ErrorCode.BAD_REQUEST,
                 message="Skill install already exists for skill",
@@ -56,7 +64,11 @@ class UserSkillInstallService:
         request: UserSkillInstallUpdateRequest,
     ) -> UserSkillInstallResponse:
         install = UserSkillInstallRepository.get_by_id(db, install_id)
-        if not install or install.user_id != user_id:
+        if (
+            not install
+            or install.user_id != user_id
+            or getattr(install, "is_deleted", False)
+        ):
             raise AppException(
                 error_code=ErrorCode.NOT_FOUND,
                 message=f"Skill install not found: {install_id}",
@@ -69,6 +81,21 @@ class UserSkillInstallService:
         db.refresh(install)
         return self._to_response(install)
 
+    def bulk_update_installs(
+        self,
+        db: Session,
+        user_id: str,
+        request: UserSkillInstallBulkUpdateRequest,
+    ) -> UserSkillInstallBulkUpdateResponse:
+        updated_count = UserSkillInstallRepository.bulk_set_enabled(
+            db,
+            user_id=user_id,
+            enabled=request.enabled,
+            install_ids=request.install_ids,
+        )
+        db.commit()
+        return UserSkillInstallBulkUpdateResponse(updated_count=updated_count)
+
     def delete_install(self, db: Session, user_id: str, install_id: int) -> None:
         install = UserSkillInstallRepository.get_by_id(db, install_id)
         if not install or install.user_id != user_id:
@@ -76,7 +103,8 @@ class UserSkillInstallService:
                 error_code=ErrorCode.NOT_FOUND,
                 message=f"Skill install not found: {install_id}",
             )
-        UserSkillInstallRepository.delete(db, install)
+        install.is_deleted = True
+        install.enabled = False
         db.commit()
 
     @staticmethod

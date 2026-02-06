@@ -41,10 +41,11 @@ export function EnvVarsPageClient() {
           isLoading={envVarStore.isLoading}
         >
           <div className="flex flex-1 flex-col px-6 py-6 overflow-auto">
-            <div className="w-full max-w-6xl mx-auto">
+            <div className="w-full max-w-4xl mx-auto">
               <EnvVarsGrid
                 envVars={envVarStore.envVars}
                 savingKey={envVarStore.savingEnvKey}
+                isLoading={envVarStore.isLoading}
                 onDelete={(id) => {
                   envVarStore.removeEnvVar(id);
                 }}

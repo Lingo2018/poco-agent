@@ -8,8 +8,12 @@ import type {
   FileNode,
   ChatMessage,
   MessageBlock,
+  SessionCancelRequest,
+  SessionCancelResponse,
   SessionResponse,
   SessionUpdateRequest,
+  ToolExecutionResponse,
+  ComputerBrowserScreenshotResponse,
   TaskEnqueueRequest,
   TaskEnqueueResponse,
   TaskConfig,
@@ -80,6 +84,10 @@ function parseConfigSnapshot(
           (id): id is number => typeof id === "number",
         )
       : undefined,
+    browser_enabled:
+      typeof configSnapshot.browser_enabled === "boolean"
+        ? configSnapshot.browser_enabled
+        : undefined,
   };
 }
 
@@ -95,14 +103,17 @@ function toExecutionSession(
         ? "completed"
         : session.status === "failed"
           ? "failed"
-          : session.status === "running"
-            ? "running"
-            : "accepted",
+          : session.status === "canceled" || session.status === "cancelled"
+            ? "canceled"
+            : session.status === "running"
+              ? "running"
+              : "accepted",
     progress,
     state_patch: session.state_patch ?? {},
     config_snapshot: parseConfigSnapshot(session.config_snapshot),
     task_name: undefined,
     user_prompt: undefined,
+    title: session.title,
   };
 }
 
@@ -115,6 +126,7 @@ function createDefaultSession(sessionId: string): ExecutionSession {
     state_patch: {},
     task_name: undefined,
     user_prompt: undefined,
+    title: null,
   };
 }
 
@@ -223,6 +235,16 @@ export const chatService = {
     );
   },
 
+  cancelSession: async (
+    sessionId: string,
+    payload?: SessionCancelRequest,
+  ): Promise<SessionCancelResponse> => {
+    return apiClient.post<SessionCancelResponse>(
+      API_ENDPOINTS.sessionCancel(sessionId),
+      payload ?? {},
+    );
+  },
+
   getRunsBySession: async (
     sessionId: string,
     params?: { limit?: number; offset?: number },
@@ -233,6 +255,28 @@ export const chatService = {
     });
     return apiClient.get<RunResponse[]>(
       `${API_ENDPOINTS.runsBySession(sessionId)}${query}`,
+    );
+  },
+
+  getToolExecutions: async (
+    sessionId: string,
+    params?: { limit?: number; offset?: number },
+  ): Promise<ToolExecutionResponse[]> => {
+    const query = buildQuery({
+      limit: params?.limit,
+      offset: params?.offset,
+    });
+    return apiClient.get<ToolExecutionResponse[]>(
+      `${API_ENDPOINTS.sessionToolExecutions(sessionId)}${query}`,
+    );
+  },
+
+  getBrowserScreenshot: async (
+    sessionId: string,
+    toolUseId: string,
+  ): Promise<ComputerBrowserScreenshotResponse> => {
+    return apiClient.get<ComputerBrowserScreenshotResponse>(
+      API_ENDPOINTS.sessionBrowserScreenshot(sessionId, toolUseId),
     );
   },
 
