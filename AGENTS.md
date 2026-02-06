@@ -25,6 +25,8 @@ This file provides guidance for AI coding agents working with code in this repos
 
 5. **GIT OPERATIONS RESTRICTED**: `git commit`, `git push`, `git reset`, and other destructive git commands require explicit user approval.
 
+6. **语言要求 / LANGUAGE REQUIREMENT**: 所有回复必须使用中文（简体）。All responses MUST be in Chinese (Simplified).
+
 ### Example Interaction:
 ```
 User: Fix the bug in api.py
