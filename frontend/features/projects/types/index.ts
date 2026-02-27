@@ -9,6 +9,8 @@ export interface ProjectItem {
   gitTokenEnvKey?: string | null;
   /** Number of tasks under this project, if the API returns it */
   taskCount?: number;
+  /** Optional text summary shown in the header */
+  description?: string | null;
   /** Owning user identifier */
   userId?: string;
   createdAt?: string;
@@ -21,4 +23,12 @@ export interface TaskHistoryItem {
   timestamp: string;
   status: "pending" | "running" | "completed" | "failed" | "canceled";
   projectId?: string;
+  hasPendingUserInput?: boolean;
+}
+
+export interface AddTaskOptions {
+  timestamp?: string;
+  status?: TaskHistoryItem["status"];
+  projectId?: string;
+  id?: string;
 }

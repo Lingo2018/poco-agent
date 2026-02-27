@@ -1,0 +1,1607 @@
+{
+  "welcome": "Bienvenue sur Poco",
+  "description": "Une plateforme d'exécution d'agents IA multi-services",
+  "home": "Accueil",
+  "language": "Langue",
+  "sidebar": {
+    "newTask": "Nouvelle tâche",
+    "search": "Rechercher",
+    "library": "Capacités",
+    "scheduledTasks": "Tâches planifiées",
+    "projects": "Projets",
+    "newProject": "Nouveau projet",
+    "newProjectPrompt": "Entrez le nom du projet :",
+    "addProject": "Ajouter un projet",
+    "allTasks": "Liste des tâches",
+    "filterTasks": "Filtrer les tâches",
+    "settings": "Paramètres",
+    "deleteTask": "Supprimer la tâche",
+    "rename": "Renommer",
+    "moveToProject": "Déplacer vers un projet",
+    "delete": "Supprimer",
+    "askTag": "ask",
+    "shareTitle": "Partagez Poco avec vos amis",
+    "shareDesc": "500 points chacun",
+    "user": "Utilisateur",
+    "defaultUserName": "Utilisateur Poco",
+    "removeFromProject": "Retirer du projet",
+    "batchOperations": "Opérations groupées",
+    "holdToSelect": "Maintenir pour sélectionner",
+    "holdToExitSelect": "Maintenir pour quitter la sélection",
+    "moveToHere": "Déplacer ici",
+    "plan": "Forfait Pro",
+    "onboarding": "Guided tutorial"
+  },
+  "header": {
+    "workspace": "Poco 1.0",
+    "switchWorkspace": "Changer d'espace de travail",
+    "switchModel": "Changer de modèle",
+    "notifications": "Notifications",
+    "more": "Plus",
+    "repoLink": "Dépôt du projet",
+    "repoName": "poco-ai/poco-agent"
+  },
+  "hero": {
+    "title": "Que puis-je faire pour vous ?",
+    "subtitle": "Assignez une tâche ou posez une question.",
+    "attachFile": "Ajouter une pièce jointe",
+    "voiceInput": "Saisie vocale",
+    "send": "Envoyer",
+    "placeholder": "Assignez une tâche ou posez une question",
+    "inputPrompts": {
+      "taskDefault": "Confiez n'importe quelle tâche à Poco",
+      "planDefault": "Créez un plan de tâche avec Poco",
+      "shortcutHint": "/ pour les commandes Slash, Shift+Enter pour une nouvelle ligne, Enter pour envoyer"
+    },
+    "tools": "Connectez vos outils à Poco",
+    "importLocal": "Importer depuis un fichier local",
+    "importFigma": "Importer depuis Figma (coming soon)",
+    "connect": "Connecter",
+    "configure": "Configurer",
+    "comingSoon": "Bientôt disponible",
+    "modes": {
+      "task": "Tâche",
+      "taskHelp": "Exécuter une fois immédiatement. Convient pour la plupart des problèmes.",
+      "plan": "Étape par étape",
+      "planHelp": "Proposer d'abord un plan d'exécution, puis exécuter étape par étape après confirmation.",
+      "scheduled": "Planifié",
+      "scheduledHelp": "Exécuter selon un calendrier Cron et éventuellement réutiliser l'espace de travail.",
+      "planPlaceholder": "Décrivez une tâche complexe. Je proposerai d'abord un plan, puis exécuterai après votre confirmation…",
+      "planPrefix": "Proposez d'abord un plan d'exécution clair (étapes avec points de contrôle). Ne pas encore exécuter. Après ma confirmation, exécuter étape par étape.\\n\\nTâche : {{prompt}}"
+    },
+    "modeLabels": {
+      "task": "Mode tâche",
+      "plan": "Mode plan",
+      "scheduled": "Mode planifié"
+    },
+    "repo": {
+      "toggle": "Paramètres du dépôt",
+      "dialogTitle": "Paramètres du dépôt",
+      "urlLabel": "URL GitHub",
+      "urlPlaceholder": "ex. https://github.com/org/repo",
+      "branchLabel": "Branche",
+      "branchPlaceholder": "ex. main",
+      "usageLabel": "Utilisation",
+      "usage": {
+        "session": {
+          "title": "Utiliser uniquement pour cette tâche (pas de projet)",
+          "help": "Idéal pour une lecture/compréhension rapide ; ne crée pas de projet"
+        },
+        "createProject": {
+          "title": "Créer un projet (long terme)",
+          "help": "Idéal pour un travail continu ; sera enregistré comme le dépôt par défaut du projet"
+        }
+      },
+      "projectNameLabel": "Nom du projet",
+      "projectNamePlaceholder": "ex. owner/repo",
+      "tokenKeyLabel": "Clé de variable d'environnement GitHub (optionnel)",
+      "tokenKeyPlaceholder": "ex. GITHUB_TOKEN",
+      "tokenKeyHelp": "Utilisé pour cloner des dépôts privés. Définissez d'abord la valeur de la clé dans les variables d'environnement.",
+      "goToEnvVars": "Aller aux variables d'environnement",
+      "toasts": {
+        "missingGithubUrl": "Veuillez entrer une URL GitHub",
+        "createProjectFailed": "Échec de la création du projet. Veuillez réessayer.",
+        "projectCreated": "Projet créé : {{name}}"
+      }
+    },
+    "browser": {
+      "toggle": "Navigateur",
+      "enabledTooltipTitle": "Navigateur activé",
+      "enabledTooltipDescription": "Poco utilisera le navigateur pour consulter des pages web, extraire des informations de page et réaliser des actions liées au web.",
+      "disabledTooltipTitle": "Navigateur désactivé",
+      "disabledTooltipDescription": "Activez-le pour permettre à Poco d'utiliser le navigateur pour consulter des pages web et effectuer des tâches liées au web.",
+      "enabledHint": "Activé"
+    },
+    "runSchedule": {
+      "toggle": "Heure d'exécution",
+      "dialogTitle": "Heure d'exécution",
+      "fields": {
+        "mode": "Mode",
+        "scheduledAt": "Exécuter à"
+      },
+      "modes": {
+        "immediate": "Exécuter maintenant",
+        "scheduled": "Exécuter une fois à une heure spécifique",
+        "nightly": "Exécuter une fois la nuit"
+      },
+      "timezoneHint": "Fuseau horaire : {{timezone}}",
+      "preview": "Sera exécuté : {{summary}}",
+      "summary": {
+        "immediate": "Exécuter maintenant",
+        "scheduled": "{{datetime}} ({{timezone}})",
+        "nightly": "Nuit (fenêtre nocturne)"
+      },
+      "badge": {
+        "immediate": "Exécuter maintenant",
+        "scheduled": "Planifié : {{datetime}}",
+        "scheduledEmpty": "Planifié : non défini",
+        "nightly": "Nuit"
+      }
+    },
+    "toasts": {
+      "uploadSuccess": "Fichier uploadé avec succès",
+      "uploadFailed": "Échec de l'upload du fichier",
+      "actionFailed": "Action échouée, veuillez réessayer",
+      "fileTooLarge": "Fichier trop volumineux, max 100 Mo supporté",
+      "duplicateFileName": "Une pièce jointe nommée {{name}} existe déjà. Veuillez la supprimer ou la renommer."
+    },
+    "mcpSelector": {
+      "title": "Sélectionner les serveurs MCP",
+      "description": "Choisissez quels serveurs MCP activer pour cette tâche. Les serveurs non installés ne seront pas affichés.",
+      "loading": "Chargement...",
+      "noServers": "Aucun serveur MCP installé. Veuillez d'abord installer des serveurs depuis la page MCP.",
+      "selected": "{{count}}/{{total}} serveurs sélectionnés",
+      "cancel": "Annuler",
+      "confirm": "Confirmer"
+    },
+    "warnings": {
+      "tooManyMcps": "Trop de serveurs MCP activés ({{count}}). Cela peut ralentir le chargement du système et réduire les performances.",
+      "tooManySkills": "Trop de compétences activées ({{count}}). Cela peut ralentir le chargement du système et réduire les performances.",
+      "mcpLimitReached": "L'activation de ce MCP dépassera la limite recommandée (3 serveurs). Trop de MCP peuvent ralentir le chargement du système.",
+      "skillLimitReached": "L'activation de cette compétence dépassera la limite recommandée (5 compétences). Trop de compétences peuvent ralentir le chargement du système."
+    }
+  },
+  "prompts": {
+    "createSlides": "Créer des diapositives",
+    "createWebsite": "Créer un site web",
+    "developApp": "Développer une app",
+    "design": "Design",
+    "more": "Plus"
+  },
+  "hints": {
+    "slashCommand": "commande Slash",
+    "send": "Envoyer",
+    "newLine": "Nouvelle ligne",
+    "separator": ","
+  },
+  "mocks": {
+    "projects": {
+      "newProject": "Nouveau projet"
+    },
+    "timestamps": {
+      "twoMinutesAgo": "il y a 2 minutes",
+      "oneHourAgo": "il y a 1 heure",
+      "justNow": "À l'instant"
+    }
+  },
+  "message": {
+    "status": {
+      "sending": "Envoi",
+      "sent": "Envoyé",
+      "streaming": "Génération",
+      "completed": "Terminé",
+      "failed": "Échoué"
+    }
+  },
+  "chat": {
+    "newChat": "Nouveau chat",
+    "continueChat": "Continuer le chat",
+    "emptyState": "Commencez une nouvelle conversation",
+    "emptyStateDesc": "Entrez un message pour commencer à discuter avec l'assistant IA",
+    "stopGenerating": "Arrêter la génération",
+    "cancelTask": "Annuler la tâche",
+    "cancelTaskConfirm": "Annuler la tâche actuelle ?",
+    "regenerate": "Régénérer",
+    "model": "Modèle",
+    "tokens": "Tokens",
+    "tokenInput": "entrée",
+    "tokenOutput": "sortie",
+    "cost": "Coût",
+    "duration": "Durée",
+    "executionTitle": "Exécution IA",
+    "inputPlaceholder": "Entrée pour envoyer, Maj + Entrée pour nouvelle ligne",
+    "askUserTitle": "Nécessite votre entrée",
+    "askUserSubmit": "Soumettre",
+    "askUserOtherPlaceholder": "Entrez votre réponse",
+    "askUserOtherOption": "Autre",
+    "askUserRequired": "Veuillez répondre à toutes les questions avant de soumettre",
+    "askUserSubmitted": "Réponses soumises",
+    "askUserFailed": "Soumission échouée, veuillez réessayer",
+    "askUserCompleteTitle": "Terminé",
+    "askUserCompleteHint": "Envoi de vos réponses…",
+    "askUserRetry": "Réessayer",
+    "planApprovalTitle": "Approbation du plan",
+    "planApprovalHint": "Veuillez examiner le plan d'exécution ci-dessous. L'approbation lancera l'exécution et peut modifier des fichiers / exécuter des commandes.",
+    "planApprovalApprove": "Approuver & exécuter",
+    "planApprovalReject": "Rejeter",
+    "planApprovalEmpty": "Aucun plan fourni",
+    "askUserTimeout": "Temps restant {{seconds}}s",
+    "askUserPrevious": "Précédent",
+    "askUserNext": "Suivant",
+    "askUserGoTo": "Question {{index}}",
+    "askUserProgress": "{{current}} / {{total}}",
+    "internalContextInjected": "Contexte interne injecté",
+    "internalContextSubtitle": "Des compétences/système/outils (pas votre entrée)",
+    "internalContextView": "Voir ({{count}})",
+    "internalContextHide": "Masquer",
+    "internalContextCopy": "Copier",
+    "thinkingTitle": "Réflexion",
+    "toolExecution": "Exécution d'outil",
+    "subagentTranscript": "Transcription du sub-agent",
+    "subagentExecution": "Sous-agent",
+    "input": "Entrée",
+    "output": "Sortie",
+    "scrollToLatestMessage": "Aller au dernier message",
+    "userPromptTimelineJump": "Aller au message utilisateur {{index}}",
+    "userPromptTimelineEmpty": "(Prompt vide)",
+    "expand": "Développer",
+    "collapse": "Réduire",
+    "copyMessage": "Copier le message",
+    "formulaCopied": "Copié",
+    "editMessage": "Modifier le message",
+    "quoteModify": "Répondre en citant",
+    "exportImage": "Generate conversation image",
+    "exportLongImage": "Export long image",
+    "exportMultiImage": "Export multiple images",
+    "exportImageSuccess": "Conversation image generated",
+    "exportImageMultiSuccess": "Exported {{count}} images",
+    "exportImageEmpty": "No conversation content to export",
+    "exportImageFailed": "Failed to generate conversation image",
+    "statusBar": {
+      "browser": "Navigateur",
+      "openDesktop": "Ouvrir le bureau",
+      "desktopPreparing": "Préparation du lien bureau",
+      "skillsConfigured": "Compétences (configurées)",
+      "skillsUsed": "Compétences",
+      "mcpConfigured": "Serveurs MCP (configurés)",
+      "mcp": "Serveurs MCP"
+    },
+    "typingWords": [
+      "Accomplishing",
+      "Actioning",
+      "Actualizing",
+      "Baking",
+      "Brewing",
+      "Calculating",
+      "Cerebrating",
+      "Churning",
+      "Clauding",
+      "Coalescing",
+      "Cogitating",
+      "Computing",
+      "Conjuring",
+      "Considering",
+      "Cooking",
+      "Crafting",
+      "Creating",
+      "Crunching",
+      "Deliberating",
+      "Determining",
+      "Doing",
+      "Effecting",
+      "Finagling",
+      "Forging",
+      "Forming",
+      "Generating",
+      "Hatching",
+      "Herding",
+      "Honking",
+      "Hustling",
+      "Ideating",
+      "Inferring",
+      "Manifesting",
+      "Marinating",
+      "Moseying",
+      "Mulling",
+      "Mustering",
+      "Musing",
+      "Noodling",
+      "Percolating",
+      "Pondering",
+      "Processing",
+      "Puttering",
+      "Reticulating",
+      "Ruminating",
+      "Schlepping",
+      "Shucking",
+      "Simmering",
+      "Smooshing",
+      "Spinning",
+      "Stewing",
+      "Synthesizing",
+      "Thinking",
+      "Transmuting",
+      "Vibing",
+      "Working"
+    ],
+    "collapseRightPanel": "Collapse output panel",
+    "expandRightPanel": "Expand output panel",
+    "toolCards": {
+      "tools": {
+        "skill": "Competence",
+        "task": "Executer la tache",
+        "askUserQuestion": "Poser une question",
+        "bash": "Executer une commande",
+        "edit": "Modifier un fichier",
+        "read": "Lire un fichier",
+        "write": "Ecrire un fichier",
+        "glob": "Trouver des fichiers",
+        "grep": "Rechercher du texte",
+        "notebookEdit": "Modifier un notebook",
+        "webFetch": "Recuperer une page web",
+        "webSearch": "Rechercher sur le web",
+        "todoWrite": "Mettre a jour les taches",
+        "bashOutput": "Sortie de commande",
+        "killBash": "Arreter la commande",
+        "exitPlanMode": "Quitter le mode plan",
+        "listMcpResources": "Lister les ressources MCP",
+        "readMcpResource": "Lire une ressource MCP",
+        "browser": "Navigateur",
+        "tool": "Outil"
+      },
+      "summary": {
+        "questions": "{{count}} questions",
+        "todos": "{{count}} todos",
+        "items": "{{count}} items"
+      },
+      "fields": {
+        "description": "Description",
+        "prompt": "Prompt",
+        "subagentType": "Subagent",
+        "questions": "Questions",
+        "question": "Question",
+        "options": "Options",
+        "command": "Command",
+        "timeout": "Timeout",
+        "runInBackground": "Background",
+        "glob": "Glob filter",
+        "type": "Type",
+        "outputMode": "Output mode",
+        "ignoreCase": "Ignore case",
+        "showLineNumber": "Line number",
+        "beforeContext": "Before context",
+        "afterContext": "After context",
+        "context": "Context",
+        "headLimit": "Head limit",
+        "multiline": "Multiline",
+        "filePath": "File path",
+        "oldString": "Old text",
+        "newString": "New text",
+        "replaceAll": "Replace all",
+        "newSource": "New source",
+        "content": "Content",
+        "offset": "Offset",
+        "limit": "Limit",
+        "pattern": "Pattern",
+        "path": "Path",
+        "query": "Query",
+        "url": "URL",
+        "statusCode": "Status code",
+        "searchPath": "Search path",
+        "allowedDomains": "Allowed domains",
+        "blockedDomains": "Blocked domains",
+        "filter": "Filter",
+        "href": "Href",
+        "selector": "Selector",
+        "text": "Text",
+        "role": "Role",
+        "name": "Name",
+        "value": "Value",
+        "button": "Button",
+        "key": "Key",
+        "server": "Server",
+        "uri": "URI",
+        "notebookPath": "Notebook path",
+        "editMode": "Edit mode",
+        "cellId": "Cell ID",
+        "cellType": "Cell type",
+        "shellId": "Shell ID",
+        "bashId": "Bash ID",
+        "status": "Status",
+        "killed": "Killed",
+        "exitCode": "Exit code",
+        "approved": "Approved",
+        "answer": "Answer",
+        "output": "Output",
+        "result": "Result",
+        "usage": "Usage",
+        "duration": "Duration",
+        "cost": "Cost",
+        "total": "Total",
+        "message": "Message",
+        "bytes": "Bytes",
+        "replacements": "Replacements",
+        "totalLines": "Total lines",
+        "linesReturned": "Returned lines",
+        "mimeType": "MIME type",
+        "fileSize": "File size",
+        "editType": "Edit type",
+        "finalUrl": "Final URL",
+        "totalResults": "Total results",
+        "totalMatches": "Total matches",
+        "matches": "Matches",
+        "files": "Files",
+        "results": "Results",
+        "resources": "Resources",
+        "stats": "Stats",
+        "contents": "Contents",
+        "multiSelect": "Multi-select"
+      },
+      "text": {
+        "rawOutput": "Raw output",
+        "structured": "Structured data",
+        "empty": "No data"
+      }
+    }
+  },
+  "status": {
+    "pending": "En attente",
+    "running": "En cours",
+    "completed": "Terminé",
+    "failed": "Échoué",
+    "canceled": "Annulé",
+    "loading": "Chargement...",
+    "progress": "Progrès"
+  },
+  "fileChanges": {
+    "title": "Modifications de fichiers",
+    "noChanges": "Aucune modification de fichier pour le moment",
+    "lines": "lignes",
+    "files": "fichiers",
+    "added": "Ajouté",
+    "modified": "Modifié",
+    "deleted": "Supprimé",
+    "renamed": "Renommé",
+    "showDiff": "Afficher le diff",
+    "hideDiff": "Masquer le diff"
+  },
+  "todo": {
+    "title": "Tâches",
+    "pending": "En attente",
+    "inProgress": "En cours",
+    "completed": "Terminé"
+  },
+  "mcp": {
+    "title": "Serveurs MCP",
+    "connected": "Connecté",
+    "disconnected": "Déconnecté",
+    "error": "Erreur"
+  },
+  "mobile": {
+    "chat": "Chat",
+    "computer": "Ordinateur",
+    "artifacts": "Artefacts",
+    "status": "Statut"
+  },
+  "computer": {
+    "title": "Ordinateur Poco",
+    "description": "Voir les étapes du navigateur et du terminal pendant l'exécution",
+    "status": {
+      "live": "En direct",
+      "replay": "Relecture"
+    },
+    "tabs": {
+      "browser": "Navigateur",
+      "terminal": "Terminal"
+    },
+    "replay": {
+      "empty": "Aucune étape de relecture pour le moment",
+      "timeline": "Chronologie",
+      "noSelection": "(aucune étape sélectionnée)",
+      "stepCounter": "{{current}} / {{total}}",
+      "durationMs": "{{ms}} ms",
+      "durationSec": "{{sec}} s",
+      "controls": {
+        "first": "Premier",
+        "prev": "Précédent",
+        "play": "Lecture",
+        "pause": "Pause",
+        "next": "Suivant",
+        "latest": "Dernier"
+      },
+      "filter": {
+        "all": "Tout",
+        "browser": "Navigateur",
+        "terminal": "Terminal"
+      },
+      "limitHint": "Affiche uniquement les {{limit}} premières étapes",
+      "liveLabel": "En direct"
+    },
+    "browser": {
+      "screenshotAlt": "Capture d'écran du navigateur",
+      "screenshotLoading": "Chargement de la capture...",
+      "screenshotUnavailable": "Aucune capture disponible",
+      "steps": "Étapes du navigateur",
+      "noSteps": "Aucune étape de navigateur pour le moment"
+    },
+    "terminal": {
+      "noSteps": "Aucune sortie de terminal pour le moment",
+      "unknownCommand": "(commande inconnue)",
+      "noOutput": "(pas de sortie)",
+      "running": "Exécution...",
+      "exitCode": "Code de sortie {{code}}",
+      "killed": "Tué par timeout"
+    }
+  },
+  "artifacts": {
+    "empty": {
+      "creating": "Poco est en cours de création...",
+      "working": "L'agent travaille sur votre tâche",
+      "noChanges": "Aucune modification de fichier",
+      "description": "Les modifications de fichiers générées par l'exécution IA seront affichées ici"
+    },
+    "viewer": {
+      "loadingEngine": "Chargement du moteur de prévisualisation...",
+      "loadingDoc": "Lecture du document...",
+      "parseError": "Impossible d'analyser le fichier Excalidraw",
+      "fetchError": "Échec de la récupération du contenu du document",
+      "retry": "Réessayer",
+      "selectFile": "Veuillez sélectionner un fichier à droite pour la prévisualisation",
+      "supportedFormats": "Supporte les PDF, documents Office, formats d'image courants, vidéos MP4, fichiers XMind, fichiers .excalidraw et fichiers .drawio",
+      "processing": "Traitement du fichier",
+      "notSupported": "Prévisualisation non supportée pour ce format",
+      "openInNewWindow": "Ouvrir dans une nouvelle fenêtre",
+      "downloadOriginal": "Télécharger le fichier original"
+    },
+    "summary": {
+      "total": "Total",
+      "totalFiles": "fichiers",
+      "added": "Ajouté",
+      "modified": "Modifié",
+      "deleted": "Supprimé",
+      "renamed": "Renommé",
+      "totalfiles": "fichiers"
+    }
+  },
+  "search": {
+    "placeholder": "Rechercher des tâches, projets, messages...",
+    "tasks": "Tâches",
+    "projects": "Projets",
+    "messages": "Messages",
+    "noResults": "Aucun résultat trouvé"
+  },
+  "library": {
+    "title": "Capacités",
+    "subtitle": "Gérer vos compétences, préréglages et outils",
+    "comingSoon": "Bientôt disponible",
+    "sidebar": {
+      "title": "Raccourcis de capacités",
+      "description": "Sélectionnez une capacité pour accéder à sa configuration.",
+      "mobile": "Parcourir les capacités",
+      "groups": {
+        "core": "Core",
+        "automation": "Automatisation",
+        "integrations": "Intégrations",
+        "labs": "Labs"
+      }
+    },
+    "skillsStore": {
+      "title": "Compétences",
+      "description": "Parcourir et installer les compétences IA contributées par la communauté",
+      "feature1": "Bibliothèque riche en compétences",
+      "feature2": "Installation en un clic",
+      "feature3": "Configuration personnalisée",
+      "action": "Parcourir les compétences",
+      "install": "Installer",
+      "uninstall": "Désinstaller",
+      "installed": "Installé",
+      "notInstalled": "Non installé",
+      "hasConfig": "Configurable"
+    },
+    "mcpInstall": {
+      "title": "MCP",
+      "description": "Gérer et configurer les serveurs Model Context Protocol",
+      "feature1": "Déploiement rapide MCP",
+      "feature2": "Gestion visuelle",
+      "feature3": "Monitoring en temps réel",
+      "action": "Gérer les serveurs"
+    },
+    "envVars": {
+      "title": "Variables d'environnement",
+      "sidebarTitle": "Variables d'environnement",
+      "description": "Stocker les clés API et secrets utilisés par les compétences et serveurs MCP.",
+      "header": {
+        "title": "Variables d'environnement",
+        "add": "Ajouter une variable"
+      },
+      "copied": "Copié dans le presse-papiers",
+      "copy": "Copier",
+      "copyError": "Échec de la copie",
+      "valuePlaceholder": "Entrer la valeur",
+      "required": "Obligatoire",
+      "secretLabel": "Secret",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "otherTitle": "Variables existantes",
+      "empty": "Aucune variable d'environnement pour le moment",
+      "addTitle": "Ajouter une variable d'environnement",
+      "editTitle": "Mettre à jour une variable d'environnement",
+      "overrideTitle": "Remplacer la variable système",
+      "addDescription": "Fournissez une paire clé/valeur et marquez comme secret si c'est une clé API.",
+      "keyLabel": "Clé",
+      "valueLabel": "Valeur",
+      "valueCreateHint": "L'ancienne valeur n'est jamais affichée. Entrez la nouvelle valeur à définir.",
+      "valueUpdateHint": "L'ancienne valeur n'est jamais affichée. Laissez vide pour garder la valeur actuelle.",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Description optionnelle",
+      "secretToggle": "Masquer la valeur (clé API)",
+      "secretHelp": "Les valeurs d'environnement ne sont jamais affichées en clair. Vous pouvez seulement définir une nouvelle valeur.",
+      "addButton": "Ajouter une variable",
+      "refresh": "Actualiser",
+      "systemHint": "Les variables système montrent seulement si elles sont définies. Créez une variable utilisateur avec la même clé pour remplacer.",
+      "userHint": "Les variables utilisateur ne sont jamais affichées en clair dans l'interface. Entrez une nouvelle valeur pour mettre à jour (laissez vide pour garder).",
+      "status": {
+        "set": "Définie",
+        "unset": "Non définie",
+        "overridden": "Remplacée par l'utilisateur",
+        "overridesSystem": "Remplace le système"
+      },
+      "actions": {
+        "override": "Remplacer",
+        "editOverride": "Modifier le remplacement utilisateur",
+        "edit": "Modifier"
+      },
+      "toasts": {
+        "created": "Variable d'environnement créée",
+        "updated": "Variable d'environnement mise à jour",
+        "deleted": "Variable d'environnement supprimée",
+        "error": "Action échouée, veuillez réessayer",
+        "refreshed": "Variables d'environnement actualisées",
+        "keyRequired": "La clé ne peut pas être vide",
+        "copied": "Copié",
+        "copyFailed": "Échec de la copie"
+      },
+      "scopeLabel": "Portée",
+      "scope": {
+        "system": "Système",
+        "user": "Utilisateur",
+        "global": "Global",
+        "mcp": "MCP"
+      }
+    },
+    "personalization": {
+      "card": {
+        "title": "Personnalisation",
+        "description": "Définir des préférences persistantes et des instructions pour toutes vos tâches",
+        "feature1": "Portée globale au niveau utilisateur",
+        "feature2": "Instructions personnalisées",
+        "feature3": "Mettre à jour à tout moment, appliqué au prochain lancement",
+        "action": "Ouvrir"
+      },
+      "header": {
+        "title": "Personnalisation",
+        "refresh": "Actualiser",
+        "clear": "Effacer",
+        "save": "Enregistrer",
+        "saving": "Enregistrement…"
+      },
+      "customInstructions": {
+        "title": "Instructions personnalisées",
+        "description": "Ces instructions influencent la façon dont l'agent répond et se comporte dans toutes les tâches futures.",
+        "hintScope": "C'est global par utilisateur : les nouveaux chats, les chats continus et les tâches planifiées l'appliqueront tous.",
+        "hintSecrets": "Ne stockez pas de clés API ou d'autres secrets ici.",
+        "status": {
+          "enabled": "Activé",
+          "disabled": "Désactivé"
+        },
+        "editor": {
+          "label": "Contenu des instructions",
+          "insertTemplate": "Insérer un exemple",
+          "placeholder": "ex. Toujours répondre en chinois ; garder un ton professionnel ; préférer les puces…",
+          "tip": "Astuce : Désactiver signifie que les instructions ne sont pas appliquées. Vous pouvez toujours modifier et enregistrer pour plus tard.",
+          "template": "# Exemple d'instructions personnalisées\\n\\n## Style de sortie\\n- Toujours répondre en chinois\\n- Préférer une structure claire et des puces\\n\\n## Règles de codage\\n- Les commentaires de code doivent être en anglais\\n- Utiliser des annotations de type pour Python (3.12+)\\n"
+        }
+      },
+      "toasts": {
+        "saved": "Enregistré",
+        "cleared": "Effacé",
+        "refreshed": "Actualisé",
+        "error": "Action échouée, veuillez réessayer"
+      }
+    },
+    "slashCommands": {
+      "card": {
+        "title": "Slash Commandes",
+        "description": "Enregistrer les commandes / fréquemment utilisées avec autocomplétion dans la saisie du chat",
+        "feature1": "Bibliothèque de commandes personnelles (global)",
+        "feature2": "Supporte argument-hint et allowed-tools",
+        "feature3": "Tapez / pour autocompléter et insérer",
+        "action": "Gérer les commandes"
+      },
+      "header": {
+        "title": "Slash Commandes",
+        "add": "Ajouter une commande"
+      },
+      "searchPlaceholder": "Rechercher des commandes...",
+      "addCard": "Ajouter une commande slash",
+      "summary": "Commandes",
+      "enabled": "Activé",
+      "mode": {
+        "raw": "Markdown",
+        "structured": "Structuré"
+      },
+      "delete": {
+        "title": "Supprimer la commande ?",
+        "description": "Après suppression, cette commande ne sera plus disponible dans les sessions."
+      },
+      "dialog": {
+        "createTitle": "Créer une commande",
+        "editTitle": "Modifier la commande"
+      },
+      "fields": {
+        "name": "Nom",
+        "nameHint": "sans /",
+        "namePlaceholder": "refactor",
+        "enabled": "Activé",
+        "rawMarkdown": "Markdown",
+        "rawMarkdownPlaceholder": "Collez le .md complet ici (frontmatter YAML supporté)",
+        "modelIgnoredHint": "Astuce : le champ model du frontmatter YAML sera ignoré.",
+        "description": "Description",
+        "descriptionPlaceholder": "ex. exécuter des tests et analyser les échecs",
+        "argumentHint": "argument-hint",
+        "argumentHintPlaceholder": "[test-pattern]",
+        "allowedTools": "allowed-tools",
+        "allowedToolsPlaceholder": "Read, Grep, Glob",
+        "content": "Contenu",
+        "contentPlaceholder": "Décrive ce que Claude doit faire (Markdown)"
+      },
+      "toasts": {
+        "loadError": "Échec du chargement des commandes",
+        "created": "Commande créée",
+        "updated": "Commande mise à jour",
+        "deleted": "Commande supprimée",
+        "error": "Action échouée"
+      },
+      "empty": "Aucune commande pour le moment"
+    },
+    "subAgents": {
+      "card": {
+        "title": "Sub-agents",
+        "description": "Créer des sub-agents spécialisés réutilisables pour l'isolement de contexte et la parallélisation.",
+        "feature1": "Contexte isolé pour garder le chat principal propre",
+        "feature2": "Exécuter plusieurs sub-agents en parallèle",
+        "feature3": "Limiter les outils/modèles pour un meilleur contrôle",
+        "action": "Gérer les sub-agents"
+      },
+      "header": {
+        "title": "Sub-agents",
+        "add": "Ajouter un sub-agent"
+      },
+      "searchPlaceholder": "Rechercher des sub-agents...",
+      "addCard": "Ajouter un sub-agent",
+      "summary": "Sub-agents",
+      "enabled": "Activé",
+      "empty": "Aucun sub-agent pour le moment",
+      "mode": {
+        "raw": "Markdown",
+        "structured": "Structuré"
+      },
+      "models": {
+        "inherit": "Hériter"
+      },
+      "delete": {
+        "title": "Supprimer le sub-agent ?",
+        "description": "Après suppression, ce sub-agent ne sera plus disponible dans les sessions."
+      },
+      "dialog": {
+        "createTitle": "Créer un sub-agent",
+        "editTitle": "Modifier le sub-agent"
+      },
+      "fields": {
+        "name": "Nom",
+        "namePlaceholder": "code-reviewer",
+        "enabled": "Activé",
+        "description": "Description",
+        "descriptionOptional": "Description (optionnelle)",
+        "descriptionPlaceholder": "Utilisé pour les examens de qualité, de sécurité et de maintenabilité.",
+        "model": "Modèle",
+        "tools": "Outils",
+        "toolsPlaceholder": "Read, Grep, Glob",
+        "toolsHint": "Laisser vide pour hériter tous les outils disponibles.",
+        "prompt": "System Prompt",
+        "promptPlaceholder": "Vous êtes un expert en examen de code...",
+        "rawMarkdown": "Markdown",
+        "rawMarkdownPlaceholder": "Collez le .md complet ici (frontmatter YAML requis ; le nom doit correspondre)",
+        "rawMarkdownHint": "Astuce : le mode raw est staging dans ~/.claude/agents et chargé par le SDK."
+      },
+      "toasts": {
+        "loadError": "Échec du chargement des sub-agents",
+        "created": "Sub-agent créé",
+        "updated": "Sub-agent mis à jour",
+        "deleted": "Sub-agent supprimé",
+        "error": "Action échouée"
+      }
+    },
+    "tags": {
+      "system": "Préréglage",
+      "user": "Mes compétences"
+    },
+    "actions": {
+      "processing": "Traitement…"
+    },
+    "scheduledTasks": {
+      "title": "Tâches planifiées",
+      "description": "Configurer la planification et les plans d'exécution automatisés des tâches",
+      "feature1": "Support des expressions Cron",
+      "feature2": "Suivi de l'historique des tâches",
+      "feature3": "Mécanisme de réessai en cas d'échec",
+      "action": "Créer une tâche",
+      "page": {
+        "title": "Tâches planifiées",
+        "create": "Créer une tâche",
+        "createTitle": "Créer une tâche planifiée",
+        "trigger": "Exécuter",
+        "empty": "Aucune tâche planifiée pour le moment"
+      },
+      "detail": {
+        "title": "Tâche planifiée",
+        "subtitle": "{{schedule}}",
+        "refresh": "Actualiser",
+        "edit": "Modifier",
+        "editTitle": "Modifier la tâche planifiée",
+        "deleteTitle": "Supprimer la tâche planifiée ?",
+        "deleteDescription": "Cela arrêtera les déclenchements futurs. L'historique des exécutions reste dans les sessions de chat.",
+        "notFound": "Tâche planifiée non trouvée",
+        "enabledOn": "Activé",
+        "enabledOff": "En pause",
+        "schedule": "Planification",
+        "lastRun": "Dernière exécution",
+        "reuseSessionOn": "Réutiliser (même session/espace de travail)",
+        "reuseSessionOff": "Ne pas réutiliser (nouvelle session/espace de travail par exécution)",
+        "reuseSessionImmutable": "Ne peut plus être modifié après création",
+        "openWorkspace": "Ouvrir la session",
+        "runsTitle": "Historique d'exécution",
+        "noRuns": "Aucune exécution pour le moment. Une exécution apparaîtra après le prochain déclenchement.",
+        "runTriggeredAt": "Déclenché à",
+        "runStatus": "Statut",
+        "runDuration": "Durée",
+        "runCost": "Coût",
+        "runTokens": "Tokens (entrée/sortie)",
+        "runProgress": "Progrès",
+        "durationSeconds": "{{seconds}}s",
+        "durationMinutesSeconds": "{{minutes}}m {{seconds}}s",
+        "viewResult": "Voir le résultat"
+      },
+      "status": {
+        "queued": "En file d'attente",
+        "claimed": "Réclamé",
+        "running": "En cours",
+        "completed": "Terminé",
+        "failed": "Échoué",
+        "canceled": "Annulé",
+        "unknown": "Inconnu"
+      },
+      "fields": {
+        "name": "Nom",
+        "cron": "Expression Cron",
+        "timezone": "Fuseau horaire",
+        "prompt": "Prompt",
+        "enabled": "Activé",
+        "enabledHelp": "Lorsque désactivé, il ne s'exécutera pas automatiquement, mais peut encore être déclenché manuellement.",
+        "reuseSession": "Réutiliser session/espace de travail",
+        "reuseSessionHelp": "Lorsque activé, le même espace de travail est réutilisé et les fichiers générés sont conservés.",
+        "nextRunAt": "Prochaine exécution",
+        "lastStatus": "Dernier statut",
+        "actions": "Actions"
+      },
+      "placeholders": {
+        "name": "ex. Build quotidien",
+        "prompt": "Que doit faire cette tâche planifiée ?"
+      },
+      "toasts": {
+        "created": "Tâche planifiée créée",
+        "updated": "Tâche planifiée mise à jour",
+        "deleted": "Tâche planifiée supprimée",
+        "triggered": "Déclenché",
+        "error": "Opération échouée, veuillez réessayer plus tard"
+      },
+      "schedule": {
+        "dialogTitle": "Paramètres de la tâche planifiée",
+        "repeat": "Planification",
+        "repeatOptions": {
+          "interval": "Tous les",
+          "daily": "Quotidien",
+          "weekly": "Hebdomadaire",
+          "monthly": "Mensuel"
+        },
+        "interval": {
+          "every": "Tous les",
+          "unitMinute": "minute(s)",
+          "unitHour": "heure(s)"
+        },
+        "time": "Heure",
+        "weekdays": {
+          "label": "Jours de la semaine",
+          "short": {
+            "0": "Dim",
+            "1": "Lun",
+            "2": "Mar",
+            "3": "Mer",
+            "4": "Jeu",
+            "5": "Ven",
+            "6": "Sam"
+          }
+        },
+        "monthDay": "Jour",
+        "preview": "Sera exécuté : {{summary}}",
+        "advanced": "Avancé",
+        "useCron": "Utiliser une expression Cron",
+        "useCronHelp": "Lorsque activé, l'expression Cron remplace la planification ci-dessus.",
+        "cronPlaceholder": "ex. */5 * * * *",
+        "cronHelp": "Expression Cron (5 champs : minute heure jour mois jour de la semaine).",
+        "summary": {
+          "intervalMinutes": "Toutes les {{count}} minute(s)",
+          "intervalHours": "Toutes les {{count}} heure(s)",
+          "daily": "Quotidiennement à {{time}}",
+          "weekly": "Hebdomadairement le {{days}} à {{time}}",
+          "monthly": "Mensuellement le jour {{day}} à {{time}}",
+          "cron": "Cron : {{cron}}"
+        }
+      }
+    },
+    "more": {
+      "title": "Plus",
+      "description": "Explorer plus de fonctionnalités et extensions",
+      "feature1": "Marketplace de préréglages",
+      "feature2": "Guides d'intégration",
+      "feature3": "Documentation API",
+      "action": "En savoir plus"
+    },
+    "skillsPage": {
+      "header": {
+        "title": "Compétences",
+        "subtitle": "Explorer et gérer les capacités IA"
+      },
+      "searchPlaceholder": "Rechercher des compétences...",
+      "addCard": "Ajouter une compétence",
+      "items": {
+        "webSearch": {
+          "name": "Recherche Web",
+          "description": "Effectuer des recherches web en temps réel pour récupérer des informations à jour sur Internet."
+        },
+        "codeExecution": {
+          "name": "Exécution de code",
+          "description": "Exécuter du code Python en toute sécurité dans un environnement sandbox pour effectuer des calculs ou des analyses de données."
+        },
+        "imageGeneration": {
+          "name": "Génération d'images",
+          "description": "Générer des images de haute qualité à partir de descriptions textuelles utilisant des modèles IA avancés."
+        },
+        "textAnalysis": {
+          "name": "Analyse de texte",
+          "description": "Analyser le sentiment, les entités et la syntaxe du contenu textuel."
+        },
+        "dataVisualization": {
+          "name": "Visualisation de données",
+          "description": "Créer des graphiques et des tableaux à partir de données pour de meilleures insights."
+        }
+      }
+    },
+    "skillsManager": {
+      "stats": {
+        "available": "Disponible",
+        "installed": "Installé",
+        "enabled": "Activé"
+      },
+      "section": {
+        "title": "Compétences"
+      },
+      "scope": {
+        "system": "Système",
+        "user": "Utilisateur"
+      },
+      "fields": {
+        "id": "id",
+        "source": "Source"
+      },
+      "actions": {
+        "install": "Installer",
+        "uninstall": "Désinstaller"
+      },
+      "toasts": {
+        "loadError": "Échec du chargement des compétences",
+        "actionError": "Opération échouée, veuillez réessayer plus tard",
+        "installed": "Compétence installée",
+        "uninstalled": "Compétence désinstallée",
+        "enabled": "Compétence activée",
+        "disabled": "Compétence désactivée",
+        "actionFailed": "Opération échouée, veuillez réessayer plus tard"
+      },
+      "empty": "Aucune compétence pour le moment",
+      "unknownSkill": "Compétence inconnue"
+    },
+    "skillsImport": {
+      "title": "Importer des compétences",
+      "tabs": {
+        "zip": "Uploader un Zip",
+        "github": "URL GitHub",
+        "command": "Importer via commande npx"
+      },
+      "fields": {
+        "zip": "Fichier Zip",
+        "githubUrl": "URL de dépôt GitHub public",
+        "nameOverride": "Nom de la compétence"
+      },
+      "placeholders": {
+        "githubUrl": "https://github.com/owner/repo",
+        "name": "ex. my-skill",
+        "command": "npx skills add https://github.com/owner/repo --skill my-skill"
+      },
+      "hints": {
+        "github": "Par défaut main/master (dépôts github.com publics uniquement)",
+        "nameRequired": "SKILL.md est à la racine de l'archive ; un nom est requis",
+        "command": "Collez une commande add, nous analyserons automatiquement l’URL GitHub et --skill."
+      },
+      "actions": {
+        "back": "Retour",
+        "discover": "Découvrir",
+        "discovering": "Découverte...",
+        "commit": "Importer & Installer",
+        "committing": "Importation..."
+      },
+      "preview": {
+        "found": "Trouvé",
+        "items": "définitions de compétences",
+        "overwrite": "va écraser",
+        "overwriteItems": "compétences existantes",
+        "willOverwrite": "Écraser",
+        "root": "Racine",
+        "path": "Chemin",
+        "unnamed": "Sans nom",
+        "pagination": {
+          "range": "Affichage {{from}}-{{to}} de {{total}}",
+          "page": "Page {{page}} / {{pages}}",
+          "prev": "Précédent",
+          "next": "Suivant"
+        },
+        "selection": {
+          "selectPage": "Sélectionner la page",
+          "clearPage": "Effacer la sélection de la page",
+          "selectAll": "Tout sélectionner",
+          "clearAll": "Tout effacer"
+        }
+      },
+      "result": {
+        "title": "Résultat de l'import",
+        "success": "Succès",
+        "failed": "Échec"
+      },
+      "toasts": {
+        "missingZip": "Veuillez choisir un fichier Zip",
+        "missingGithubUrl": "Veuillez entrer une URL GitHub",
+        "discovered": "Découvert. Veuillez confirmer ce que vous souhaitez importer.",
+        "discoverError": "Découverte échouée, veuillez réessayer plus tard",
+        "committed": "Import réussi",
+        "commitError": "Import échoué, veuillez réessayer plus tard",
+        "partialFailed": "Certaines compétences n'ont pas pu être importées. Veuillez vérifier les détails.",
+        "commitTimeout": "Import expiré, veuillez réessayer plus tard",
+        "invalidCommand": "Impossible de parser la commande. Veuillez inclure une URL github.com."
+      },
+      "progress": {
+        "title": "Progression de l'import",
+        "value": "Progression",
+        "jobId": "ID de tâche"
+      }
+    },
+    "pluginsPage": {
+      "searchPlaceholder": "Rechercher des préréglages...",
+      "addCard": "Ajouter un préréglage"
+    },
+    "mcpLibrary": {
+      "header": {
+        "title": "Serveurs MCP",
+        "subtitle": "Gérer les intégrations Model Context Protocol",
+        "settings": "Paramètres globaux",
+        "add": "Ajouter MCP"
+      },
+      "searchPlaceholder": "Rechercher des serveurs...",
+      "addCard": "Ajouter un MCP",
+      "status": {
+        "enabled": "Activé",
+        "disabled": "Désactivé"
+      },
+      "envRequired": "Clés d'environnement requises",
+      "descriptionFallback": "Aucune description fournie",
+      "empty": "Aucune préconfiguration MCP disponible",
+      "actions": {
+        "enable": "Activer",
+        "disable": "Désactiver",
+        "uninstall": "Désinstaller",
+        "settings": "Configurer",
+        "configure": "Configurer le serveur MCP"
+      },
+      "dialog": {
+        "title": "Titre MCP (unique)",
+        "displayName": "Nom d'affichage",
+        "jsonConfig": "Configuration JSON complète",
+        "required": "Requis"
+      },
+      "sections": {
+        "status": "Statut du serveur",
+        "statusHint": "Activer la connexion pour ce serveur MCP",
+        "envVars": "Variables d'environnement",
+        "envVarsHint": "Fournir les clés API ou secrets requis par cette préconfiguration"
+      },
+      "fields": {
+        "transport": "Transport",
+        "category": "Catégorie",
+        "version": "Version",
+        "source": "Source"
+      },
+      "toasts": {
+        "enabled": "Serveur MCP activé",
+        "disabled": "Serveur MCP désactivé",
+        "uninstalled": "Serveur MCP désinstallé",
+        "error": "Opération échouée, veuillez réessayer",
+        "actionFailed": "Opération échouée, veuillez réessayer",
+        "created": "Serveur MCP créé",
+        "updated": "Serveur MCP mis à jour"
+      }
+    },
+    "sources": {
+      "github": "GitHub",
+      "zip": "ZIP",
+      "system": "Système",
+      "manual": "Manuel",
+      "unknown": "Inconnu"
+    },
+    "pluginsManager": {
+      "toasts": {
+        "exclusiveEnabled": "(Autres préréglages désactivés)"
+      }
+    },
+    "presets": {
+      "title": "Préréglages",
+      "description": "Gérer les préconfigurations de capacités réutilisables"
+    },
+    "presetsPage": {
+      "header": {
+        "title": "Préréglages"
+      }
+    }
+  },
+  "task": {
+    "renameDescription": "Entrez un nouveau nom de tâche",
+    "nameLabel": "Nom de la tâche",
+    "namePlaceholder": "Entrez le nom de la tâche",
+    "toasts": {
+      "renamed": "Tâche renommée",
+      "renameFailed": "Échec du renommage"
+    }
+  },
+  "project": {
+    "subtitle": "{{count}} tâches",
+    "titleWithCount": "{{name}} · {{count}} tâches",
+    "share": "Partager le projet",
+    "settings": "Paramètres du projet",
+    "rename": "Renommer le projet",
+    "renameDescription": "Entrez un nouveau nom de projet",
+    "nameLabel": "Nom du projet",
+    "namePlaceholder": "Entrez le nom du projet",
+    "delete": "Supprimer le projet",
+    "deleteDescription": "La suppression de ce projet déplacera toutes ses tâches vers la liste principale.",
+    "deleteConfirm": "Supprimer"
+  },
+  "userMenu": {
+    "credits": "Crédits",
+    "home": "Accueil",
+    "settings": "Paramètres",
+    "logout": "Se déconnecter"
+  },
+  "pending": {
+    "queued": "En file d'attente",
+    "pending": "En attente",
+    "modify": "Modifier",
+    "send": "Envoyer immédiatement",
+    "delete": "Supprimer"
+  },
+  "common": {
+    "cancel": "Annuler",
+    "create": "Créer",
+    "delete": "Supprimer",
+    "deleted": "Supprimé",
+    "edit": "Modifier",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "confirm": "Confirmer",
+    "enabled": "Activé",
+    "disabled": "Désactivé"
+  },
+  "pagination": {
+    "previous": "Précédent",
+    "next": "Suivant",
+    "page": "Page {{page}}",
+    "of": "/ {{total}}",
+    "rowsPerPage": "Lignes par page",
+    "items": "éléments"
+  },
+  "settings": {
+    "dialogTitle": "Paramètres",
+    "sidebar": {
+      "account": "Compte",
+      "settings": "Paramètres",
+      "models": "Modèles",
+      "usage": "Utilisation",
+      "shortcuts": "Shortcuts"
+    },
+    "upgrade": "Mettre à niveau",
+    "credits": "Crédits",
+    "freeCredits": "Crédits gratuits",
+    "dailyRefresh": "Actualisation quotidienne des crédits",
+    "dailyRefreshHint": "Réinitialisé à {{max}} chaque jour à {{time}}",
+    "generalSettings": "Paramètres généraux",
+    "darkMode": "Mode sombre",
+    "backend": "Backend",
+    "modelConfigTitle": "Configuration des modèles",
+    "modelGlm": "GLM-4.7",
+    "modelGlmDescription": "Activer le modèle GLM pour l'exécution des tâches",
+    "apiKeys": "Clés API",
+    "openAiApiKey": "Clé API OpenAI",
+    "openAiApiKeyHint": "Utilisé pour les modèles compatibles OpenAI.",
+    "openAiApiKeyPlaceholder": "Entrez votre clé API OpenAI",
+    "openAiBaseUrl": "URL de base OpenAI",
+    "openAiBaseUrlHint": "Remplacer le endpoint OpenAI par défaut.",
+    "openAiBaseUrlPlaceholder": "https://api.openai.com/v1",
+    "anthropicApiKey": "Clé API Anthropic",
+    "anthropicApiKeyHint": "Utilisé pour les modèles compatibles Anthropic.",
+    "anthropicApiKeyPlaceholder": "Entrez votre clé API Anthropic",
+    "anthropicBaseUrl": "URL de base Anthropic",
+    "anthropicBaseUrlHint": "Remplacer le endpoint Anthropic par défaut.",
+    "anthropicBaseUrlPlaceholder": "https://api.anthropic.com",
+    "claudeCode": "Claude Code",
+    "language": "Langue",
+    "english": "English",
+    "simplifiedChinese": "简体中文",
+    "noUsageData": "Aucune donnée d'utilisation pour le moment",
+    "getHelp": "Obtenir de l'aide",
+    "getHelpUrl": "https://github.com/poco-ai/poco-agent/issues",
+    "theme": "Thème",
+    "systemMode": "Système",
+    "lightMode": "Mode clair",
+    "claude": "Claude",
+    "french": "Français",
+    "japanese": "日本語",
+    "german": "Deutsch",
+    "russian": "Русский",
+    "shortcuts": {
+      "title": "Keyboard Shortcuts",
+      "description": "Read-only shortcut reference for the current app version.",
+      "currentPlatform": "Current: {{platform}}",
+      "alternatePlatform": "Also on {{platform}}",
+      "or": "or",
+      "platform": {
+        "mac": "macOS",
+        "windows": "Windows"
+      },
+      "items": {
+        "toggleMainSidebar": {
+          "action": "Toggle main sidebar",
+          "hint": "Collapse or expand the primary left sidebar."
+        },
+        "togglePlanMode": {
+          "action": "Switch mode (planning)",
+          "hint": "Cycle composer mode while the main input is focused."
+        },
+        "switchPromptHistory": {
+          "action": "Browse prompt history",
+          "hint": "Use in chat input to recall previous prompts."
+        },
+        "slashCommand": {
+          "action": "Slash command",
+          "hint": "Type / to open slash command suggestions."
+        },
+        "search": {
+          "action": "Global search",
+          "hint": "Open or close global search dialog."
+        },
+        "toggleOutputPanel": {
+          "action": "Toggle output panel",
+          "hint": "Collapse or expand computer/artifacts panel in chat."
+        },
+        "jumpUserPrompts": {
+          "action": "Jump user prompts",
+          "hint": "When output panel is collapsed, use J/K to jump between user messages."
+        },
+        "openSettings": {
+          "action": "Open settings",
+          "hint": "Open the settings dialog."
+        }
+      }
+    }
+  },
+  "validation": {
+    "projectNameRequired": "Veuillez entrer un nom de projet",
+    "selectProject": "Veuillez sélectionner un projet",
+    "missingTaskId": "ID de tâche manquant",
+    "taskContentRequired": "Veuillez entrer le contenu de la tâche",
+    "selectExecutionTime": "Veuillez sélectionner l'heure d'exécution",
+    "nightlyNoTime": "L'exécution nocturne ne supporte pas la définition de l'heure d'exécution",
+    "missingSessionId": "ID de session manquant",
+    "missingToolUseId": "ID d'utilisation d'outil manquant",
+    "messageContentRequired": "Veuillez entrer le contenu du message",
+    "sessionNameRequired": "Veuillez entrer le nom de la session",
+    "sessionNameTooLong": "Nom de session trop long"
+  },
+  "user": {
+    "plan": {
+      "free": "Gratuit"
+    },
+    "credits": {
+      "unlimited": "Illimité"
+    }
+  },
+  "fileSidebar": {
+    "title": "Liste des fichiers",
+    "fileList": "Liste des fichiers",
+    "downloadAll": "Tout télécharger",
+    "noFiles": "Aucun fichier pour le moment",
+    "downloadStarted": "Début du téléchargement de l'archive de l'espace de travail",
+    "downloadStart": "Début du téléchargement de l'archive de l'espace de travail",
+    "archiveNotAvailable": "Archive non disponible pour le moment",
+    "archiveUnavailable": "Archive non disponible pour le moment",
+    "downloadFailed": "Échec du téléchargement"
+  },
+  "pullToRefresh": {
+    "refreshing": "Actualisation...",
+    "releaseToRefresh": "Relâcher pour actualiser",
+    "pullToRefresh": "Tirer pour actualiser"
+  },
+  "usageTooltip": {
+    "currentSession": "Session actuelle :",
+    "duration": "Durée :",
+    "tokens": "Tokens",
+    "usageStatistics": "Statistiques d'utilisation",
+    "usageStats": "Statistiques d'utilisation :",
+    "today": "Aujourd'hui :",
+    "thisWeek": "Cette semaine :",
+    "thisMonth": "Ce mois :",
+    "durationFormat": "{{mins}}m {{secs}}s"
+  },
+  "cardNav": {
+    "turnOffAll": "Tout éteindre",
+    "turnOnAll": "Tout activer",
+    "noMcpInstalled": "Aucun MCP installé",
+    "noSkillsInstalled": "Aucune compétence installée",
+    "noPluginsInstalled": "Aucun preset installé",
+    "oneClickClose": "Tout éteindre",
+    "notInstalledMcp": "Aucun MCP installé",
+    "notInstalledSkill": "Aucune compétence installée",
+    "apps": "Apps",
+    "comingSoon": "Bientôt disponible",
+    "clickForDetails": "Cliquez pour les détails",
+    "connectTools": "Connectez vos outils à Poco"
+  },
+  "fileChange": {
+    "previewDisabled": "Exécution, prévisualisation non disponible",
+    "executingNoPreview": "Exécution, prévisualisation non disponible",
+    "previewFile": "Prévisualiser le fichier",
+    "linesAdded": "lignes ajoutées",
+    "linesDeleted": "lignes supprimées",
+    "totalChanges": "{{count}} modifications de lignes",
+    "viewDiff": "Voir le diff"
+  },
+  "computerPanel": {
+    "all": "Tout"
+  },
+  "chatPanel": {
+    "fileAttachment": "[+{{count}} fichiers]",
+    "skillsUsed": "Compétences utilisées",
+    "conversationHistory": "Historique de conversation",
+    "loading": "Chargement...",
+    "noHistory": "Aucun historique pour le moment",
+    "session": "Session",
+    "status": "Statut :"
+  },
+  "artifactsPanel": {
+    "documentPreview": "Aperçu du document",
+    "workspacePreview": "Aperçu des fichiers de l'espace de travail",
+    "sidebarOpen": "Barre latérale ouverte",
+    "sidebarClosed": "Barre latérale fermée",
+    "sidebarClose": "Fermer la barre latérale",
+    "fileChanges": "Modifications de fichiers",
+    "totalFiles": "fichiers"
+  },
+  "mcpGrid": {
+    "availableServers": "Serveurs disponibles : {{count}}",
+    "enabledServers": "Activés : {{count}}",
+    "turnOffAll": "Tout éteindre",
+    "noMcpServers": "Aucun serveur MCP pour le moment",
+    "system": "Système",
+    "user": "Utilisateur",
+    "uninstall": "Désinstaller",
+    "settings": "Paramètres"
+  },
+  "skillsGrid": {
+    "turnOffAll": "Tout éteindre"
+  },
+  "mcpSettings": {
+    "configureServer": "Configurer le serveur MCP",
+    "fullJsonConfig": "Configuration JSON complète",
+    "mcpName": "Nom MCP",
+    "jsonConfig": "Configuration JSON complète",
+    "invalidJson": "Configuration JSON invalide",
+    "nameRequired": "Le nom est requis",
+    "saveFailed": "Échec de l’enregistrement du serveur MCP"
+  },
+  "queryActions": {
+    "taskNameRequired": "Veuillez entrer un nom de tâche",
+    "renameFailed": "Échec du renommage",
+    "creditUnlimited": "Crédits illimités"
+  },
+  "chatInput": {
+    "connect": "Connecter",
+    "cancelTask": "Annuler la tâche"
+  },
+  "chatContainer": {
+    "loading": "Chargement..."
+  },
+  "projectDialogs": {
+    "cancel": "Annuler",
+    "create": "Créer",
+    "selectProject": "Sélectionner un projet pour déplacer cette tâche",
+    "noProject": "Aucun projet",
+    "move": "Déplacer"
+  },
+  "connectors": {
+    "title": "Connecteurs",
+    "apps": "Apps",
+    "search": "Rechercher des connecteurs",
+    "inDevelopment": "En développement",
+    "details": "Détails",
+    "connectNow": "Connecter maintenant",
+    "connected": "Connecté",
+    "enabled": "Activé",
+    "coreCapabilities": "Fonctionnalités de base",
+    "gmail": {
+      "description": "Rédiger des e-mails, rechercher des conversations et générer rapidement des résumés"
+    },
+    "gcal": {
+      "description": "Voir les calendriers, optimiser la gestion du temps et des activités"
+    },
+    "gdrive": {
+      "description": "Accéder rapidement aux fichiers, rechercher intelligemment le contenu et laisser Poco vous aider à gérer les documents plus efficacement"
+    },
+    "outlookMail": {
+      "description": "Rédiger, rechercher et gérer vos e-mails Outlook dans Poco de manière transparente"
+    },
+    "github": {
+      "description": "Gérer les dépôts de code, développement collaboratif et revue de code"
+    },
+    "slack": {
+      "description": "Lire et écrire des conversations Slack dans Poco"
+    },
+    "notion": {
+      "description": "Rechercher et mettre à jour du contenu, automatiser les flux de travail"
+    },
+    "filesystem": {
+      "description": "Permettre de lire et d'écrire des fichiers sur le système de fichiers local"
+    },
+    "postgres": {
+      "description": "Accès en lecture seule à la base de données PostgreSQL"
+    },
+    "sentry": {
+      "description": "Récupérer et analyser les rapports d'erreurs depuis Sentry"
+    },
+    "webSearch": {
+      "description": "Effectuer des recherches web en temps réel pour obtenir les informations les plus récentes."
+    },
+    "codeInterpreter": {
+      "description": "Exécuter du code Python en toute sécurité dans un environnement sandbox."
+    }
+  },
+  "connectorCapabilities": {
+    "automation": {
+      "title": "Workflows d'automatisation",
+      "description": "Déclenchement basé sur les événements pour des flux de tâches complexes"
+    },
+    "assistant": {
+      "title": "Assistant de collaboration intelligente",
+      "description": "L'IA comprend profondément le contexte et fournit des suggestions"
+    },
+    "security": {
+      "title": "Système de sécurité",
+      "description": "Chiffrement de niveau entreprise pour garantir la sécurité des données"
+    },
+    "search": {
+      "title": "Index de recherche global",
+      "description": "Recherche interplateforme avec rappel à la milliseconde"
+    }
+  },
+  "mcpHeader": {
+    "mcpManagement": "Gestion des serveurs MCP",
+    "searchPlaceholder": "Rechercher des serveurs...",
+    "addMcp": "Ajouter MCP"
+  },
+  "skillsHeader": {
+    "skillsManagement": "Gestion des compétences"
+  },
+  "models": {
+    "defaultTag": "Par défaut",
+    "claudeSonnet45": {
+      "description": "Équilibrer vitesse et intelligence"
+    },
+    "claudeOpus45": {
+      "description": "Le modèle le plus puissant"
+    },
+    "gpt4Turbo": {
+      "description": "Rapide et efficace"
+    }
+  },
+  "creditsPopover": {
+    "proPlan": "Forfait Pro",
+    "credits": "Crédits",
+    "unlimited": "Illimité",
+    "freeCredits": "Crédits gratuits",
+    "dailyRefresh": "Actualisation quotidienne des crédits",
+    "dailyRefreshHint": "Réinitialisé à 9999 tous les jours à 00:00",
+    "viewUsage": "Voir l'utilisation"
+  },
+  "actions": {
+    "processing": "Traitrement..."
+  },
+  "filesidebar": {
+    "title": "Liste des fichiers"
+  },
+  "onboarding": {
+    "close": "Close tutorial",
+    "skip": "Skip",
+    "back": "Back",
+    "next": "Next",
+    "done": "Finish",
+    "progress": "Step {{current}} / {{total}}",
+    "targetUnavailable": "This area is collapsed or unavailable right now. Continue to the next step.",
+    "letsStart": "Let's get started.",
+    "steps": {
+      "welcome": {
+        "title": "Welcome to Poco",
+        "description": "This quick tutorial highlights the core areas you will use most often. You can reopen it anytime from the sidebar quick menu."
+      },
+      "workspace": {
+        "title": "Main workspace",
+        "description": "Your main content appears here, including task creation, chat execution, and capability management pages."
+      },
+      "newTask": {
+        "title": "Create a new task",
+        "description": "Use this button to quickly start a fresh task and jump into execution."
+      },
+      "projects": {
+        "title": "Projects section",
+        "description": "Create, rename, and manage projects here to organize work by project."
+      },
+      "capabilities": {
+        "title": "Capabilities entry",
+        "description": "Start from the sidebar entry, then open the Skills page for detailed management."
+      },
+      "modeToggle": {
+        "title": "Pick a run mode",
+        "description": "Switch between Task, Step-by-step, and Scheduled modes before sending your prompt."
+      },
+      "composer": {
+        "title": "Task composer",
+        "description": "Write instructions, attach files, set repository options, and launch execution from here."
+      },
+      "quickMenu": {
+        "title": "Quick settings menu",
+        "description": "Use this menu for language/theme/backend preferences, and restart this tutorial anytime."
+      },
+      "taskList": {
+        "title": "Task list",
+        "description": "This list lets you revisit all unassigned tasks and quickly reopen any recent execution session."
+      },
+      "skillsDetail": {
+        "title": "Skills page",
+        "description": "This is the Skills view inside Capabilities, where you browse and manage skills."
+      }
+    }
+  }
+}

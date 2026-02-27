@@ -46,11 +46,14 @@ class Settings(BaseSettings):
     )
     s3_read_timeout_seconds: int = Field(default=60, alias="S3_READ_TIMEOUT_SECONDS")
     s3_max_attempts: int = Field(default=3, alias="S3_MAX_ATTEMPTS")
-    openai_api_key: str = Field(default="", alias="OPENAI_API_KEY")
-    openai_base_url: str | None = Field(default=None, alias="OPENAI_BASE_URL")
-    openai_default_model: str = Field(
-        default="gpt-4o-mini", alias="OPENAI_DEFAULT_MODEL"
+    anthropic_api_key: str = Field(default="", alias="ANTHROPIC_API_KEY")
+    anthropic_base_url: str = Field(
+        default="https://api.anthropic.com", alias="ANTHROPIC_BASE_URL"
     )
+    default_model: str = Field(
+        default="claude-sonnet-4-20250514", alias="DEFAULT_MODEL"
+    )
+    model_list: list[str] = Field(default_factory=list, alias="MODEL_LIST")
     max_upload_size_mb: int = Field(default=100, alias="MAX_UPLOAD_SIZE_MB")
 
     model_config = SettingsConfigDict(

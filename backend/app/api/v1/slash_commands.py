@@ -9,11 +9,14 @@ from app.schemas.slash_command import (
     SlashCommandResponse,
     SlashCommandUpdateRequest,
 )
+from app.schemas.slash_command_config import SlashCommandSuggestionResponse
+from app.services.slash_command_config_service import SlashCommandConfigService
 from app.services.slash_command_service import SlashCommandService
 
 router = APIRouter(prefix="/slash-commands", tags=["slash-commands"])
 
 service = SlashCommandService()
+config_service = SlashCommandConfigService()
 
 
 @router.get("", response_model=ResponseSchema[list[SlashCommandResponse]])
@@ -23,6 +26,18 @@ async def list_slash_commands(
 ) -> JSONResponse:
     result = service.list_commands(db, user_id=user_id)
     return Response.success(data=result, message="Slash commands retrieved")
+
+
+@router.get(
+    "/suggestions",
+    response_model=ResponseSchema[list[SlashCommandSuggestionResponse]],
+)
+async def list_slash_command_suggestions(
+    user_id: str = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+) -> JSONResponse:
+    result = config_service.list_suggestions(db, user_id=user_id)
+    return Response.success(data=result, message="Slash command suggestions retrieved")
 
 
 @router.get("/{command_id}", response_model=ResponseSchema[SlashCommandResponse])

@@ -9,6 +9,10 @@ from app.schemas.mcp_server import (
     McpServerResponse,
     McpServerUpdateRequest,
 )
+from app.utils.mcp_server_config import (
+    extract_single_mcp_server_key,
+    normalize_mcp_server_config,
+)
 
 
 class McpServerService:
@@ -20,7 +24,7 @@ class McpServerService:
         self, db: Session, user_id: str, server_id: int
     ) -> McpServerResponse:
         server = McpServerRepository.get_by_id(db, server_id)
-        if not server or (server.scope != "system" and server.owner_user_id != user_id):
+        if not server or (server.scope == "user" and server.owner_user_id != user_id):
             raise AppException(
                 error_code=ErrorCode.MCP_SERVER_NOT_FOUND,
                 message=f"MCP server not found: {server_id}",
@@ -38,11 +42,15 @@ class McpServerService:
                 message=f"MCP server already exists: {request.name}",
             )
 
+        normalized_config = normalize_mcp_server_config(
+            request.server_config,
+            default_server_key=request.name,
+        )
         server = McpServer(
             name=request.name,
             scope=scope,
             owner_user_id=user_id,
-            server_config=request.server_config,
+            server_config=normalized_config,
         )
 
         McpServerRepository.create(db, server)
@@ -58,10 +66,20 @@ class McpServerService:
         request: McpServerUpdateRequest,
     ) -> McpServerResponse:
         server = McpServerRepository.get_by_id(db, server_id)
-        if not server or (server.scope != "system" and server.owner_user_id != user_id):
+        if not server:
             raise AppException(
                 error_code=ErrorCode.MCP_SERVER_NOT_FOUND,
                 message=f"MCP server not found: {server_id}",
+            )
+        if server.scope == "system":
+            raise AppException(
+                error_code=ErrorCode.FORBIDDEN,
+                message="Cannot modify system MCP servers",
+            )
+        if server.owner_user_id != user_id:
+            raise AppException(
+                error_code=ErrorCode.FORBIDDEN,
+                message="MCP server does not belong to the user",
             )
 
         if request.name is not None and request.name != server.name:
@@ -75,7 +93,13 @@ class McpServerService:
         if request.scope is not None:
             server.scope = request.scope
         if request.server_config is not None:
-            server.server_config = request.server_config
+            default_key = (
+                extract_single_mcp_server_key(server.server_config) or server.name
+            )
+            server.server_config = normalize_mcp_server_config(
+                request.server_config,
+                default_server_key=default_key,
+            )
 
         db.commit()
         db.refresh(server)
@@ -83,10 +107,20 @@ class McpServerService:
 
     def delete_server(self, db: Session, user_id: str, server_id: int) -> None:
         server = McpServerRepository.get_by_id(db, server_id)
-        if not server or (server.scope != "system" and server.owner_user_id != user_id):
+        if not server:
             raise AppException(
                 error_code=ErrorCode.MCP_SERVER_NOT_FOUND,
                 message=f"MCP server not found: {server_id}",
+            )
+        if server.scope == "system":
+            raise AppException(
+                error_code=ErrorCode.FORBIDDEN,
+                message="Cannot delete system MCP servers",
+            )
+        if server.owner_user_id != user_id:
+            raise AppException(
+                error_code=ErrorCode.FORBIDDEN,
+                message="MCP server does not belong to the user",
             )
         McpServerRepository.delete(db, server)
         db.commit()

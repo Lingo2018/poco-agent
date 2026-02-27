@@ -41,5 +41,10 @@ async def resolve_slash_commands(
     user_id: str = Depends(get_current_user_id),
     db: Session = Depends(get_db),
 ) -> JSONResponse:
-    resolved = service.resolve_user_commands(db, user_id=user_id, names=request.names)
+    resolved = service.resolve_user_commands(
+        db,
+        user_id=user_id,
+        names=request.names,
+        skill_names=request.skill_names,
+    )
     return Response.success(data=resolved, message="Slash commands resolved")

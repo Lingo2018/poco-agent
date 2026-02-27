@@ -15,6 +15,7 @@ import { useT } from "@/lib/i18n/client";
 interface AssistantMessageProps {
   message: ChatMessage;
   runUsage?: UsageResponse | null;
+  sessionStatus?: string;
 }
 
 function pickNumber(value: unknown): number | null {
@@ -23,7 +24,7 @@ function pickNumber(value: unknown): number | null {
 
 function formatCostUsd(value: number | null | undefined): string | null {
   if (typeof value !== "number" || !Number.isFinite(value)) return null;
-  return `$${value.toFixed(6)}`;
+  return "$" + value.toFixed(3);
 }
 
 function formatDurationMs(value: number | null | undefined): string | null {
@@ -35,7 +36,11 @@ function formatDurationMs(value: number | null | undefined): string | null {
   return seconds >= 60 ? `${Math.round(seconds)}s` : `${seconds.toFixed(1)}s`;
 }
 
-export function AssistantMessage({ message, runUsage }: AssistantMessageProps) {
+export function AssistantMessage({
+  message,
+  runUsage,
+  sessionStatus,
+}: AssistantMessageProps) {
   const { t } = useT("translation");
   const [isCopied, setIsCopied] = React.useState(false);
   const [isLiked, setIsLiked] = React.useState(false);
@@ -102,82 +107,79 @@ export function AssistantMessage({ message, runUsage }: AssistantMessageProps) {
     !!runUsage &&
     message.status !== "streaming" &&
     (costLabel !== null || tokensLabel !== null || durationLabel !== null);
+  const timestampLabel =
+    message.timestamp && !isNaN(new Date(message.timestamp).getTime())
+      ? new Date(message.timestamp).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : null;
 
   return (
-    <div className="flex w-full gap-4 group animate-in fade-in slide-in-from-left-4 duration-300 min-w-0">
-      {/* Avatar Section */}
-      <div className="flex-shrink-0 mt-1">
-        <div className="size-8 rounded-full bg-muted border border-border flex items-center justify-center">
-          <Bot className="size-4 text-muted-foreground" />
+    <div className="group w-full min-w-0 animate-in fade-in slide-in-from-left-4 duration-300">
+      <div className="flex w-full min-w-0 items-center gap-1.5">
+        <div className="size-7 shrink-0 rounded-full border border-border bg-muted flex items-center justify-center">
+          <Bot className="size-3.5 text-muted-foreground" />
         </div>
+        <span className="shrink-0 text-xl font-bold text-foreground font-brand">
+          Poco
+        </span>
+        {timestampLabel ? (
+          <span className="ml-auto shrink-0 text-xs text-muted-background/40 opacity-0 transition-opacity group-hover:opacity-100">
+            {timestampLabel}
+          </span>
+        ) : null}
       </div>
 
-      {/* Content Section */}
-      <div className="flex-1 min-w-0 space-y-2 w-full">
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="text-xs font-bold text-foreground/50 tracking-wide uppercase shrink-0">
-            Poco
-          </span>
-          <span className="text-[10px] text-muted-foreground/40 shrink-0">
-            {message.timestamp && !isNaN(new Date(message.timestamp).getTime())
-              ? new Date(message.timestamp).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
+      <div className="mt-2 w-full min-w-0 overflow-hidden break-words text-base text-foreground [overflow-wrap:anywhere]">
+        <MessageContent
+          content={message.content}
+          sessionStatus={sessionStatus}
+        />
+        {message.status === "streaming" && <TypingIndicator />}
+      </div>
+
+      <div className="mt-2 flex min-w-0 items-center gap-2 pt-2">
+        <div className="shrink-0 flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-7 text-muted-foreground hover:text-foreground"
+            onClick={onCopy}
+            title="Copy message"
+          >
+            {isCopied ? (
+              <Check className="size-3.5" />
+            ) : (
+              <Copy className="size-3.5" />
+            )}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className={`size-7 hover:text-foreground ${
+              isLiked
+                ? "text-primary hover:text-primary/90"
+                : "text-muted-foreground"
+            }`}
+            onClick={onLike}
+            title="Like response"
+          >
+            <ThumbsUp className={`size-3.5 ${isLiked ? "fill-current" : ""}`} />
+          </Button>
+        </div>
+
+        {showUsage ? (
+          <div className="w-0 flex-1 overflow-hidden truncate text-right font-mono text-xs tabular-nums text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
+            {costLabel ? `${t("chat.cost")}: ${costLabel}` : null}
+            {tokensLabel
+              ? `${costLabel ? " · " : ""}${t("chat.tokens")}: ${tokensLabel}`
               : null}
-          </span>
-        </div>
-
-        <div className="text-foreground text-base break-words w-full min-w-0">
-          <MessageContent content={message.content} />
-          {message.status === "streaming" && <TypingIndicator />}
-        </div>
-
-        {/* Action Buttons - Visible on hover */}
-        <div className="flex items-center justify-between gap-2 pt-2 min-w-0">
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-7 text-muted-foreground hover:text-foreground"
-              onClick={onCopy}
-              title="Copy message"
-            >
-              {isCopied ? (
-                <Check className="size-3.5" />
-              ) : (
-                <Copy className="size-3.5" />
-              )}
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className={`size-7 hover:text-foreground ${
-                isLiked
-                  ? "text-primary hover:text-primary/90"
-                  : "text-muted-foreground"
-              }`}
-              onClick={onLike}
-              title="Like response"
-            >
-              <ThumbsUp
-                className={`size-3.5 ${isLiked ? "fill-current" : ""}`}
-              />
-            </Button>
+            {durationLabel
+              ? `${costLabel || tokensLabel ? " · " : ""}${t("chat.duration")}: ${durationLabel}`
+              : null}
           </div>
-
-          {showUsage ? (
-            <div className="text-xs text-muted-foreground font-mono tabular-nums truncate min-w-0 opacity-0 group-hover:opacity-100 transition-opacity">
-              {costLabel ? `${t("chat.cost")}: ${costLabel}` : null}
-              {tokensLabel
-                ? `${costLabel ? " · " : ""}${t("chat.tokens")}: ${tokensLabel}`
-                : null}
-              {durationLabel
-                ? `${costLabel || tokensLabel ? " · " : ""}${t("chat.duration")}: ${durationLabel}`
-                : null}
-            </div>
-          ) : null}
-        </div>
+        ) : null}
       </div>
     </div>
   );

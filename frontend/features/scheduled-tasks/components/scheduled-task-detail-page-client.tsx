@@ -6,7 +6,7 @@ import { ArrowLeft, Pencil, Play, RefreshCw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { useT } from "@/lib/i18n/client";
-import { useAppShell } from "@/components/shared/app-shell-context";
+import { useAppShell } from "@/components/shell/app-shell-context";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -20,7 +20,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { scheduledTasksService } from "@/features/scheduled-tasks/services/scheduled-tasks-service";
+import { scheduledTasksService } from "@/features/scheduled-tasks/api/scheduled-tasks-api";
 import type {
   ScheduledTask,
   ScheduledTaskUpdateInput,
@@ -199,7 +199,7 @@ export function ScheduledTaskDetailPageClient({ taskId }: { taskId: string }) {
 
   return (
     <>
-      <header className="flex h-16 shrink-0 items-center justify-between border-b border-border/50 bg-background/50 px-6 backdrop-blur-sm sticky top-0 z-10">
+      <header className="flex h-16 shrink-0 items-center justify-between border-b border-border/50 bg-background/50 px-6 backdrop-blur-sm sticky top-0 z-10 font-serif">
         <div className="flex items-center gap-3 min-w-0">
           <Button
             variant="ghost"
@@ -386,8 +386,8 @@ export function ScheduledTaskDetailPageClient({ taskId }: { taskId: string }) {
                 </div>
 
                 <div className="rounded-lg border border-border p-4 space-y-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="text-sm font-medium">
+                  <div className="flex min-w-0 flex-nowrap items-center justify-between gap-3 overflow-x-auto whitespace-nowrap [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    <div className="text-sm font-medium shrink-0">
                       {t("library.scheduledTasks.fields.prompt")}
                     </div>
                   </div>
@@ -397,14 +397,14 @@ export function ScheduledTaskDetailPageClient({ taskId }: { taskId: string }) {
                 </div>
 
                 <div className="rounded-lg border border-border p-4 space-y-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="text-sm font-medium">
+                  <div className="flex min-w-0 flex-nowrap items-center justify-between gap-3 overflow-x-auto whitespace-nowrap [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    <div className="text-sm font-medium shrink-0">
                       {t("library.scheduledTasks.detail.runsTitle")}
                     </div>
                     <Button
                       size="sm"
                       variant="outline"
-                      className="gap-2"
+                      className="gap-2 shrink-0"
                       onClick={() => refresh()}
                       disabled={isRefreshing}
                     >
@@ -418,8 +418,8 @@ export function ScheduledTaskDetailPageClient({ taskId }: { taskId: string }) {
                       {t("library.scheduledTasks.detail.noRuns")}
                     </div>
                   ) : (
-                    <div className="w-full overflow-auto rounded-lg border border-border">
-                      <table className="w-full text-sm">
+                    <div className="w-full overflow-x-auto rounded-lg border border-border [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                      <table className="w-full min-w-[720px] whitespace-nowrap text-sm">
                         <thead className="bg-muted/40 text-muted-foreground">
                           <tr>
                             <th className="px-4 py-3 text-left font-medium">

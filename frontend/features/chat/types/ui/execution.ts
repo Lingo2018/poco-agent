@@ -5,7 +5,7 @@
 import type { ApiStatePatch } from "../api/callback";
 
 export type ExecutionStatus =
-  | "accepted"
+  | "pending"
   | "running"
   | "completed"
   | "failed"
@@ -49,12 +49,17 @@ export interface NewMessage {
 
 /**
  * Configuration snapshot from session creation
- * Contains the IDs of MCP servers and skills used in this session
+ * Contains the IDs of MCP servers, skills, and presets used in this session
  */
 export interface ConfigSnapshot {
   mcp_server_ids?: number[];
   skill_ids?: number[];
+  plugin_ids?: number[];
   browser_enabled?: boolean;
+  model?: string;
+  repo_url?: string;
+  git_branch?: string;
+  git_token_env_key?: string | null;
 }
 
 /**

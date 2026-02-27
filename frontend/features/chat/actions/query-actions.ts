@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { chatService } from "@/features/chat/services/chat-service";
+import { chatService } from "@/features/chat/api/chat-api";
+
+// Validation error messages - translation keys that will be resolved by the caller
+const VALIDATION_ERRORS = {
+  missingSessionId: "validation.missingSessionId",
+  missingToolUseId: "validation.missingToolUseId",
+} as const;
 
 const listSessionsSchema = z.object({
   userId: z.string().optional(),
@@ -8,7 +14,7 @@ const listSessionsSchema = z.object({
 });
 
 const sessionIdSchema = z.object({
-  sessionId: z.string().trim().min(1, "缺少会话 ID"),
+  sessionId: z.string().trim().min(1, VALIDATION_ERRORS.missingSessionId),
 });
 
 const getMessagesSchema = sessionIdSchema.extend({
@@ -25,7 +31,7 @@ const toolExecutionsSchema = sessionIdSchema.extend({
 });
 
 const browserScreenshotSchema = sessionIdSchema.extend({
-  toolUseId: z.string().trim().min(1, "缺少工具调用 ID"),
+  toolUseId: z.string().trim().min(1, VALIDATION_ERRORS.missingToolUseId),
 });
 
 export type ListSessionsInput = z.infer<typeof listSessionsSchema>;

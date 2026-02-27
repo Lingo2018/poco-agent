@@ -1,0 +1,1607 @@
+{
+  "welcome": "Pocoへようこそ",
+  "description": "マルチサービスAIエージェント実行プラットフォーム",
+  "home": "ホーム",
+  "language": "言語",
+  "sidebar": {
+    "newTask": "新しいタスク",
+    "search": "検索",
+    "library": "機能",
+    "scheduledTasks": "スケジュールタスク",
+    "projects": "プロジェクト",
+    "newProject": "新しいプロジェクト",
+    "newProjectPrompt": "プロジェクト名を入力してください：",
+    "addProject": "プロジェクトを追加",
+    "allTasks": "タスクリスト",
+    "filterTasks": "タスクを絞り込む",
+    "settings": "設定",
+    "deleteTask": "タスクを削除",
+    "rename": "名前を変更",
+    "moveToProject": "プロジェクトへ移動",
+    "delete": "削除",
+    "askTag": "ask",
+    "shareTitle": "Poco を友だちに共有",
+    "shareDesc": "それぞれ 500 ポイント",
+    "user": "ユーザー",
+    "defaultUserName": "Pocoユーザー",
+    "removeFromProject": "プロジェクトから外す",
+    "batchOperations": "一括操作",
+    "holdToSelect": "長押しで選択",
+    "holdToExitSelect": "長押しで選択を終了",
+    "moveToHere": "ここに移動",
+    "plan": "Pro プラン",
+    "onboarding": "Guided tutorial"
+  },
+  "header": {
+    "workspace": "Poco 1.0",
+    "switchWorkspace": "ワークスペースを切り替え",
+    "switchModel": "モデルを切り替え",
+    "notifications": "通知",
+    "more": "その他",
+    "repoLink": "プロジェクトリポジトリ",
+    "repoName": "poco-ai/poco-agent"
+  },
+  "hero": {
+    "title": "何かお手伝いできることはありますか？",
+    "subtitle": "タスクを割り当てるか、質問してください。",
+    "attachFile": "添付ファイルを追加",
+    "voiceInput": "音声入力",
+    "send": "送信",
+    "placeholder": "タスクを入力するか、質問してください",
+    "inputPrompts": {
+      "taskDefault": "Poco にどんなタスクでも割り当てる",
+      "planDefault": "Poco と一緒にタスク計画を作成する",
+      "shortcutHint": "/ でスラッシュコマンド、Shift+Enter で改行、Enter で送信"
+    },
+    "tools": "Poco にツールを接続",
+    "importLocal": "ローカルファイルからインポート",
+    "importFigma": "Figmaからインポート（近日公開）",
+    "connect": "接続",
+    "configure": "設定",
+    "comingSoon": "近日公開",
+    "modes": {
+      "task": "タスク",
+      "taskHelp": "すぐに1回実行します。ほとんどの問題に適しています。",
+      "plan": "ステップバイステップ",
+      "planHelp": "最初に実行計画を提案し、確認後にステップごとに実行します。",
+      "scheduled": "スケジュール",
+      "scheduledHelp": "Cronスケジュールで実行し、オプションでワークスペースを再利用します。",
+      "planPlaceholder": "複雑なタスクを説明してください。最初に計画を提案し、確認後に実行します…",
+      "planPrefix": "まず、明確な実行計画（チェックポイント付きステップ）を提案してください。まだ実行しないでください。確認後、ステップごとに実行します。\\n\\nタスク：{{prompt}}"
+    },
+    "modeLabels": {
+      "task": "タスクモード",
+      "plan": "計画モード",
+      "scheduled": "定時モード"
+    },
+    "repo": {
+      "toggle": "リポジトリ設定",
+      "dialogTitle": "リポジトリ設定",
+      "urlLabel": "GitHub URL",
+      "urlPlaceholder": "例：https://github.com/org/repo",
+      "branchLabel": "ブランチ",
+      "branchPlaceholder": "例：main",
+      "usageLabel": "使用方法",
+      "usage": {
+        "session": {
+          "title": "このタスクのみで使用（プロジェクトなし）",
+          "help": "クイックな読み取り/理解に最適。プロジェクトは作成されません"
+        },
+        "createProject": {
+          "title": "プロジェクトを作成（長期）",
+          "help": "継続的な作業に最適。プロジェクトのデフォルトリポジトリとして保存されます"
+        }
+      },
+      "projectNameLabel": "プロジェクト名",
+      "projectNamePlaceholder": "例：owner/repo",
+      "tokenKeyLabel": "GitHubトークン環境変数キー（オプション）",
+      "tokenKeyPlaceholder": "例：GITHUB_TOKEN",
+      "tokenKeyHelp": "プライベートリポジトリのクローンに使用されます。最初に環境変数でキー値を設定してください。",
+      "goToEnvVars": "環境変数へ",
+      "toasts": {
+        "missingGithubUrl": "GitHub URLを入力してください",
+        "createProjectFailed": "プロジェクトの作成に失敗しました。もう一度お試しください。",
+        "projectCreated": "プロジェクトを作成しました：{{name}}"
+      }
+    },
+    "browser": {
+      "toggle": "ブラウザ",
+      "enabledTooltipTitle": "ブラウザは有効です",
+      "enabledTooltipDescription": "Poco はブラウザを使って Web ページを閲覧し、ページ情報を取得し、Web 関連の操作を実行します。",
+      "disabledTooltipTitle": "ブラウザは無効です",
+      "disabledTooltipDescription": "有効にすると、Poco がブラウザで Web ページの閲覧や Web 関連タスクを実行できます。",
+      "enabledHint": "有効"
+    },
+    "runSchedule": {
+      "toggle": "実行時間",
+      "dialogTitle": "実行時間",
+      "fields": {
+        "mode": "モード",
+        "scheduledAt": "実行日時"
+      },
+      "modes": {
+        "immediate": "今すぐ実行",
+        "scheduled": "特定の時刻に1回実行",
+        "nightly": "夜間に1回実行"
+      },
+      "timezoneHint": "タイムゾーン：{{timezone}}",
+      "preview": "実行予定：{{summary}}",
+      "summary": {
+        "immediate": "今すぐ実行",
+        "scheduled": "{{datetime}}（{{timezone}}）",
+        "nightly": "夜間（夜間ウィンドウ）"
+      },
+      "badge": {
+        "immediate": "今すぐ実行",
+        "scheduled": "スケジュール：{{datetime}}",
+        "scheduledEmpty": "スケジュール：未設定",
+        "nightly": "夜間"
+      }
+    },
+    "toasts": {
+      "uploadSuccess": "ファイルのアップロードに成功しました",
+      "uploadFailed": "ファイルのアップロードに失敗しました",
+      "actionFailed": "アクションに失敗しました。もう一度お試しください",
+      "fileTooLarge": "ファイルが大きすぎます。最大100MBまでサポートしています",
+      "duplicateFileName": "{{name}}という名前の添付ファイルが既に存在します。削除または名前を変更してください。"
+    },
+    "mcpSelector": {
+      "title": "MCPサーバーを選択",
+      "description": "このタスクで有効にするMCPサーバーを選択してください。未インストールのサーバーは表示されません。",
+      "loading": "読み込み中...",
+      "noServers": "インストールされているMCPサーバーがありません。最初にMCPページからサーバーをインストールしてください。",
+      "selected": "{{count}}/{{total}}サーバーが選択されました",
+      "cancel": "キャンセル",
+      "confirm": "確認"
+    },
+    "warnings": {
+      "tooManyMcps": "有効なMCPサーバーが多すぎます（{{count}}個）。システムの読み込みが遅くなり、パフォーマンスが低下する可能性があります。",
+      "tooManySkills": "有効なスキルが多すぎます（{{count}}個）。システムの読み込みが遅くなり、パフォーマンスが低下する可能性があります。",
+      "mcpLimitReached": "このMCPを有効にすると、推奨制限（3サーバー）を超えます。MCPが多すぎるとシステムの読み込みが遅くなる可能性があります。",
+      "skillLimitReached": "このスキルを有効にすると、推奨制限（5スキル）を超えます。スキルが多すぎるとシステムの読み込みが遅くなる可能性があります。"
+    }
+  },
+  "prompts": {
+    "createSlides": "スライドを作成",
+    "createWebsite": "ウェブサイトを作成",
+    "developApp": "アプリを開発",
+    "design": "デザイン",
+    "more": "その他"
+  },
+  "hints": {
+    "slashCommand": "スラッシュコマンドを使用",
+    "send": "送信",
+    "newLine": "改行",
+    "separator": "、"
+  },
+  "mocks": {
+    "projects": {
+      "newProject": "新しいプロジェクト"
+    },
+    "timestamps": {
+      "twoMinutesAgo": "2分前",
+      "oneHourAgo": "1時間前",
+      "justNow": "たった今"
+    }
+  },
+  "message": {
+    "status": {
+      "sending": "送信中",
+      "sent": "送信済み",
+      "streaming": "生成中",
+      "completed": "完了",
+      "failed": "失敗"
+    }
+  },
+  "chat": {
+    "newChat": "新しいチャット",
+    "continueChat": "チャットを続ける",
+    "emptyState": "新しい会話を始める",
+    "emptyStateDesc": "メッセージを入力してAIアシスタントとチャットを始めてください",
+    "stopGenerating": "生成を停止",
+    "cancelTask": "タスクをキャンセル",
+    "cancelTaskConfirm": "現在のタスクをキャンセルしますか？",
+    "regenerate": "再生成",
+    "model": "モデル",
+    "tokens": "トークン",
+    "tokenInput": "入力",
+    "tokenOutput": "出力",
+    "cost": "コスト",
+    "duration": "所要時間",
+    "executionTitle": "AI実行",
+    "inputPlaceholder": "Enterで送信、Shift + Enterで改行",
+    "askUserTitle": "入力が必要です",
+    "askUserSubmit": "送信",
+    "askUserOtherPlaceholder": "回答を入力してください",
+    "askUserOtherOption": "その他",
+    "askUserRequired": "送信前にすべての質問に回答してください",
+    "askUserSubmitted": "回答を送信しました",
+    "askUserFailed": "送信に失敗しました。もう一度お試しください",
+    "askUserCompleteTitle": "完了",
+    "askUserCompleteHint": "回答を送信中…",
+    "askUserRetry": "再試行",
+    "planApprovalTitle": "計画の承認",
+    "planApprovalHint": "以下の実行計画を確認してください。承認すると実行が開始され、ファイルが変更されたりコマンドが実行されたりする可能性があります。",
+    "planApprovalApprove": "承認して実行",
+    "planApprovalReject": "拒否",
+    "planApprovalEmpty": "計画が提供されていません",
+    "askUserTimeout": "残り時間 {{seconds}}秒",
+    "askUserPrevious": "前へ",
+    "askUserNext": "次へ",
+    "askUserGoTo": "質問 {{index}}",
+    "askUserProgress": "{{current}} / {{total}}",
+    "internalContextInjected": "内部コンテキストが挿入されました",
+    "internalContextSubtitle": "スキル/システム/ツールから（ユーザー入力ではありません）",
+    "internalContextView": "表示（{{count}}）",
+    "internalContextHide": "非表示",
+    "internalContextCopy": "コピー",
+    "thinkingTitle": "思考中",
+    "toolExecution": "ツール実行",
+    "subagentTranscript": "サブエージェントの記録",
+    "subagentExecution": "サブエージェント",
+    "input": "入力",
+    "output": "出力",
+    "scrollToLatestMessage": "最新メッセージにジャンプ",
+    "userPromptTimelineJump": "ユーザーメッセージ {{index}} に移動",
+    "userPromptTimelineEmpty": "（空のプロンプト）",
+    "expand": "展開",
+    "collapse": "折りたたみ",
+    "copyMessage": "メッセージをコピー",
+    "formulaCopied": "コピーしました",
+    "editMessage": "メッセージを編集",
+    "quoteModify": "引用して返信",
+    "exportImage": "Generate conversation image",
+    "exportLongImage": "Export long image",
+    "exportMultiImage": "Export multiple images",
+    "exportImageSuccess": "Conversation image generated",
+    "exportImageMultiSuccess": "Exported {{count}} images",
+    "exportImageEmpty": "No conversation content to export",
+    "exportImageFailed": "Failed to generate conversation image",
+    "statusBar": {
+      "browser": "ブラウザ",
+      "openDesktop": "デスクトップを開く",
+      "desktopPreparing": "デスクトップリンクを準備中",
+      "skillsConfigured": "スキル（設定済み）",
+      "skillsUsed": "スキル",
+      "mcpConfigured": "MCPサーバー（設定済み）",
+      "mcp": "MCPサーバー"
+    },
+    "typingWords": [
+      "Accomplishing",
+      "Actioning",
+      "Actualizing",
+      "Baking",
+      "Brewing",
+      "Calculating",
+      "Cerebrating",
+      "Churning",
+      "Clauding",
+      "Coalescing",
+      "Cogitating",
+      "Computing",
+      "Conjuring",
+      "Considering",
+      "Cooking",
+      "Crafting",
+      "Creating",
+      "Crunching",
+      "Deliberating",
+      "Determining",
+      "Doing",
+      "Effecting",
+      "Finagling",
+      "Forging",
+      "Forming",
+      "Generating",
+      "Hatching",
+      "Herding",
+      "Honking",
+      "Hustling",
+      "Ideating",
+      "Inferring",
+      "Manifesting",
+      "Marinating",
+      "Moseying",
+      "Mulling",
+      "Mustering",
+      "Musing",
+      "Noodling",
+      "Percolating",
+      "Pondering",
+      "Processing",
+      "Puttering",
+      "Reticulating",
+      "Ruminating",
+      "Schlepping",
+      "Shucking",
+      "Simmering",
+      "Smooshing",
+      "Spinning",
+      "Stewing",
+      "Synthesizing",
+      "Thinking",
+      "Transmuting",
+      "Vibing",
+      "Working"
+    ],
+    "collapseRightPanel": "Collapse output panel",
+    "expandRightPanel": "Expand output panel",
+    "toolCards": {
+      "tools": {
+        "skill": "スキル",
+        "task": "タスク実行",
+        "askUserQuestion": "ユーザーに質問",
+        "bash": "コマンド実行",
+        "edit": "ファイル編集",
+        "read": "ファイル読み取り",
+        "write": "ファイル書き込み",
+        "glob": "ファイル検索",
+        "grep": "テキスト検索",
+        "notebookEdit": "ノートブック編集",
+        "webFetch": "Webページ取得",
+        "webSearch": "Web検索",
+        "todoWrite": "TODO更新",
+        "bashOutput": "コマンド出力",
+        "killBash": "コマンド停止",
+        "exitPlanMode": "計画モード終了",
+        "listMcpResources": "MCPリソース一覧",
+        "readMcpResource": "MCPリソース読み取り",
+        "browser": "ブラウザー",
+        "tool": "ツール"
+      },
+      "summary": {
+        "questions": "{{count}} questions",
+        "todos": "{{count}} todos",
+        "items": "{{count}} items"
+      },
+      "fields": {
+        "description": "Description",
+        "prompt": "Prompt",
+        "subagentType": "Subagent",
+        "questions": "Questions",
+        "question": "Question",
+        "options": "Options",
+        "command": "Command",
+        "timeout": "Timeout",
+        "runInBackground": "Background",
+        "glob": "Glob filter",
+        "type": "Type",
+        "outputMode": "Output mode",
+        "ignoreCase": "Ignore case",
+        "showLineNumber": "Line number",
+        "beforeContext": "Before context",
+        "afterContext": "After context",
+        "context": "Context",
+        "headLimit": "Head limit",
+        "multiline": "Multiline",
+        "filePath": "File path",
+        "oldString": "Old text",
+        "newString": "New text",
+        "replaceAll": "Replace all",
+        "newSource": "New source",
+        "content": "Content",
+        "offset": "Offset",
+        "limit": "Limit",
+        "pattern": "Pattern",
+        "path": "Path",
+        "query": "Query",
+        "url": "URL",
+        "statusCode": "Status code",
+        "searchPath": "Search path",
+        "allowedDomains": "Allowed domains",
+        "blockedDomains": "Blocked domains",
+        "filter": "Filter",
+        "href": "Href",
+        "selector": "Selector",
+        "text": "Text",
+        "role": "Role",
+        "name": "Name",
+        "value": "Value",
+        "button": "Button",
+        "key": "Key",
+        "server": "Server",
+        "uri": "URI",
+        "notebookPath": "Notebook path",
+        "editMode": "Edit mode",
+        "cellId": "Cell ID",
+        "cellType": "Cell type",
+        "shellId": "Shell ID",
+        "bashId": "Bash ID",
+        "status": "Status",
+        "killed": "Killed",
+        "exitCode": "Exit code",
+        "approved": "Approved",
+        "answer": "Answer",
+        "output": "Output",
+        "result": "Result",
+        "usage": "Usage",
+        "duration": "Duration",
+        "cost": "Cost",
+        "total": "Total",
+        "message": "Message",
+        "bytes": "Bytes",
+        "replacements": "Replacements",
+        "totalLines": "Total lines",
+        "linesReturned": "Returned lines",
+        "mimeType": "MIME type",
+        "fileSize": "File size",
+        "editType": "Edit type",
+        "finalUrl": "Final URL",
+        "totalResults": "Total results",
+        "totalMatches": "Total matches",
+        "matches": "Matches",
+        "files": "Files",
+        "results": "Results",
+        "resources": "Resources",
+        "stats": "Stats",
+        "contents": "Contents",
+        "multiSelect": "Multi-select"
+      },
+      "text": {
+        "rawOutput": "Raw output",
+        "structured": "Structured data",
+        "empty": "No data"
+      }
+    }
+  },
+  "status": {
+    "pending": "待機中",
+    "running": "実行中",
+    "completed": "完了",
+    "failed": "失敗",
+    "canceled": "キャンセル済み",
+    "loading": "読み込み中...",
+    "progress": "進行状況"
+  },
+  "fileChanges": {
+    "title": "ファイル変更",
+    "noChanges": "まだファイル変更はありません",
+    "lines": "行",
+    "files": "ファイル",
+    "added": "追加",
+    "modified": "変更",
+    "deleted": "削除",
+    "renamed": "名前変更",
+    "showDiff": "差分を表示",
+    "hideDiff": "差分を非表示"
+  },
+  "todo": {
+    "title": "タスク",
+    "pending": "待機中",
+    "inProgress": "進行中",
+    "completed": "完了"
+  },
+  "mcp": {
+    "title": "MCPサーバー",
+    "connected": "接続済み",
+    "disconnected": "切断",
+    "error": "エラー"
+  },
+  "mobile": {
+    "chat": "チャット",
+    "computer": "コンピューター",
+    "artifacts": "アーティファクト",
+    "status": "ステータス"
+  },
+  "computer": {
+    "title": "Pocoコンピューター",
+    "description": "実行中のブラウザとターミナルの手順を監視",
+    "status": {
+      "live": "ライブ",
+      "replay": "リプレイ"
+    },
+    "tabs": {
+      "browser": "ブラウザ",
+      "terminal": "ターミナル"
+    },
+    "replay": {
+      "empty": "まだリプレイ手順はありません",
+      "timeline": "タイムライン",
+      "noSelection": "（手順が選択されていません）",
+      "stepCounter": "{{current}} / {{total}}",
+      "durationMs": "{{ms}}ミリ秒",
+      "durationSec": "{{sec}}秒",
+      "controls": {
+        "first": "最初へ",
+        "prev": "前へ",
+        "play": "再生",
+        "pause": "一時停止",
+        "next": "次へ",
+        "latest": "最新へ"
+      },
+      "filter": {
+        "all": "すべて",
+        "browser": "ブラウザ",
+        "terminal": "ターミナル"
+      },
+      "limitHint": "最初の{{limit}}手順のみ表示",
+      "liveLabel": "リアルタイム"
+    },
+    "browser": {
+      "screenshotAlt": "ブラウザスクリーンショット",
+      "screenshotLoading": "スクリーンショットを読み込み中...",
+      "screenshotUnavailable": "スクリーンショットが利用できません",
+      "steps": "ブラウザの手順",
+      "noSteps": "まだブラウザの手順はありません"
+    },
+    "terminal": {
+      "noSteps": "まだターミナル出力はありません",
+      "unknownCommand": "（不明なコマンド）",
+      "noOutput": "（出力なし）",
+      "running": "実行中...",
+      "exitCode": "終了コード {{code}}",
+      "killed": "タイムアウトにより終了しました"
+    }
+  },
+  "artifacts": {
+    "empty": {
+      "creating": "Pocoが作成中...",
+      "working": "エージェントがタスクに取り組んでいます",
+      "noChanges": "ファイル変更はありません",
+      "description": "AI実行によって生成されたファイル変更がここに表示されます"
+    },
+    "viewer": {
+      "loadingEngine": "プレビューエンジンを読み込み中...",
+      "loadingDoc": "ドキュメントを読み込み中...",
+      "parseError": "Excalidraw ファイルの解析に失敗しました",
+      "fetchError": "ドキュメントコンテンツの取得に失敗しました",
+      "retry": "再試行",
+      "selectFile": "プレビューするファイルを右から選択してください",
+      "supportedFormats": "PDF、Officeドキュメント、一般的な画像形式、MP4 動画、XMind ファイル、.excalidraw ファイル、.drawio ファイルをサポート",
+      "processing": "ファイル処理",
+      "notSupported": "この形式はプレビューをサポートしていません",
+      "openInNewWindow": "新しいウィンドウで開く",
+      "downloadOriginal": "元のファイルをダウンロード"
+    },
+    "summary": {
+      "total": "合計",
+      "totalFiles": "ファイル",
+      "added": "追加",
+      "modified": "変更",
+      "deleted": "削除",
+      "renamed": "名前変更",
+      "totalfiles": "ファイル"
+    }
+  },
+  "search": {
+    "placeholder": "タスク、プロジェクト、メッセージを検索...",
+    "tasks": "タスク",
+    "projects": "プロジェクト",
+    "messages": "メッセージ",
+    "noResults": "結果が見つかりませんでした"
+  },
+  "library": {
+    "title": "機能",
+    "subtitle": "スキル、プリセット、ツールを管理",
+    "comingSoon": "近日公開",
+    "sidebar": {
+      "title": "機能ショートカット",
+      "description": "機能を選択して設定にジャンプします。",
+      "mobile": "機能を参照",
+      "groups": {
+        "core": "コア",
+        "automation": "自動化",
+        "integrations": "統合",
+        "labs": "ラボ"
+      }
+    },
+    "skillsStore": {
+      "title": "スキル",
+      "description": "コミュニティが提供するAIスキルを参照してインストール",
+      "feature1": "豊富なスキルライブラリ",
+      "feature2": "ワンクリックインストール",
+      "feature3": "カスタム設定",
+      "action": "スキルを参照",
+      "install": "インストール",
+      "uninstall": "アンインストール",
+      "installed": "インストール済み",
+      "notInstalled": "未インストール",
+      "hasConfig": "設定可能"
+    },
+    "mcpInstall": {
+      "title": "MCP",
+      "description": "Model Context Protocolサーバーを管理・設定",
+      "feature1": "迅速なMCP展開",
+      "feature2": "視覚的な管理",
+      "feature3": "リアルタイム監視",
+      "action": "サーバーを管理"
+    },
+    "envVars": {
+      "title": "環境変数",
+      "sidebarTitle": "環境変数",
+      "description": "スキルやMCPサーバーで使用されるAPIキーやシークレットを保存します。",
+      "header": {
+        "title": "環境変数",
+        "add": "変数を追加"
+      },
+      "copied": "クリップボードにコピーしました",
+      "copy": "コピー",
+      "copyError": "コピーに失敗しました",
+      "valuePlaceholder": "値を入力",
+      "required": "必須",
+      "secretLabel": "シークレット",
+      "save": "保存",
+      "saving": "保存中…",
+      "otherTitle": "既存の変数",
+      "empty": "まだ環境変数はありません",
+      "addTitle": "環境変数を追加",
+      "editTitle": "環境変数を更新",
+      "overrideTitle": "システム変数を上書き",
+      "addDescription": "キーと値のペアを提供し、APIキーの場合はシークレットとしてマークしてください。",
+      "keyLabel": "キー",
+      "valueLabel": "値",
+      "valueCreateHint": "古い値は表示されません。設定する新しい値を入力してください。",
+      "valueUpdateHint": "古い値は表示されません。空白のままにすると現在の値が保持されます。",
+      "descriptionLabel": "説明",
+      "descriptionPlaceholder": "オプションの説明",
+      "secretToggle": "値をマスク（APIキー）",
+      "secretHelp": "環境値はプレーンテキストで表示されません。新しい値のみ設定できます。",
+      "addButton": "変数を追加",
+      "refresh": "更新",
+      "systemHint": "システム変数は設定されているかどうかのみを表示します。上書きするには同じキーでユーザー変数を作成してください。",
+      "userHint": "ユーザー変数はUIでプレーンテキストを表示しません。更新するには新しい値を入力してください（空白のままにすると保持）。",
+      "status": {
+        "set": "設定済み",
+        "unset": "未設定",
+        "overridden": "ユーザーにより上書き済み",
+        "overridesSystem": "システムを上書き"
+      },
+      "actions": {
+        "override": "上書き",
+        "editOverride": "ユーザー上書きを編集",
+        "edit": "編集"
+      },
+      "toasts": {
+        "created": "環境変数を作成しました",
+        "updated": "環境変数を更新しました",
+        "deleted": "環境変数を削除しました",
+        "error": "アクションに失敗しました。もう一度お試しください",
+        "refreshed": "環境変数を更新しました",
+        "keyRequired": "キーを空にすることはできません",
+        "copied": "コピーしました",
+        "copyFailed": "コピーに失敗しました"
+      },
+      "scopeLabel": "スコープ",
+      "scope": {
+        "system": "システム",
+        "user": "ユーザー",
+        "global": "グローバル",
+        "mcp": "MCP"
+      }
+    },
+    "personalization": {
+      "card": {
+        "title": "パーソナライゼーション",
+        "description": "すべてのタスクに対して永続的な設定と指示を設定",
+        "feature1": "ユーザーレベルのグローバルスコープ",
+        "feature2": "カスタム指示",
+        "feature3": "いつでも更新可能、次回の実行時に適用",
+        "action": "開く"
+      },
+      "header": {
+        "title": "パーソナライゼーション",
+        "refresh": "更新",
+        "clear": "クリア",
+        "save": "保存",
+        "saving": "保存中…"
+      },
+      "customInstructions": {
+        "title": "カスタム指示",
+        "description": "これらの指示は、今後のすべてのタスクにおいてエージェントの応答と動作に影響します。",
+        "hintScope": "これはユーザーごとのグローバル設定です：新しいチャット、継続中のチャット、スケジュールタスクすべてに適用されます。",
+        "hintSecrets": "ここにAPIキーやその他のシークレットを保存しないでください。",
+        "status": {
+          "enabled": "有効",
+          "disabled": "無効"
+        },
+        "editor": {
+          "label": "指示の内容",
+          "insertTemplate": "例を挿入",
+          "placeholder": "例：常に日本語で応答する；プロフェッショナルなトーンを維持する；箇条書きを優先する…",
+          "tip": "ヒント：オフにすると指示が適用されません。後のために編集して保存することはできます。",
+          "template": "# カスタム指示の例\n\n## 出力スタイル\n- 常に日本語で応答する\n- 明確な構造と箇条書きを優先する\n\n## コーディングルール\n- コードコメントは英語でなければなりません\n- Python（3.12+）の型アノテーションを使用する\n"
+        }
+      },
+      "toasts": {
+        "saved": "保存しました",
+        "cleared": "クリアしました",
+        "refreshed": "更新しました",
+        "error": "アクションに失敗しました。もう一度お試しください"
+      }
+    },
+    "slashCommands": {
+      "card": {
+        "title": "スラッシュコマンド",
+        "description": "チャット入力でオートコンプリートされる頻繁に使用する/コマンドを保存",
+        "feature1": "個人コマンドライブラリ（グローバル）",
+        "feature2": "引数ヒントと許可ツールをサポート",
+        "feature3": "/を入力してオートコンプリートと挿入",
+        "action": "コマンドを管理"
+      },
+      "header": {
+        "title": "スラッシュコマンド",
+        "add": "コマンドを追加"
+      },
+      "searchPlaceholder": "コマンドを検索...",
+      "addCard": "スラッシュコマンドを追加",
+      "summary": "コマンド",
+      "enabled": "有効",
+      "mode": {
+        "raw": "Markdown",
+        "structured": "構造化"
+      },
+      "delete": {
+        "title": "コマンドを削除しますか？",
+        "description": "削除後、このコマンドはセッションで使用できなくなります。"
+      },
+      "dialog": {
+        "createTitle": "コマンドを作成",
+        "editTitle": "コマンドを編集"
+      },
+      "fields": {
+        "name": "名前",
+        "nameHint": "/なし",
+        "namePlaceholder": "refactor",
+        "enabled": "有効",
+        "rawMarkdown": "Markdown",
+        "rawMarkdownPlaceholder": "完全な.mdをここに貼り付け（YAMLフロントマター対応）",
+        "modelIgnoredHint": "ヒント：YAMLフロントマターのモデルフィールドは無視されます。",
+        "description": "説明",
+        "descriptionPlaceholder": "例：テストを実行して失敗を分析",
+        "argumentHint": "引数ヒント",
+        "argumentHintPlaceholder": "[test-pattern]",
+        "allowedTools": "許可ツール",
+        "allowedToolsPlaceholder": "Read、Grep、Glob",
+        "content": "コンテンツ",
+        "contentPlaceholder": "Claudeがすべきことを説明（Markdown）"
+      },
+      "toasts": {
+        "loadError": "コマンドの読み込みに失敗しました",
+        "created": "コマンドを作成しました",
+        "updated": "コマンドを更新しました",
+        "deleted": "コマンドを削除しました",
+        "error": "アクションに失敗しました"
+      },
+      "empty": "まだコマンドはありません"
+    },
+    "subAgents": {
+      "card": {
+        "title": "サブエージェント",
+        "description": "コンテキストの分離と並列化のために再利用可能な専門サブエージェントを作成します。",
+        "feature1": "メインチャットをクリーンに保つための分離されたコンテキスト",
+        "feature2": "複数のサブエージェントを並列で実行",
+        "feature3": "ツール/モデルを制限してより良い制御",
+        "action": "サブエージェントを管理"
+      },
+      "header": {
+        "title": "サブエージェント",
+        "add": "サブエージェントを追加"
+      },
+      "searchPlaceholder": "サブエージェントを検索...",
+      "addCard": "サブエージェントを追加",
+      "summary": "サブエージェント",
+      "enabled": "有効",
+      "empty": "まだサブエージェントはありません",
+      "mode": {
+        "raw": "Markdown",
+        "structured": "構造化"
+      },
+      "models": {
+        "inherit": "継承"
+      },
+      "delete": {
+        "title": "サブエージェントを削除しますか？",
+        "description": "削除後、このサブエージェントはセッションで使用できなくなります。"
+      },
+      "dialog": {
+        "createTitle": "サブエージェントを作成",
+        "editTitle": "サブエージェントを編集"
+      },
+      "fields": {
+        "name": "名前",
+        "namePlaceholder": "code-reviewer",
+        "enabled": "有効",
+        "description": "説明",
+        "descriptionOptional": "説明（オプション）",
+        "descriptionPlaceholder": "品質、セキュリティ、保守性のレビューに使用されます。",
+        "model": "モデル",
+        "tools": "ツール",
+        "toolsPlaceholder": "Read、Grep、Glob",
+        "toolsHint": "空白のままにすると、利用可能なすべてのツールを継承します。",
+        "prompt": "システムプロンプト",
+        "promptPlaceholder": "あなたは専門的なコードレビュアーです...",
+        "rawMarkdown": "Markdown",
+        "rawMarkdownPlaceholder": "完全な.mdをここに貼り付け（YAMLフロントマター必須；名前は一致する必要があります）",
+        "rawMarkdownHint": "ヒント：Rawモードは~/.claude/agentsにステージングされ、SDKによって読み込まれます。"
+      },
+      "toasts": {
+        "loadError": "サブエージェントの読み込みに失敗しました",
+        "created": "サブエージェントを作成しました",
+        "updated": "サブエージェントを更新しました",
+        "deleted": "サブエージェントを削除しました",
+        "error": "アクションに失敗しました"
+      }
+    },
+    "tags": {
+      "system": "プリセット",
+      "user": "マイスキル"
+    },
+    "actions": {
+      "processing": "処理中…"
+    },
+    "scheduledTasks": {
+      "title": "スケジュールタスク",
+      "description": "自動タスクスケジューリングと実行計画を設定",
+      "feature1": "Cron式サポート",
+      "feature2": "タスク履歴追跡",
+      "feature3": "失敗時のリトライメカニズム",
+      "action": "タスクを作成",
+      "page": {
+        "title": "スケジュールタスク",
+        "create": "タスクを作成",
+        "createTitle": "スケジュールタスクを作成",
+        "trigger": "実行",
+        "empty": "まだスケジュールタスクはありません"
+      },
+      "detail": {
+        "title": "スケジュールタスク",
+        "subtitle": "{{schedule}}",
+        "refresh": "更新",
+        "edit": "編集",
+        "editTitle": "スケジュールタスクを編集",
+        "deleteTitle": "スケジュールタスクを削除しますか？",
+        "deleteDescription": "これにより今後のトリガーが停止されます。既存の実行履歴はチャットセッションに残ります。",
+        "notFound": "スケジュールタスクが見つかりません",
+        "enabledOn": "有効",
+        "enabledOff": "一時停止",
+        "schedule": "スケジュール",
+        "lastRun": "最後の実行",
+        "reuseSessionOn": "再利用（同じセッション/ワークスペース）",
+        "reuseSessionOff": "再利用しない（実行ごとに新しいセッション/ワークスペース）",
+        "reuseSessionImmutable": "作成後は変更できません",
+        "openWorkspace": "セッションを開く",
+        "runsTitle": "実行履歴",
+        "noRuns": "まだ実行はありません。次回のトリガーの後に実行が表示されます。",
+        "runTriggeredAt": "トリガー時刻",
+        "runStatus": "ステータス",
+        "runDuration": "所要時間",
+        "runCost": "コスト",
+        "runTokens": "トークン（入力/出力）",
+        "runProgress": "進行状況",
+        "durationSeconds": "{{seconds}}秒",
+        "durationMinutesSeconds": "{{minutes}}分{{seconds}}秒",
+        "viewResult": "結果を表示"
+      },
+      "status": {
+        "queued": "キュー待ち",
+        "claimed": "取得済み",
+        "running": "実行中",
+        "completed": "完了",
+        "failed": "失敗",
+        "canceled": "キャンセル済み",
+        "unknown": "不明"
+      },
+      "fields": {
+        "name": "名前",
+        "cron": "Cron式",
+        "timezone": "タイムゾーン",
+        "prompt": "プロンプト",
+        "enabled": "有効",
+        "enabledHelp": "無効にすると自動実行されませんが、手動でトリガーすることはできます。",
+        "reuseSession": "セッション/ワークスペースを再利用",
+        "reuseSessionHelp": "有効にすると、同じワークスペースが再利用され、生成されたファイルが保持されます。",
+        "nextRunAt": "次回実行",
+        "lastStatus": "最後のステータス",
+        "actions": "アクション"
+      },
+      "placeholders": {
+        "name": "例：デイリービルド",
+        "prompt": "このスケジュールタスクは何をするべきですか？"
+      },
+      "toasts": {
+        "created": "スケジュールタスクを作成しました",
+        "updated": "スケジュールタスクを更新しました",
+        "deleted": "スケジュールタスクを削除しました",
+        "triggered": "トリガーしました",
+        "error": "操作に失敗しました。後でもう一度お試しください"
+      },
+      "schedule": {
+        "dialogTitle": "スケジュールタスク設定",
+        "repeat": "スケジュール",
+        "repeatOptions": {
+          "interval": "間隔",
+          "daily": "毎日",
+          "weekly": "毎週",
+          "monthly": "毎月"
+        },
+        "interval": {
+          "every": "毎",
+          "unitMinute": "分",
+          "unitHour": "時間"
+        },
+        "time": "時刻",
+        "weekdays": {
+          "label": "曜日",
+          "short": {
+            "0": "日",
+            "1": "月",
+            "2": "火",
+            "3": "水",
+            "4": "木",
+            "5": "金",
+            "6": "土"
+          }
+        },
+        "monthDay": "日",
+        "preview": "実行予定：{{summary}}",
+        "advanced": "詳細",
+        "useCron": "Cron式を使用",
+        "useCronHelp": "有効にすると、cron式が上記のスケジュールを上書きします。",
+        "cronPlaceholder": "例：*/5 * * * *",
+        "cronHelp": "Cron式（5フィールド：分 時 日 月 曜日）。",
+        "summary": {
+          "intervalMinutes": "{{count}}分ごと",
+          "intervalHours": "{{count}}時間ごと",
+          "daily": "毎日{{time}}",
+          "weekly": "毎週{{days}}{{time}}",
+          "monthly": "毎月{{day}}日{{time}}",
+          "cron": "Cron：{{cron}}"
+        }
+      }
+    },
+    "more": {
+      "title": "その他",
+      "description": "その他の機能と拡張機能を探索",
+      "feature1": "プリセットマーケットプレイス",
+      "feature2": "統合ガイド",
+      "feature3": "APIドキュメント",
+      "action": "詳細"
+    },
+    "skillsPage": {
+      "header": {
+        "title": "スキル",
+        "subtitle": "AI機能を探索・管理"
+      },
+      "searchPlaceholder": "スキルを検索...",
+      "addCard": "スキルを追加",
+      "items": {
+        "webSearch": {
+          "name": "ウェブ検索",
+          "description": "リアルタイムウェブ検索を実行してインター���ットから最新の情報を取得します。"
+        },
+        "codeExecution": {
+          "name": "コード実行",
+          "description": "サンドボックス環境でPythonコードを安全に実行して計算やデータ分析を行います。"
+        },
+        "imageGeneration": {
+          "name": "画像生成",
+          "description": "高度なAIモデルを使用してテキスト説明から高品質の画像を生成します。"
+        },
+        "textAnalysis": {
+          "name": "テキスト分析",
+          "description": "テキストコンテンツの感情、エンティティ、構文を分析します。"
+        },
+        "dataVisualization": {
+          "name": "データ可視化",
+          "description": "データセットからチャートとグラフを作成してより良い洞察を得ます。"
+        }
+      }
+    },
+    "skillsManager": {
+      "stats": {
+        "available": "利用可能",
+        "installed": "インストール済み",
+        "enabled": "有効"
+      },
+      "section": {
+        "title": "スキル"
+      },
+      "scope": {
+        "system": "システム",
+        "user": "ユーザー"
+      },
+      "fields": {
+        "id": "ID",
+        "source": "ソース"
+      },
+      "actions": {
+        "install": "インストール",
+        "uninstall": "アンインストール"
+      },
+      "toasts": {
+        "loadError": "スキルの読み込みに失敗しました",
+        "actionError": "操作に失敗しました。後でもう一度お試しください",
+        "installed": "スキルをインストールしました",
+        "uninstalled": "スキルをアンインストールしました",
+        "enabled": "スキルを有効にしました",
+        "disabled": "スキルを無効にしました",
+        "actionFailed": "操作に失敗しました。後でもう一度お試しください"
+      },
+      "empty": "まだスキルはありません",
+      "unknownSkill": "不明なスキル"
+    },
+    "skillsImport": {
+      "title": "スキルをインポート",
+      "tabs": {
+        "zip": "Zipをアップロード",
+        "github": "GitHub URL",
+        "command": "npx コマンド導入"
+      },
+      "fields": {
+        "zip": "Zipファイル",
+        "githubUrl": "GitHubパブリックリポジトリURL",
+        "nameOverride": "スキル名"
+      },
+      "placeholders": {
+        "githubUrl": "https://github.com/owner/repo",
+        "name": "例：my-skill",
+        "command": "npx skills add https://github.com/owner/repo --skill my-skill"
+      },
+      "hints": {
+        "github": "デフォルトはmain/master（パブリックgithub.comリポジトリのみ）",
+        "nameRequired": "SKILL.mdはアーカイブのルートにあります。名前が必要です",
+        "command": "add コマンドを貼り付けると、GitHub URL と --skill を自動解析します。"
+      },
+      "actions": {
+        "back": "戻る",
+        "discover": "発見",
+        "discovering": "発見中...",
+        "commit": "インポートしてインストール",
+        "committing": "インポート中..."
+      },
+      "preview": {
+        "found": "検出",
+        "items": "スキル定義",
+        "overwrite": "上書き",
+        "overwriteItems": "既存のスキル",
+        "willOverwrite": "上書きする",
+        "root": "ルート",
+        "path": "パス",
+        "unnamed": "名前なし",
+        "pagination": {
+          "range": "{{from}}-{{to}} / {{total}}を表示",
+          "page": "{{page}} / {{pages}}ページ",
+          "prev": "前へ",
+          "next": "次へ"
+        },
+        "selection": {
+          "selectPage": "ページを選択",
+          "clearPage": "ページ選択をクリア",
+          "selectAll": "すべてを選択",
+          "clearAll": "すべての選択をクリア"
+        }
+      },
+      "result": {
+        "title": "インポート結果",
+        "success": "成功",
+        "failed": "失敗"
+      },
+      "toasts": {
+        "missingZip": "Zipファイルを選択してください",
+        "missingGithubUrl": "GitHub URLを入力してください",
+        "discovered": "検出しました。インポートする内容を確認してください。",
+        "discoverError": "検出に失敗しました。後でもう一度お試しください",
+        "committed": "インポートに成功しました",
+        "commitError": "インポートに失敗しました。後でもう一度お試しください",
+        "partialFailed": "一部のスキルのインポートに失敗しました。詳細を確認してください。",
+        "commitTimeout": "インポートがタイムアウトしました。後でもう一度お試しください",
+        "invalidCommand": "コマンドを解析できません。github.com の URL を含めてください。"
+      },
+      "progress": {
+        "title": "インポートの進行状況",
+        "value": "進行状況",
+        "jobId": "ジョブID"
+      }
+    },
+    "pluginsPage": {
+      "searchPlaceholder": "プリセットを検索...",
+      "addCard": "プリセットを追加"
+    },
+    "mcpLibrary": {
+      "header": {
+        "title": "MCPサーバー",
+        "subtitle": "Model Context Protocol統合を管理",
+        "settings": "グローバル設定",
+        "add": "MCPを追加"
+      },
+      "searchPlaceholder": "サーバーを検索...",
+      "addCard": "MCPを追加",
+      "status": {
+        "enabled": "有効",
+        "disabled": "無効"
+      },
+      "envRequired": "環境変数キーが必要",
+      "descriptionFallback": "説明が提供されていません",
+      "empty": "利用可能なMCPプリセットはありません",
+      "actions": {
+        "enable": "有効にする",
+        "disable": "無効にする",
+        "uninstall": "アンインストール",
+        "settings": "設定",
+        "configure": "MCPサーバーを設定"
+      },
+      "dialog": {
+        "title": "MCPタイトル（一意）",
+        "displayName": "表示名",
+        "jsonConfig": "完全なJSON設定",
+        "required": "必須"
+      },
+      "sections": {
+        "status": "サーバーステータス",
+        "statusHint": "このMCPサーバーの接続を切り替えます",
+        "envVars": "環境変数",
+        "envVarsHint": "このプリセットで必要なAPIキーやシークレットを提供してください"
+      },
+      "fields": {
+        "transport": "トランスポート",
+        "category": "カテゴリー",
+        "version": "バージョン",
+        "source": "ソース"
+      },
+      "toasts": {
+        "enabled": "MCPサーバーを有効にしました",
+        "disabled": "MCPサーバーを無効にしました",
+        "uninstalled": "MCPサーバーをアンインストールしました",
+        "error": "操作に失敗しました。もう一度お試しください",
+        "actionFailed": "操作に失敗しました。もう一度お試しください",
+        "created": "MCPサーバーを作成しました",
+        "updated": "MCPサーバーを更新しました"
+      }
+    },
+    "sources": {
+      "github": "GitHub",
+      "zip": "ZIP",
+      "system": "システム",
+      "manual": "手動",
+      "unknown": "不明"
+    },
+    "pluginsManager": {
+      "toasts": {
+        "exclusiveEnabled": "（他のプリセットもオフにしました）"
+      }
+    },
+    "presets": {
+      "title": "プリセット",
+      "description": "再利用可能な機能プリセットを管理"
+    },
+    "presetsPage": {
+      "header": {
+        "title": "プリセット"
+      }
+    }
+  },
+  "task": {
+    "renameDescription": "新しいタスク名を入力してください",
+    "nameLabel": "タスク名",
+    "namePlaceholder": "タスク名を入力",
+    "toasts": {
+      "renamed": "タスク名を変更しました",
+      "renameFailed": "タスク名の変更に失敗しました"
+    }
+  },
+  "project": {
+    "subtitle": "{{count}}タスク",
+    "titleWithCount": "{{name}} ・ {{count}}件のタスク",
+    "share": "プロジェクトを共有",
+    "settings": "プロジェクト設定",
+    "rename": "プロジェクト名を変更",
+    "renameDescription": "新しいプロジェクト名を入力してください",
+    "nameLabel": "プロジェクト名",
+    "namePlaceholder": "プロジェクト名を入力",
+    "delete": "プロジェクトを削除",
+    "deleteDescription": "このプロジェクトを削除すると、すべてのタスクがメインリストに戻ります。",
+    "deleteConfirm": "削除"
+  },
+  "userMenu": {
+    "credits": "クレジット",
+    "home": "ホーム",
+    "settings": "設定",
+    "logout": "ログアウト"
+  },
+  "pending": {
+    "queued": "キュー待ち",
+    "pending": "待機中",
+    "modify": "編集",
+    "send": "今すぐ送信",
+    "delete": "削除"
+  },
+  "common": {
+    "cancel": "キャンセル",
+    "create": "作成",
+    "delete": "削除",
+    "deleted": "削除済み",
+    "edit": "編集",
+    "save": "保存",
+    "saving": "保存中...",
+    "confirm": "確認",
+    "enabled": "有効",
+    "disabled": "無効"
+  },
+  "pagination": {
+    "previous": "前へ",
+    "next": "次へ",
+    "page": "{{page}}ページ",
+    "of": "/ {{total}}",
+    "rowsPerPage": "ページあたりの行数",
+    "items": "アイテム"
+  },
+  "settings": {
+    "dialogTitle": "設定",
+    "sidebar": {
+      "account": "アカウント",
+      "settings": "設定",
+      "models": "モデル",
+      "usage": "使用状況",
+      "shortcuts": "Shortcuts"
+    },
+    "upgrade": "アップグレード",
+    "credits": "クレジット",
+    "freeCredits": "無料クレジット",
+    "dailyRefresh": "毎日のクレジット更新",
+    "dailyRefreshHint": "毎日{{time}}に{{max}}へ更新",
+    "generalSettings": "一般設定",
+    "darkMode": "ダークモード",
+    "backend": "バックエンド",
+    "modelConfigTitle": "モデル設定",
+    "modelGlm": "GLM-4.7",
+    "modelGlmDescription": "タスク実行のためにGLMモデルを有効にする",
+    "apiKeys": "APIキー",
+    "openAiApiKey": "OpenAI APIキー",
+    "openAiApiKeyHint": "OpenAI互換モデルで使用されます。",
+    "openAiApiKeyPlaceholder": "OpenAI APIキーを入力",
+    "openAiBaseUrl": "OpenAI Base URL",
+    "openAiBaseUrlHint": "デフォルトのOpenAI APIエンドポイントを上書きします。",
+    "openAiBaseUrlPlaceholder": "https://api.openai.com/v1",
+    "anthropicApiKey": "Anthropic APIキー",
+    "anthropicApiKeyHint": "Anthropic互換モデルで使用されます。",
+    "anthropicApiKeyPlaceholder": "Anthropic APIキーを入力",
+    "anthropicBaseUrl": "Anthropic Base URL",
+    "anthropicBaseUrlHint": "デフォルトのAnthropic APIエンドポイントを上書きします。",
+    "anthropicBaseUrlPlaceholder": "https://api.anthropic.com",
+    "claudeCode": "Claude Code",
+    "language": "言語",
+    "english": "English",
+    "simplifiedChinese": "简体中文",
+    "noUsageData": "使用データはまだありません",
+    "getHelp": "ヘルプを表示",
+    "getHelpUrl": "https://github.com/poco-ai/poco-agent/issues",
+    "theme": "テーマ",
+    "systemMode": "システム",
+    "lightMode": "ライトモード",
+    "claude": "Claude",
+    "french": "Français",
+    "japanese": "日本語",
+    "german": "Deutsch",
+    "russian": "Русский",
+    "shortcuts": {
+      "title": "Keyboard Shortcuts",
+      "description": "Read-only shortcut reference for the current app version.",
+      "currentPlatform": "Current: {{platform}}",
+      "alternatePlatform": "Also on {{platform}}",
+      "or": "or",
+      "platform": {
+        "mac": "macOS",
+        "windows": "Windows"
+      },
+      "items": {
+        "toggleMainSidebar": {
+          "action": "Toggle main sidebar",
+          "hint": "Collapse or expand the primary left sidebar."
+        },
+        "togglePlanMode": {
+          "action": "Switch mode (planning)",
+          "hint": "Cycle composer mode while the main input is focused."
+        },
+        "switchPromptHistory": {
+          "action": "Browse prompt history",
+          "hint": "Use in chat input to recall previous prompts."
+        },
+        "slashCommand": {
+          "action": "Slash command",
+          "hint": "Type / to open slash command suggestions."
+        },
+        "search": {
+          "action": "Global search",
+          "hint": "Open or close global search dialog."
+        },
+        "toggleOutputPanel": {
+          "action": "Toggle output panel",
+          "hint": "Collapse or expand computer/artifacts panel in chat."
+        },
+        "jumpUserPrompts": {
+          "action": "Jump user prompts",
+          "hint": "When output panel is collapsed, use J/K to jump between user messages."
+        },
+        "openSettings": {
+          "action": "Open settings",
+          "hint": "Open the settings dialog."
+        }
+      }
+    }
+  },
+  "validation": {
+    "projectNameRequired": "プロジェクト名を入力してください",
+    "selectProject": "プロジェクトを選択してください",
+    "missingTaskId": "タスクIDが見つかりません",
+    "taskContentRequired": "タスク内容を入力してください",
+    "selectExecutionTime": "実行時刻を選択してください",
+    "nightlyNoTime": "夜間実行は実行時刻の設定をサポートしていません",
+    "missingSessionId": "セッションIDが見つかりません",
+    "missingToolUseId": "ツール使用IDが見つかりません",
+    "messageContentRequired": "メッセージ内容を入力してください",
+    "sessionNameRequired": "セッション名を入力してください",
+    "sessionNameTooLong": "セッション名が長すぎます"
+  },
+  "user": {
+    "plan": {
+      "free": "無料"
+    },
+    "credits": {
+      "unlimited": "無制限"
+    }
+  },
+  "fileSidebar": {
+    "title": "ファイルリスト",
+    "fileList": "ファイルリスト",
+    "downloadAll": "すべてをダウンロード",
+    "noFiles": "まだファイルはありません",
+    "downloadStarted": "ワークスペースアーカイブのダウンロードを開始しています",
+    "downloadStart": "ワークスペースアーカイブのダウンロードを開始しています",
+    "archiveNotAvailable": "アーカイブファイルがまだ利用できません",
+    "archiveUnavailable": "アーカイブファイルがまだ利用できません",
+    "downloadFailed": "ダウンロードに失敗しました"
+  },
+  "pullToRefresh": {
+    "refreshing": "更新中...",
+    "releaseToRefresh": "更新するにはリリース",
+    "pullToRefresh": "更新するにはプル"
+  },
+  "usageTooltip": {
+    "currentSession": "現在のセッション：",
+    "duration": "所要時間：",
+    "tokens": "トークン",
+    "usageStatistics": "使用統計",
+    "usageStats": "使用統計：",
+    "today": "今日：",
+    "thisWeek": "今週：",
+    "thisMonth": "今月：",
+    "durationFormat": "{{mins}}分{{secs}}秒"
+  },
+  "cardNav": {
+    "turnOffAll": "すべてをオフ",
+    "turnOnAll": "すべてをオン",
+    "noMcpInstalled": "MCPはインストールされていません",
+    "noSkillsInstalled": "スキルはインストールされていません",
+    "noPluginsInstalled": "プリセットはインストールされていません",
+    "oneClickClose": "すべてをオフ",
+    "notInstalledMcp": "MCPはインストールされていません",
+    "notInstalledSkill": "スキルはインストールされていません",
+    "apps": "アプリ",
+    "comingSoon": "近日公開",
+    "clickForDetails": "詳細をクリック",
+    "connectTools": "Pocoにツールを接続"
+  },
+  "fileChange": {
+    "previewDisabled": "実行中、プレビューは利用できません",
+    "executingNoPreview": "実行中、プレビューは利用できません",
+    "previewFile": "ファイルをプレビュー",
+    "linesAdded": "行が追加されました",
+    "linesDeleted": "行が削除されました",
+    "totalChanges": "{{count}}行変更",
+    "viewDiff": "差分を表示"
+  },
+  "computerPanel": {
+    "all": "すべて"
+  },
+  "chatPanel": {
+    "fileAttachment": "[+{{count}}ファイル]",
+    "skillsUsed": "使用されたスキル",
+    "conversationHistory": "会話履歴",
+    "loading": "読み込み中...",
+    "noHistory": "まだ履歴はありません",
+    "session": "セッション",
+    "status": "ステータス："
+  },
+  "artifactsPanel": {
+    "documentPreview": "ドキュメントプレビュー",
+    "workspacePreview": "ワークスペースファイルプレビュー",
+    "sidebarOpen": "サイドバーを開く",
+    "sidebarClosed": "サイドバーを閉じる",
+    "sidebarClose": "サイドバーを閉じる",
+    "fileChanges": "ファイル変更",
+    "totalFiles": "ファイル"
+  },
+  "mcpGrid": {
+    "availableServers": "利用可能なサーバー：{{count}}",
+    "enabledServers": "有効：{{count}}",
+    "turnOffAll": "すべてをオフ",
+    "noMcpServers": "まだMCPサーバーはありません",
+    "system": "システム",
+    "user": "ユーザー",
+    "uninstall": "アンインストール",
+    "settings": "設定"
+  },
+  "skillsGrid": {
+    "turnOffAll": "すべてをオフ"
+  },
+  "mcpSettings": {
+    "configureServer": "MCPサーバーを設定",
+    "fullJsonConfig": "完全なJSON設定",
+    "mcpName": "MCP名",
+    "jsonConfig": "完全なJSON設定",
+    "invalidJson": "JSON 設定が不正です",
+    "nameRequired": "名前は必須です",
+    "saveFailed": "MCP サーバーの保存に失敗しました"
+  },
+  "queryActions": {
+    "taskNameRequired": "タスク名を入力してください",
+    "renameFailed": "名前の変更に失敗しました",
+    "creditUnlimited": "無制限のクレジット"
+  },
+  "chatInput": {
+    "connect": "接続",
+    "cancelTask": "タスクをキャンセル"
+  },
+  "chatContainer": {
+    "loading": "読み込み中..."
+  },
+  "projectDialogs": {
+    "cancel": "キャンセル",
+    "create": "作成",
+    "selectProject": "このタスクを移動するプロジェクトを選択",
+    "noProject": "プロジェクトなし",
+    "move": "移動"
+  },
+  "connectors": {
+    "title": "コネクタ",
+    "apps": "アプリ",
+    "search": "コネクタを検索",
+    "inDevelopment": "開発中",
+    "details": "詳細",
+    "connectNow": "今すぐ接続",
+    "connected": "接続済み",
+    "enabled": "有効",
+    "coreCapabilities": "コア機能",
+    "gmail": {
+      "description": "メールを下書き、会話を検索、要約を素早く生成"
+    },
+    "gcal": {
+      "description": "スケジュールを表示、時間とアクティビティ管理を最適化"
+    },
+    "gdrive": {
+      "description": "ファイルに素早くアクセス、コンテンツをインテリジェントに検索、Pocoがドキュメント管理をより効率的にサポート"
+    },
+    "outlookMail": {
+      "description": "PocoでOutlookメールをシームレスに作成、検索、管理"
+    },
+    "github": {
+      "description": "コードリポジトリを管理、共同開発、コードレビュー"
+    },
+    "slack": {
+      "description": "PocoでSlack会話を読み書き"
+    },
+    "notion": {
+      "description": "コンテンツを検索・更新、ワークフローを自動化"
+    },
+    "filesystem": {
+      "description": "ローカルファイルシステムのファイルの読み書きを許可"
+    },
+    "postgres": {
+      "description": "PostgreSQLの読み取り専用データベースアクセス"
+    },
+    "sentry": {
+      "description": "Sentryからエラーレポートを取得・分析"
+    },
+    "webSearch": {
+      "description": "リアルタイムウェブ検索を実行して最新の情報を取得します。"
+    },
+    "codeInterpreter": {
+      "description": "サンドボックス環境でPythonコードを安全に実行します。"
+    }
+  },
+  "connectorCapabilities": {
+    "automation": {
+      "title": "自動化ワークフロー",
+      "description": "複雑なタスクフローのためのイベント駆動トリガー"
+    },
+    "assistant": {
+      "title": "スマートコラボレーションアシスタント",
+      "description": "AIがコンテキストを深く理解し、提案を提供"
+    },
+    "security": {
+      "title": "セキュリティ管理システム",
+      "description": "データセキュリティを確保するエンタープライズレベルの暗号化"
+    },
+    "search": {
+      "title": "グローバル検索インデックス",
+      "description": "ミリ秒級の再現率でクロスプラットフォームクエリ"
+    }
+  },
+  "mcpHeader": {
+    "mcpManagement": "MCPサーバー管理",
+    "searchPlaceholder": "サーバーを検索...",
+    "addMcp": "MCPを追加"
+  },
+  "skillsHeader": {
+    "skillsManagement": "スキル管理"
+  },
+  "models": {
+    "defaultTag": "デフォルト",
+    "claudeSonnet45": {
+      "description": "速度と知性のバランス"
+    },
+    "claudeOpus45": {
+      "description": "最も強力なモデル"
+    },
+    "gpt4Turbo": {
+      "description": "高速で効率的"
+    }
+  },
+  "creditsPopover": {
+    "proPlan": "Proプラン",
+    "credits": "クレジット",
+    "unlimited": "無制限",
+    "freeCredits": "無料クレジット",
+    "dailyRefresh": "毎日の更新クレジット",
+    "dailyRefreshHint": "毎日00:00に9999へ更新",
+    "viewUsage": "使用状況を表示"
+  },
+  "actions": {
+    "processing": "処理中..."
+  },
+  "filesidebar": {
+    "title": "ファイルリスト"
+  },
+  "onboarding": {
+    "close": "Close tutorial",
+    "skip": "Skip",
+    "back": "Back",
+    "next": "Next",
+    "done": "Finish",
+    "progress": "Step {{current}} / {{total}}",
+    "targetUnavailable": "This area is collapsed or unavailable right now. Continue to the next step.",
+    "letsStart": "Let's get started.",
+    "steps": {
+      "welcome": {
+        "title": "Welcome to Poco",
+        "description": "This quick tutorial highlights the core areas you will use most often. You can reopen it anytime from the sidebar quick menu."
+      },
+      "workspace": {
+        "title": "Main workspace",
+        "description": "Your main content appears here, including task creation, chat execution, and capability management pages."
+      },
+      "newTask": {
+        "title": "Create a new task",
+        "description": "Use this button to quickly start a fresh task and jump into execution."
+      },
+      "projects": {
+        "title": "Projects section",
+        "description": "Create, rename, and manage projects here to organize work by project."
+      },
+      "capabilities": {
+        "title": "Capabilities entry",
+        "description": "Start from the sidebar entry, then open the Skills page for detailed management."
+      },
+      "modeToggle": {
+        "title": "Pick a run mode",
+        "description": "Switch between Task, Step-by-step, and Scheduled modes before sending your prompt."
+      },
+      "composer": {
+        "title": "Task composer",
+        "description": "Write instructions, attach files, set repository options, and launch execution from here."
+      },
+      "quickMenu": {
+        "title": "Quick settings menu",
+        "description": "Use this menu for language/theme/backend preferences, and restart this tutorial anytime."
+      },
+      "taskList": {
+        "title": "Task list",
+        "description": "This list lets you revisit all unassigned tasks and quickly reopen any recent execution session."
+      },
+      "skillsDetail": {
+        "title": "Skills page",
+        "description": "This is the Skills view inside Capabilities, where you browse and manage skills."
+      }
+    }
+  }
+}

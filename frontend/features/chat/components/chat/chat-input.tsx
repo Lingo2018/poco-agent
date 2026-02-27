@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { ArrowUp, Mic, Plus, SlidersHorizontal, Loader2 } from "lucide-react";
+import { ArrowUp, Plus, SlidersHorizontal, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useT } from "@/lib/i18n/client";
@@ -12,12 +12,12 @@ import {
 import {
   AVAILABLE_CONNECTORS,
   type ConnectorType,
-} from "@/features/home/model/connectors";
+} from "@/features/connectors";
 import { toast } from "sonner";
-import { uploadAttachment } from "@/features/attachments/services/attachment-service";
+import { uploadAttachment } from "@/features/attachments/api/attachment-api";
 import type { InputFile } from "@/features/chat/types";
 import { FileCard } from "@/components/shared/file-card";
-import { playFileUploadSound } from "@/lib/utils/sound";
+import { playUploadSound } from "@/lib/utils/sound";
 import { useSlashCommandAutocomplete } from "@/features/chat/hooks/use-slash-command-autocomplete";
 import { cn } from "@/lib/utils";
 
@@ -103,7 +103,7 @@ export function ChatInput({
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      toast.error(t("hero.toasts.fileTooLarge", "文件过大，最大支持 100MB"));
+      toast.error(t("hero.toasts.fileTooLarge"));
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -114,11 +114,11 @@ export function ChatInput({
       setIsUploading(true);
       const uploadedFile = await uploadAttachment(file);
       setAttachments((prev) => [...prev, uploadedFile]);
-      toast.success(t("hero.toasts.uploadSuccess", "文件上传成功"));
-      playFileUploadSound();
+      toast.success(t("hero.toasts.uploadSuccess"));
+      playUploadSound();
     } catch (error) {
       console.error("Upload failed:", error);
-      toast.error(t("hero.toasts.uploadFailed", "文件上传失败"));
+      toast.error(t("hero.toasts.uploadFailed"));
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
@@ -152,7 +152,7 @@ export function ChatInput({
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      toast.error(t("hero.toasts.fileTooLarge", "文件过大，最大支持 100MB"));
+      toast.error(t("hero.toasts.fileTooLarge"));
       return;
     }
 
@@ -160,11 +160,11 @@ export function ChatInput({
       setIsUploading(true);
       const uploadedFile = await uploadAttachment(file);
       setAttachments((prev) => [...prev, uploadedFile]);
-      toast.success(t("hero.toasts.uploadSuccess", "文件上传成功"));
-      playFileUploadSound();
+      toast.success(t("hero.toasts.uploadSuccess"));
+      playUploadSound();
     } catch (error) {
       console.error("Upload failed:", error);
-      toast.error(t("hero.toasts.uploadFailed", "文件上传失败"));
+      toast.error(t("hero.toasts.uploadFailed"));
     } finally {
       setIsUploading(false);
     }
@@ -183,7 +183,7 @@ export function ChatInput({
           className="hidden"
           onChange={handleFileSelect}
         />
-        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+        <div className="rounded-2xl border border-border bg-card shadow-sm">
           {/* Attachments */}
           {attachments.length > 0 && (
             <div className="flex flex-wrap gap-2 px-4 pt-4">
@@ -201,7 +201,7 @@ export function ChatInput({
           {/* Input area */}
           <div className="relative px-4 pb-3 pt-4">
             {slashAutocomplete.isOpen ? (
-              <div className="absolute bottom-full left-0 mb-2 w-full overflow-hidden rounded-lg border border-border bg-popover shadow-md">
+              <div className="absolute bottom-full left-0 z-50 mb-2 w-full overflow-hidden rounded-lg border border-border bg-popover shadow-md">
                 <div className="max-h-64 overflow-auto py-1">
                   {slashAutocomplete.suggestions.map((item, idx) => {
                     const selected = idx === slashAutocomplete.activeIndex;
@@ -223,19 +223,7 @@ export function ChatInput({
                             : "hover:bg-accent/50",
                         )}
                       >
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="font-mono">{item.command}</span>
-                          {item.argument_hint ? (
-                            <span className="text-xs text-muted-foreground font-mono truncate">
-                              {item.argument_hint}
-                            </span>
-                          ) : null}
-                        </div>
-                        {item.description ? (
-                          <div className="text-xs text-muted-foreground truncate">
-                            {item.description}
-                          </div>
-                        ) : null}
+                        <span className="font-mono">{item.command}</span>
                       </button>
                     );
                   })}
@@ -320,7 +308,9 @@ export function ChatInput({
                             <span>{connector.title}</span>
                           </div>
                           {/* TODO: Implement connection logic */}
-                          <span className="text-xs font-medium">连接</span>
+                          <span className="text-xs font-medium">
+                            {t("hero.connect")}
+                          </span>
                         </div>
                       </DropdownMenuItem>
                     ));
@@ -331,16 +321,6 @@ export function ChatInput({
 
             {/* Right side buttons */}
             <div className="flex items-center gap-1">
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="size-9 rounded-xl hover:bg-accent"
-                title={t("hero.voiceInput")}
-                disabled={disabled}
-              >
-                <Mic className="size-4" />
-              </Button>
               <Button
                 onClick={() => {
                   onSend(attachments);

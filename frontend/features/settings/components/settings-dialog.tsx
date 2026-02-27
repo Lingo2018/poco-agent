@@ -1,356 +1,791 @@
 "use client";
 
-import { useTheme } from "next-themes";
-import { useUserAccount } from "@/features/user/hooks/use-user-account";
-import { useRouter } from "next/navigation";
-import { useAppShell } from "@/components/shared/app-shell-context";
-
 import * as React from "react";
 import {
-  User,
-  Settings,
   Activity,
-  Calendar,
-  Plug,
-  ExternalLink,
+  ChevronLeft,
+  ChevronRight,
   HelpCircle,
-  UserCog,
+  Keyboard,
+  Languages,
+  LogOut,
+  Palette,
   Sparkles,
-  RefreshCw,
-  Moon,
+  Server,
+  SlidersHorizontal,
+  User,
+  X,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import type { LucideIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { PullToRefresh } from "@/components/ui/pull-to-refresh";
-import { ScheduledTasksHeader } from "@/features/scheduled-tasks/components/scheduled-tasks-header";
-import { ScheduledTasksTable } from "@/features/scheduled-tasks/components/scheduled-tasks-table";
-import { CreateScheduledTaskDialog } from "@/features/scheduled-tasks/components/create-scheduled-task-dialog";
-import { ScheduledTaskEditDialog } from "@/features/scheduled-tasks/components/scheduled-task-edit-dialog";
-import { useScheduledTasksStore } from "@/features/scheduled-tasks/hooks/use-scheduled-tasks-store";
-import type { ScheduledTask } from "@/features/scheduled-tasks/types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n/client";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useThemeMode, type ThemeMode } from "@/hooks/use-theme-mode";
+import { SettingsSidebar } from "@/features/settings/components/settings-sidebar";
+import { AccountSettingsTab } from "@/features/settings/components/tabs/account-settings-tab";
+import { ModelsSettingsTab } from "@/features/settings/components/tabs/models-settings-tab";
+import { ShortcutsSettingsTab } from "@/features/settings/components/tabs/shortcuts-settings-tab";
+import { UsageSettingsTab } from "@/features/settings/components/tabs/usage-settings-tab";
+import {
+  useBackendPreference,
+  type BackendOption,
+} from "@/features/settings/hooks/use-backend-preference";
+import { useSettingsLanguage } from "@/features/settings/hooks/use-settings-language";
+import type {
+  ApiProviderConfig,
+  SettingsSidebarItem,
+  SettingsTabId,
+  SettingsTabRequest,
+} from "@/features/settings/types";
+import { useUserAccount } from "@/features/user/hooks/use-user-account";
 
 interface SettingsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  tabRequest?: SettingsTabRequest | null;
+  onStartOnboarding?: () => void;
 }
 
-const SIDEBAR_ITEMS = [
-  { icon: User, label: "账户", id: "account" },
-  { icon: Settings, label: "设置", id: "settings" },
-  { icon: Activity, label: "使用情况", id: "usage" },
-  { icon: Calendar, label: "定时任务", id: "scheduled" },
-  { icon: Plug, label: "连接器", id: "connectors" },
-];
+type MobileView = "overview" | SettingsTabId;
 
-export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
-  const [activeTab, setActiveTab] = React.useState("account");
-  const { profile, credits, isLoading } = useUserAccount();
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = React.useState(false);
+type SettingOption = {
+  value: string;
+  label: string;
+  description?: string;
+};
+
+const MOBILE_SHEET_CLOSE_THRESHOLD = 140;
+
+const DEFAULT_OPENAI_CONFIG: ApiProviderConfig = {
+  enabled: false,
+  key: "",
+  useCustomBaseUrl: false,
+  baseUrl: "https://api.openai.com/v1",
+};
+
+const DEFAULT_ANTHROPIC_CONFIG: ApiProviderConfig = {
+  enabled: false,
+  key: "",
+  useCustomBaseUrl: false,
+  baseUrl: "https://api.anthropic.com",
+};
+
+export function SettingsDialog({
+  open,
+  onOpenChange,
+  tabRequest,
+  onStartOnboarding,
+}: SettingsDialogProps) {
+  const { t } = useT("translation");
+  const isMobile = useIsMobile();
   const router = useRouter();
-  const { lng } = useAppShell();
+  const { mode, setMode } = useThemeMode();
+  const { backend, setBackend } = useBackendPreference();
+  const { currentLanguage, changeLanguage } = useSettingsLanguage();
+  const { profile, credits, isLoading } = useUserAccount();
 
-  // Scheduled tasks state
-  const [createTaskOpen, setCreateTaskOpen] = React.useState(false);
-  const [editTaskOpen, setEditTaskOpen] = React.useState(false);
-  const [editingTask, setEditingTask] = React.useState<ScheduledTask | null>(
-    null,
+  const [activeTab, setActiveTab] = React.useState<SettingsTabId>(
+    tabRequest?.tab ?? "account",
   );
-  const scheduledTasksStore = useScheduledTasksStore();
+  const [mobileView, setMobileView] = React.useState<MobileView>("overview");
+  const [isGlmEnabled, setIsGlmEnabled] = React.useState(true);
+  const [openAiConfig, setOpenAiConfig] = React.useState(DEFAULT_OPENAI_CONFIG);
+  const [anthropicConfig, setAnthropicConfig] = React.useState(
+    DEFAULT_ANTHROPIC_CONFIG,
+  );
 
-  React.useEffect(() => {
-    setMounted(true);
+  const dragHandleRef = React.useRef<HTMLDivElement | null>(null);
+  const dragStartYRef = React.useRef(0);
+  const dragPointerIdRef = React.useRef<number | null>(null);
+  const translateYRef = React.useRef(0);
+  const [dragOffset, setDragOffset] = React.useState(0);
+  const [isDraggingSheet, setIsDraggingSheet] = React.useState(false);
+
+  const updateDragOffset = React.useCallback((value: number) => {
+    translateYRef.current = value;
+    setDragOffset(value);
   }, []);
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case "account":
-        return (
-          <div className="flex-1 overflow-y-auto p-5">
-            {/* User Profile Card */}
-            <div className="flex items-center gap-4 mb-6">
-              <Avatar className="size-14 bg-primary">
-                <AvatarFallback className="text-xl text-primary-foreground bg-primary">
-                  {profile?.email?.[0]?.toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                {isLoading ? (
-                  <div className="space-y-2">
-                    <div className="h-5 w-32 bg-muted rounded animate-pulse" />
-                    <div className="h-4 w-48 bg-muted rounded animate-pulse" />
-                  </div>
-                ) : (
-                  <>
-                    <div className="text-base font-medium truncate">
-                      {profile?.email}
-                    </div>
-                    <div className="text-sm text-muted-foreground truncate">
-                      {profile?.id}
-                    </div>
-                  </>
-                )}
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="icon" className="size-8">
-                  <UserCog className="size-4" />
-                </Button>
-                <Button variant="outline" size="icon" className="size-8">
-                  <ExternalLink className="size-4" />
-                </Button>
-              </div>
-            </div>
+  const resetDragState = React.useCallback(() => {
+    dragPointerIdRef.current = null;
+    dragStartYRef.current = 0;
+    translateYRef.current = 0;
+    setIsDraggingSheet(false);
+    setDragOffset(0);
+  }, []);
 
-            {/* Plan Card */}
-            <div className="rounded-xl border border-border bg-card overflow-hidden">
-              <div className="p-4 flex items-center justify-between border-b border-border border-dashed">
-                <span className="font-medium">
-                  {profile?.planName}
-                </span>
-                <Button
-                  size="sm"
-                  className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 h-7 px-4 text-xs font-bold"
-                >
-                  升级
-                </Button>
-              </div>
-              <div className="p-4 space-y-5">
-                {/* Credits */}
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Sparkles className="size-4" />
-                      <span className="text-sm font-medium">积分</span>
-                      <HelpCircle className="size-3.5 opacity-50" />
-                    </div>
-                    <span className="text-xl font-bold tracking-tight">
-                      {credits?.total}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground/60 pl-6">
-                    <span>免费积分</span>
-                    <span>{credits?.free}</span>
-                  </div>
-                </div>
+  const handleSheetOpenChange = React.useCallback(
+    (nextOpen: boolean) => {
+      if (!nextOpen) {
+        setMobileView("overview");
+      }
+      onOpenChange(nextOpen);
+    },
+    [onOpenChange],
+  );
 
-                {/* Daily Refresh */}
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <RefreshCw className="size-4" />
-                      <span className="text-sm font-medium">每日刷新积分</span>
-                      <HelpCircle className="size-3.5 opacity-50" />
-                    </div>
-                    <span className="text-xl font-bold tracking-tight">
-                      {credits?.dailyRefreshCurrent}
-                    </span>
-                  </div>
-                  <div className="text-xs text-muted-foreground/60 pl-6">
-                    每天 {credits?.refreshTime} 刷新为 {credits?.dailyRefreshMax}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      case "settings":
-        return (
-          <div className="p-6">
-            <h3 className="text-lg font-medium mb-4">通用设置</h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between py-2">
-                <div className="flex items-center gap-2">
-                  <Moon className="size-4 text-muted-foreground" />
-                  <span className="text-sm">深色模式</span>
-                </div>
-                <Switch
-                  checked={theme === "dark"}
-                  onCheckedChange={(checked) =>
-                    setTheme(checked ? "dark" : "light")
-                  }
-                  disabled={!mounted}
-                />
-              </div>
-              <div className="flex items-center justify-between py-2">
-                <div className="flex items-center gap-2">
-                  <User className="size-4 text-muted-foreground" />
-                  <span className="text-sm">语言</span>
-                </div>
-                <span className="text-sm text-muted-foreground">简体中文</span>
-              </div>
-            </div>
-          </div>
-        );
-      case "usage":
-        return (
-          <div className="p-6">
-            <div className="text-center text-muted-foreground py-10">
-              暂无使用数据
-            </div>
-          </div>
-        );
-      case "scheduled":
-        return (
-          <div className="flex flex-1 flex-col overflow-hidden min-h-0">
-            <div className="px-6 pt-4 pb-2 shrink-0">
-              <ScheduledTasksHeader
-                onAddClick={() => setCreateTaskOpen(true)}
-              />
-            </div>
-            <PullToRefresh
-              onRefresh={scheduledTasksStore.refresh}
-              isLoading={scheduledTasksStore.isLoading}
-            >
-              <div className="flex flex-1 flex-col px-6 py-6 overflow-auto min-h-0">
-                <div className="w-full max-w-6xl mx-auto">
-                  <ScheduledTasksTable
-                    tasks={scheduledTasksStore.tasks}
-                    savingId={scheduledTasksStore.savingId}
-                    onToggleEnabled={async (task) => {
-                      await scheduledTasksStore.updateTask(
-                        task.scheduled_task_id,
-                        {
-                          enabled: !task.enabled,
-                        },
-                      );
-                    }}
-                    onOpen={(task) => {
-                      router.push(
-                        `/${lng}/capabilities/scheduled-tasks/${task.scheduled_task_id}`,
-                      );
-                    }}
-                    onEdit={(task) => {
-                      setEditingTask(task);
-                      setEditTaskOpen(true);
-                    }}
-                    onTrigger={async (task) => {
-                      const resp = await scheduledTasksStore.triggerTask(
-                        task.scheduled_task_id,
-                      );
-                      if (resp?.session_id) {
-                        router.push(`/${lng}/chat/${resp.session_id}`);
-                      }
-                    }}
-                    onDelete={async (task) => {
-                      await scheduledTasksStore.removeTask(
-                        task.scheduled_task_id,
-                      );
-                    }}
-                  />
-                </div>
-              </div>
-            </PullToRefresh>
-            <CreateScheduledTaskDialog
-              open={createTaskOpen}
-              onOpenChange={setCreateTaskOpen}
-              onCreate={async (input) => {
-                const created = await scheduledTasksStore.createTask(input);
-                if (created) {
-                  router.push(
-                    `/${lng}/capabilities/scheduled-tasks/${created.scheduled_task_id}`,
-                  );
-                }
-              }}
-              isSaving={scheduledTasksStore.savingId === "create"}
-            />
-            <ScheduledTaskEditDialog
-              open={editTaskOpen}
-              onOpenChange={setEditTaskOpen}
-              task={editingTask}
-              isSaving={
-                !!editingTask &&
-                scheduledTasksStore.savingId === editingTask.scheduled_task_id
-              }
-              onSave={async (payload) => {
-                if (!editingTask) return;
-                await scheduledTasksStore.updateTask(
-                  editingTask.scheduled_task_id,
-                  payload,
-                );
-                await scheduledTasksStore.refresh();
-              }}
-            />
-          </div>
-        );
-      case "connectors":
-        return (
-          <div className="p-6">
-            <div className="text-center text-muted-foreground py-10">
-              已连接的服务将显示在这里
-            </div>
-          </div>
-        );
-      default:
-        return null;
+  const handleClose = React.useCallback(() => {
+    handleSheetOpenChange(false);
+  }, [handleSheetOpenChange]);
+
+  const shouldStartDrag = React.useCallback((target: EventTarget | null) => {
+    if (!dragHandleRef.current) return false;
+    if (!(target instanceof HTMLElement)) return false;
+    if (target.closest("[data-prevent-drag=true]")) return false;
+    return dragHandleRef.current.contains(target);
+  }, []);
+
+  const handlePointerDown = React.useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (!isMobile) return;
+      if (event.pointerType === "mouse") return;
+      if (!shouldStartDrag(event.target)) return;
+      dragStartYRef.current = event.clientY;
+      dragPointerIdRef.current = event.pointerId;
+      updateDragOffset(0);
+      setIsDraggingSheet(true);
+      event.currentTarget.setPointerCapture(event.pointerId);
+    },
+    [isMobile, shouldStartDrag, updateDragOffset],
+  );
+
+  const handlePointerMove = React.useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (!isMobile) return;
+      if (!isDraggingSheet) return;
+      if (dragPointerIdRef.current !== event.pointerId) return;
+      const offset = Math.max(event.clientY - dragStartYRef.current, 0);
+      updateDragOffset(offset);
+    },
+    [isMobile, isDraggingSheet, updateDragOffset],
+  );
+
+  const handlePointerEnd = React.useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (!isMobile) return;
+      if (!isDraggingSheet) return;
+      if (dragPointerIdRef.current !== event.pointerId) return;
+      event.currentTarget.releasePointerCapture(event.pointerId);
+      const shouldClose = translateYRef.current > MOBILE_SHEET_CLOSE_THRESHOLD;
+      resetDragState();
+      if (shouldClose) {
+        handleClose();
+      }
+    },
+    [handleClose, isDraggingSheet, isMobile, resetDragState],
+  );
+
+  const handlePointerCancel = React.useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (!isMobile) return;
+      if (dragPointerIdRef.current !== event.pointerId) return;
+      event.currentTarget.releasePointerCapture(event.pointerId);
+      resetDragState();
+    },
+    [isMobile, resetDragState],
+  );
+
+  const sidebarItems = React.useMemo<SettingsSidebarItem[]>(
+    () => [
+      { icon: User, label: t("settings.sidebar.account"), id: "account" },
+      { icon: Server, label: t("settings.sidebar.models"), id: "models" },
+      { icon: Activity, label: t("settings.sidebar.usage"), id: "usage" },
+      {
+        icon: Keyboard,
+        label: t("settings.sidebar.shortcuts"),
+        id: "shortcuts",
+      },
+    ],
+    [t],
+  );
+
+  const activeTitle = React.useMemo(
+    () => sidebarItems.find((item) => item.id === activeTab)?.label,
+    [activeTab, sidebarItems],
+  );
+
+  const languageOptions = React.useMemo<SettingOption[]>(
+    () => [
+      { value: "en", label: t("settings.english") },
+      { value: "zh", label: t("settings.simplifiedChinese") },
+      { value: "fr", label: t("settings.french") },
+      { value: "ja", label: t("settings.japanese") },
+      { value: "de", label: t("settings.german") },
+      { value: "ru", label: t("settings.russian") },
+    ],
+    [t],
+  );
+
+  const backendOptions = React.useMemo<SettingOption[]>(
+    () => [{ value: "claude-code", label: t("settings.claudeCode") }],
+    [t],
+  );
+
+  const themeOptions = React.useMemo<SettingOption[]>(
+    () => [
+      { value: "light", label: t("settings.lightMode") },
+      { value: "dark", label: t("settings.darkMode") },
+      { value: "system", label: t("settings.systemMode") },
+    ],
+    [t],
+  );
+
+  const mobileHeaderTitle = React.useMemo(() => {
+    if (mobileView === "overview") return t("settings.dialogTitle");
+    return (
+      sidebarItems.find((item) => item.id === mobileView)?.label ??
+      t("settings.dialogTitle")
+    );
+  }, [mobileView, sidebarItems, t]);
+
+  const sheetMotionStyle = React.useMemo<React.CSSProperties | undefined>(
+    () =>
+      isMobile
+        ? {
+            transform:
+              dragOffset > 0 ? `translate3d(0, ${dragOffset}px, 0)` : undefined,
+            transition: isDraggingSheet ? "none" : "transform 0.25s ease",
+          }
+        : undefined,
+    [dragOffset, isDraggingSheet, isMobile],
+  );
+
+  React.useEffect(() => {
+    if (!open) {
+      setMobileView("overview");
+      resetDragState();
     }
+  }, [open, resetDragState]);
+
+  React.useEffect(() => {
+    if (!open) return;
+    if (!tabRequest) return;
+    setActiveTab(tabRequest.tab);
+    if (isMobile) {
+      setMobileView(tabRequest.tab);
+    }
+  }, [open, tabRequest, isMobile]);
+
+  React.useEffect(() => {
+    if (!open) return;
+    if (tabRequest) return;
+    setActiveTab("account");
+    if (isMobile) {
+      setMobileView("overview");
+    }
+  }, [open, tabRequest, isMobile]);
+
+  const updateOpenAiConfig = React.useCallback(
+    (patch: Partial<ApiProviderConfig>) => {
+      setOpenAiConfig((prev) => ({ ...prev, ...patch }));
+    },
+    [],
+  );
+
+  const updateAnthropicConfig = React.useCallback(
+    (patch: Partial<ApiProviderConfig>) => {
+      setAnthropicConfig((prev) => ({ ...prev, ...patch }));
+    },
+    [],
+  );
+
+  const handleLogout = React.useCallback(() => {
+    router.push("/login");
+    handleClose();
+  }, [router, handleClose]);
+
+  const handleMobileNavigate = (view: MobileView) => {
+    if (view === "overview") {
+      setMobileView("overview");
+      return;
+    }
+
+    if (
+      view === "account" ||
+      view === "models" ||
+      view === "usage" ||
+      view === "shortcuts"
+    ) {
+      setActiveTab(view);
+    }
+
+    setMobileView(view);
   };
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        className="!max-w-[1000px] w-[90vw] p-0 gap-0 overflow-hidden !h-[75vh] min-h-[500px] max-h-[800px] bg-background text-foreground flex flex-col"
-        showCloseButton={false}
-      >
-        <DialogHeader className="sr-only">
-          <DialogTitle>设置</DialogTitle>
-        </DialogHeader>
-        <div className="flex flex-1 min-h-0">
-          {/* Left Sidebar */}
-          <div className="w-64 bg-muted/30 border-r border-border flex flex-col shrink-0">
-            <div className="p-4 flex items-center gap-2 font-semibold text-lg">
-              <Sparkles className="size-5 text-foreground" />
-              <span>Poco</span>
-            </div>
-            <div className="flex-1 overflow-y-auto py-2 px-2 space-y-0.5 min-h-0">
-              {SIDEBAR_ITEMS.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={cn(
-                    "w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
-                    activeTab === item.id
-                      ? "bg-accent text-accent-foreground font-medium"
-                      : "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
-                  )}
-                >
-                  <item.icon className="size-4" />
-                  {item.label}
-                </button>
-              ))}
-            </div>
-            <div className="p-4 border-t border-border shrink-0">
-              <button
-                onClick={() => window.open("https://open-cowork.com", "_blank")}
-                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors w-full"
-              >
-                <HelpCircle className="size-4" />
-                <span>获取帮助</span>
-                <ExternalLink className="size-3 ml-auto" />
-              </button>
-            </div>
-          </div>
+  const handleHelp = React.useCallback(() => {
+    window.open(t("settings.getHelpUrl"), "_blank");
+  }, [t]);
 
-          {/* Right Content */}
-          <div className="flex-1 bg-background flex flex-col min-w-0 min-h-0">
-            {activeTab !== "scheduled" && (
-              <div className="flex items-center justify-between p-5 pb-2 shrink-0">
-                <h2 className="text-xl font-semibold">
-                  {SIDEBAR_ITEMS.find((i) => i.id === activeTab)?.label}
-                </h2>
+  const handleStartOnboarding = React.useCallback(() => {
+    handleClose();
+    window.setTimeout(() => {
+      onStartOnboarding?.();
+    }, 180);
+  }, [handleClose, onStartOnboarding]);
+
+  const renderContent = () => {
+    if (activeTab === "account") {
+      return (
+        <AccountSettingsTab
+          profile={profile}
+          credits={credits}
+          isLoading={isLoading}
+        />
+      );
+    }
+
+    if (activeTab === "models") {
+      return (
+        <ModelsSettingsTab
+          isGlmEnabled={isGlmEnabled}
+          openAiConfig={openAiConfig}
+          anthropicConfig={anthropicConfig}
+          onToggleGlm={setIsGlmEnabled}
+          onUpdateOpenAiConfig={updateOpenAiConfig}
+          onUpdateAnthropicConfig={updateAnthropicConfig}
+        />
+      );
+    }
+
+    if (activeTab === "usage") {
+      return <UsageSettingsTab />;
+    }
+
+    return <ShortcutsSettingsTab />;
+  };
+
+  const renderMobileSecondary = () => (
+    <div className="min-h-0 flex-1 overflow-hidden rounded-3xl border border-border/50 bg-card/70">
+      {renderContent()}
+    </div>
+  );
+
+  if (!isMobile) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent
+          className="!max-w-[1000px] !h-[75vh] flex w-[90vw] min-h-[500px] max-h-[800px] flex-col gap-0 overflow-hidden bg-background p-0 text-foreground"
+          showCloseButton={false}
+        >
+          <DialogHeader className="sr-only">
+            <DialogTitle>{t("settings.dialogTitle")}</DialogTitle>
+          </DialogHeader>
+
+          <div className="flex min-h-0 flex-1">
+            <SettingsSidebar
+              items={sidebarItems}
+              activeTab={activeTab}
+              onSelectTab={setActiveTab}
+            />
+
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-background">
+              <div className="flex shrink-0 items-center justify-between p-5 pb-2">
+                <h2 className="text-xl font-semibold">{activeTitle}</h2>
               </div>
-            )}
-            {renderContent()}
+              {renderContent()}
+            </div>
           </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  return (
+    <Sheet open={open} onOpenChange={handleSheetOpenChange}>
+      <SheetContent
+        side="bottom"
+        className="flex h-[92vh] w-full max-h-[96vh] flex-col rounded-t-3xl border border-border/20 bg-background px-4 pb-6 pt-3 shadow-[var(--shadow-xl)] sm:px-6 [&>button:last-child]:hidden"
+        style={sheetMotionStyle}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerEnd}
+        onPointerCancel={handlePointerCancel}
+      >
+        <SheetHeader className="sr-only">
+          <SheetTitle>{t("settings.dialogTitle")}</SheetTitle>
+        </SheetHeader>
+
+        <div ref={dragHandleRef} className="mb-2 flex flex-col gap-2 pb-1">
+          <div className="mx-auto h-1.5 w-12 rounded-full bg-muted" />
+          <MobileSettingsHeader
+            title={mobileHeaderTitle}
+            canGoBack={mobileView !== "overview"}
+            onBack={() => handleMobileNavigate("overview")}
+            onClose={handleClose}
+            backLabel={t("library.mobile.back")}
+            closeLabel={t("common.cancel")}
+          />
         </div>
-      </DialogContent>
-    </Dialog>
+
+        <div className="flex min-h-0 flex-1 flex-col gap-4">
+          {mobileView === "overview" ? (
+            <MobileSettingsOverview
+              sidebarItems={sidebarItems}
+              onNavigate={handleMobileNavigate}
+              accountGroupTitle={t("settings.sidebar.account")}
+              generalGroupTitle={t("settings.generalSettings")}
+              helpGroupTitle={t("settings.getHelp")}
+              backendLabel={t("settings.backend")}
+              backendValue={backend}
+              backendOptions={backendOptions}
+              onBackendChange={(value) => setBackend(value as BackendOption)}
+              themeLabel={t("settings.theme")}
+              themeValue={mode}
+              themeOptions={themeOptions}
+              onThemeChange={setMode}
+              languageLabel={t("settings.language")}
+              languageValue={currentLanguage}
+              languageOptions={languageOptions}
+              onLanguageChange={changeLanguage}
+              helpLabel={t("settings.getHelp")}
+              onboardingLabel={t("sidebar.onboarding")}
+              logoutLabel={t("userMenu.logout")}
+              onOpenHelp={handleHelp}
+              onStartOnboarding={handleStartOnboarding}
+              onLogout={handleLogout}
+            />
+          ) : (
+            renderMobileSecondary()
+          )}
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+interface MobileSettingsOverviewProps {
+  sidebarItems: SettingsSidebarItem[];
+  onNavigate: (view: MobileView) => void;
+  accountGroupTitle: string;
+  generalGroupTitle: string;
+  helpGroupTitle: string;
+  backendLabel: string;
+  backendValue: BackendOption;
+  backendOptions: SettingOption[];
+  onBackendChange: (value: BackendOption) => void;
+  themeLabel: string;
+  themeValue: ThemeMode;
+  themeOptions: SettingOption[];
+  onThemeChange: (value: ThemeMode) => void;
+  languageLabel: string;
+  languageValue: string;
+  languageOptions: SettingOption[];
+  onLanguageChange: (value: string) => void;
+  helpLabel: string;
+  onboardingLabel: string;
+  logoutLabel: string;
+  onOpenHelp: () => void;
+  onStartOnboarding: () => void;
+  onLogout: () => void;
+}
+
+function MobileSettingsOverview({
+  sidebarItems,
+  onNavigate,
+  accountGroupTitle,
+  generalGroupTitle,
+  helpGroupTitle,
+  backendLabel,
+  backendValue,
+  backendOptions,
+  onBackendChange,
+  themeLabel,
+  themeValue,
+  themeOptions,
+  onThemeChange,
+  languageLabel,
+  languageValue,
+  languageOptions,
+  onLanguageChange,
+  helpLabel,
+  onboardingLabel,
+  logoutLabel,
+  onOpenHelp,
+  onStartOnboarding,
+  onLogout,
+}: MobileSettingsOverviewProps) {
+  const accountItems = sidebarItems.filter(
+    (item) => item.id === "account" || item.id === "usage",
+  );
+  const generalItems = sidebarItems.filter(
+    (item) => item.id === "models" || item.id === "shortcuts",
+  );
+
+  return (
+    <div className="flex-1 space-y-5 overflow-y-auto pb-2">
+      <SettingCard title={accountGroupTitle}>
+        {accountItems.map((item) => (
+          <SettingNavRow
+            key={item.id}
+            icon={item.icon}
+            title={item.label}
+            onClick={() => onNavigate(item.id)}
+          />
+        ))}
+      </SettingCard>
+
+      <SettingCard title={generalGroupTitle}>
+        {generalItems.map((item) => (
+          <SettingNavRow
+            key={item.id}
+            icon={item.icon}
+            title={item.label}
+            onClick={() => onNavigate(item.id)}
+          />
+        ))}
+        <SettingSelectRow
+          icon={SlidersHorizontal}
+          title={backendLabel}
+          value={backendValue}
+          options={backendOptions}
+          onChange={(value) => onBackendChange(value as BackendOption)}
+        />
+        <SettingSelectRow
+          icon={Palette}
+          title={themeLabel}
+          value={themeValue}
+          options={themeOptions}
+          onChange={(value) => onThemeChange(value as ThemeMode)}
+        />
+        <SettingSelectRow
+          icon={Languages}
+          title={languageLabel}
+          value={languageValue}
+          options={languageOptions}
+          onChange={onLanguageChange}
+        />
+      </SettingCard>
+
+      <SettingCard title={helpGroupTitle}>
+        <SettingNavRow
+          icon={HelpCircle}
+          title={helpLabel}
+          onClick={onOpenHelp}
+        />
+        <SettingNavRow
+          icon={Sparkles}
+          title={onboardingLabel}
+          onClick={onStartOnboarding}
+          dataOnboarding="mobile-settings-onboarding"
+        />
+        <SettingNavRow
+          icon={LogOut}
+          title={logoutLabel}
+          destructive
+          showChevron={false}
+          onClick={onLogout}
+        />
+      </SettingCard>
+    </div>
+  );
+}
+
+interface MobileSettingsHeaderProps {
+  title: string;
+  canGoBack: boolean;
+  onBack: () => void;
+  onClose: () => void;
+  backLabel: string;
+  closeLabel: string;
+}
+
+function MobileSettingsHeader({
+  title,
+  canGoBack,
+  onBack,
+  onClose,
+  backLabel,
+  closeLabel,
+}: MobileSettingsHeaderProps) {
+  return (
+    <div className="mb-2 flex items-center justify-between gap-4">
+      {canGoBack ? (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-10 rounded-full border border-border/40 bg-card/80 text-foreground"
+          onClick={onBack}
+          aria-label={backLabel}
+          data-prevent-drag="true"
+        >
+          <ChevronLeft className="size-5" />
+          <span className="sr-only">{backLabel}</span>
+        </Button>
+      ) : (
+        <div className="size-10" />
+      )}
+
+      <div className="text-center">
+        <p className="text-lg font-semibold text-foreground">{title}</p>
+      </div>
+
+      <Button
+        variant="ghost"
+        size="icon"
+        className="size-10 rounded-full border border-border/40 bg-card/80 text-foreground"
+        onClick={onClose}
+        aria-label={closeLabel}
+        data-prevent-drag="true"
+      >
+        <X className="size-4" />
+        <span className="sr-only">{closeLabel}</span>
+      </Button>
+    </div>
+  );
+}
+
+interface SettingCardProps {
+  title: string;
+  children: React.ReactNode;
+}
+
+function SettingCard({ title, children }: SettingCardProps) {
+  const items = React.Children.toArray(children);
+
+  return (
+    <section className="space-y-2">
+      <p className="text-xs font-semibold text-muted-foreground">{title}</p>
+      <div className="rounded-3xl border border-border/50 bg-card/70 shadow-[var(--shadow-lg)]">
+        {items.map((child, index) => (
+          <div
+            key={index}
+            className={cn(index > 0 && "border-t border-border/40")}
+          >
+            {child}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+interface SettingNavRowProps {
+  icon: LucideIcon;
+  title: string;
+  value?: string;
+  onClick?: () => void;
+  showChevron?: boolean;
+  destructive?: boolean;
+  dataOnboarding?: string;
+}
+
+function SettingNavRow({
+  icon: Icon,
+  title,
+  value,
+  onClick,
+  showChevron = true,
+  destructive = false,
+  dataOnboarding,
+}: SettingNavRowProps) {
+  const isInteractive = Boolean(onClick);
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={!isInteractive}
+      data-onboarding={dataOnboarding}
+      className={cn(
+        "flex w-full items-center gap-3 px-4 py-4 text-left transition-colors",
+        destructive
+          ? "text-destructive hover:bg-destructive/10"
+          : "text-foreground hover:bg-foreground/5",
+        !isInteractive && "cursor-default opacity-80",
+      )}
+    >
+      <div
+        className={cn(
+          "flex size-10 shrink-0 items-center justify-center rounded-2xl bg-muted/70 text-muted-foreground",
+          destructive && "bg-destructive/10 text-destructive",
+        )}
+      >
+        <Icon className="size-4" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p
+          className={cn(
+            "text-base font-medium",
+            destructive && "text-destructive",
+          )}
+        >
+          {title}
+        </p>
+      </div>
+      {value ? (
+        <span
+          className={cn(
+            "max-w-[40%] truncate text-sm",
+            destructive ? "text-destructive" : "text-muted-foreground",
+          )}
+        >
+          {value}
+        </span>
+      ) : null}
+      {showChevron ? (
+        <ChevronRight className="size-4 text-muted-foreground" />
+      ) : null}
+    </button>
+  );
+}
+
+interface SettingSelectRowProps {
+  icon: LucideIcon;
+  title: string;
+  value: string;
+  options: SettingOption[];
+  onChange: (value: string) => void;
+}
+
+function SettingSelectRow({
+  icon: Icon,
+  title,
+  value,
+  options,
+  onChange,
+}: SettingSelectRowProps) {
+  return (
+    <div className="flex w-full items-center gap-3 px-4 py-4 text-left">
+      <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-muted/70 text-muted-foreground">
+        <Icon className="size-4" />
+      </div>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <p className="text-base font-medium text-foreground">{title}</p>
+      </div>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger className="min-w-[140px] rounded-2xl border border-border/60 bg-background/80 text-foreground">
+          <SelectValue placeholder={title} />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 }

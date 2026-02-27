@@ -3,7 +3,7 @@
 
 # Poco: Your Pocket Coworker
 
-**基于云端 Claude Code，打造 Manus 般的 Agent 体验**
+基于云端 Claude Code，打造 Manus 般的 Agent 体验
 
 你也可以把它看作是 **OpenClaw** 的**更安全**（沙盒隔离）、**更漂亮**（现代 UI）、**配置更简单**（开箱即用）的替代方案。
 
@@ -32,40 +32,23 @@
 ![home](assets/home.png)
 
 <details>
-<summary><strong>点击查看更多功能截图</strong></summary>
+<summary><strong>点击查看更多功能演示</strong></summary>
 <br>
 
-**1. 产物前端渲染，页面高颜值**
-
-![output](assets/output.png)
-
-**2. mcp/skills全面支持，配置容易**
-
-![home](assets/capability.png)
-
-![skills](assets/skills.png)
-
-**3. 定时任务**
-
-![schedule](assets/schedule.png)
-
-</details>
-
-<details>
-<summary><strong>点击查看功能演示</strong></summary>
-<br>
-
-**1. 手机端操作演示**
-完美适配移动端，口袋里的 AI Coworker。
-![Demo4](https://github.com/user-attachments/assets/ccf680bb-358c-4fc9-ad97-50f75b5ea3ac)
-
-**2. 写代码与产物预览**
-通过几次对话做一个游戏，右侧直接预览运行结果。
-![Demo1](https://github.com/user-attachments/assets/0ef59c4c-8363-44a6-b9ed-7005ccfd71cb)
-
-**3. 复杂文件处理**
-支持读取和分析各类项目文件。
-![Demo3](https://github.com/user-attachments/assets/8135dab4-6396-4af8-97af-6f665853fb56)
+1. 产物渲染，支持浏览器与终端回看
+   ![output](assets/output.png)
+   ![output-computer](assets/output-computer.png)
+   <video src="https://github.com/user-attachments/assets/3d732f0b-3f32-4aca-ab61-ec28c5fd274e" controls="controls"></video>
+   ![HTML](https://github.com/user-attachments/assets/0ef59c4c-8363-44a6-b9ed-7005ccfd71cb)
+   ![Multiple-file](https://github.com/user-attachments/assets/8135dab4-6396-4af8-97af-6f665853fb56)
+2. Plugin/MCP/Skills/Subagent/Slash Commands 全面支持，配置容易
+   ![mcp](assets/mcp.png)
+   ![skills](assets/skills.png)
+   <video src="https://github.com/user-attachments/assets/60df5a0f-c338-44ad-af03-e1ebb98d5743" controls="controls"></video>
+3. 定时任务
+   ![schedule](assets/schedule.png)
+4. 移动端优化，口袋里的 AI Coworker
+   <video src="https://github.com/user-attachments/assets/a8364763-8edf-4bb1-b873-5c27755a5712" controls="controls"></video>
 
 </details>
 
@@ -77,17 +60,11 @@
 ./scripts/quickstart.sh
 ```
 
-启动完成后访问：http://localhost:3000
+启动完成后访问：`http://localhost:3000`
 
-(可选) 如需使用外部 S3/R2 存储，请使用 docker-compose.r2.yml 启动。
+(可选) 如需使用外部 S3/R2 存储，请使用 `docker-compose.r2.yml` 启动。
 
-详细的部署文档与可能遇到的问题，请参考[部署文档](./docs/README.md)。
-
-## 社区
-
-扫码加入微信群交流：
-
-<img src="assets/wx_group.jpg" alt="微信群二维码" width="180">
+详细的部署指南与可能遇到的问题，请参考[部署文档](./docs/zh/README.md)。
 
 ## Star History
 

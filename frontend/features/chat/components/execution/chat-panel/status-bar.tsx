@@ -6,6 +6,7 @@ import {
   Zap,
   Server,
   AppWindow,
+  Plug,
   CheckCircle2,
   XCircle,
   AlertCircle,
@@ -16,10 +17,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { mcpService } from "@/features/mcp/services/mcp-service";
-import { skillsService } from "@/features/skills/services/skills-service";
-import type { McpServer } from "@/features/mcp/types";
-import type { Skill } from "@/features/skills/types";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { mcpService } from "@/features/capabilities/mcp/api/mcp-api";
+import { skillsService } from "@/features/capabilities/skills/api/skills-api";
+import { pluginsService } from "@/features/capabilities/plugins/api/plugins-api";
+import type { McpServer } from "@/features/capabilities/mcp/types";
+import type { Skill } from "@/features/capabilities/skills/types";
+import type { Plugin } from "@/features/capabilities/plugins/types";
 import type {
   SkillUse,
   McpStatusItem,
@@ -27,6 +35,8 @@ import type {
   BrowserState,
 } from "@/features/chat/types";
 import { useT } from "@/lib/i18n/client";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 interface StatusBarProps {
   // Runtime execution data (deprecated, now using configSnapshot)
@@ -35,6 +45,7 @@ interface StatusBarProps {
   browser?: BrowserState | null;
   // Configuration snapshot from session creation
   configSnapshot?: ConfigSnapshot | null;
+  className?: string;
 }
 
 export function StatusBar({
@@ -42,21 +53,60 @@ export function StatusBar({
   mcpStatuses = [],
   browser = null,
   configSnapshot,
+  className,
 }: StatusBarProps) {
   const { t } = useT("translation");
   const [mcpServers, setMcpServers] = React.useState<McpServer[]>([]);
   const [allSkills, setAllSkills] = React.useState<Skill[]>([]);
+  const [allPresets, setAllPresets] = React.useState<Plugin[]>([]);
+  const isMobile = useIsMobile();
+
+  const renderInteractiveCard = React.useCallback(
+    (card: React.ReactNode, content: React.ReactNode) => {
+      if (isMobile) {
+        return (
+          <Popover>
+            <PopoverTrigger asChild>{card}</PopoverTrigger>
+            <PopoverContent
+              side="top"
+              align="start"
+              sideOffset={8}
+              className="w-64 p-2 bg-card border-border shadow-lg"
+            >
+              {content}
+            </PopoverContent>
+          </Popover>
+        );
+      }
+
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>{card}</TooltipTrigger>
+          <TooltipContent
+            side="top"
+            className="p-2 bg-card border-border shadow-lg"
+            sideOffset={8}
+          >
+            {content}
+          </TooltipContent>
+        </Tooltip>
+      );
+    },
+    [isMobile],
+  );
 
   // Load MCP servers and skills on mount
   React.useEffect(() => {
     const loadData = async () => {
       try {
-        const [serversData, skillsData] = await Promise.all([
+        const [serversData, skillsData, pluginsData] = await Promise.all([
           mcpService.listServers(),
           skillsService.listSkills(),
+          pluginsService.listPlugins(),
         ]);
         setMcpServers(serversData);
         setAllSkills(skillsData);
+        setAllPresets(pluginsData);
       } catch (error) {
         console.error("[StatusBar] Failed to load config data:", error);
       }
@@ -81,6 +131,14 @@ export function StatusBar({
       .filter((skill): skill is Skill => skill !== undefined);
   }, [configSnapshot?.skill_ids, allSkills]);
 
+  // Find presets by IDs from config snapshot
+  const configuredPresets = React.useMemo(() => {
+    const pluginIds = configSnapshot?.plugin_ids ?? [];
+    return pluginIds
+      .map((id) => allPresets.find((plugin) => plugin.id === id))
+      .filter((plugin): plugin is Plugin => plugin !== undefined);
+  }, [configSnapshot?.plugin_ids, allPresets]);
+
   const visibleMcpStatuses = React.useMemo(() => {
     // Hide built-in/internal MCP servers (e.g. executor-injected Playwright MCP).
     return (mcpStatuses ?? []).filter((mcp) => {
@@ -93,11 +151,12 @@ export function StatusBar({
   const hasSkills = configuredSkills.length > 0 || skills.length > 0;
   const hasMcp =
     configuredMcpServers.length > 0 || visibleMcpStatuses.length > 0;
+  const hasPresets = configuredPresets.length > 0;
   const hasBrowser = Boolean(
     configSnapshot?.browser_enabled || browser?.enabled,
   );
 
-  if (!hasSkills && !hasMcp && !hasBrowser) {
+  if (!hasSkills && !hasMcp && !hasPresets && !hasBrowser) {
     return null;
   }
 
@@ -119,6 +178,12 @@ export function StatusBar({
           status: "configured" as const,
         }))
       : visibleMcpStatuses;
+
+  const displayPresets = configuredPresets.map((plugin) => ({
+    id: String(plugin.id),
+    name: plugin.name,
+    status: "configured" as const,
+  }));
 
   const getSkillStatusIcon = (status: string) => {
     if (status === "configured") {
@@ -149,13 +214,18 @@ export function StatusBar({
   };
 
   return (
-    <div className="flex items-center gap-2 px-4 py-2.5 border-t border-border bg-muted/20">
+    <div
+      className={cn(
+        "flex min-w-0 flex-nowrap items-center gap-2 overflow-x-auto overflow-y-hidden px-4 py-2.5 scrollbar-hide",
+        className,
+      )}
+    >
       <TooltipProvider delayDuration={200}>
         {/* Browser Card */}
         {hasBrowser && (
-          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-border/60 hover:border-border hover:shadow-sm transition-all cursor-pointer group">
+          <div className="group flex shrink-0 min-w-0 max-w-full items-center gap-2 rounded-lg border border-border/60 bg-card px-3 py-2 transition-all hover:border-border hover:shadow-sm cursor-pointer">
             <AppWindow className="size-3.5 text-foreground group-hover:text-foreground/80 transition-colors" />
-            <span className="text-xs font-medium text-foreground">
+            <span className="min-w-0 truncate text-xs font-medium text-foreground">
               {t("chat.statusBar.browser")}
             </span>
             <Badge
@@ -168,21 +238,49 @@ export function StatusBar({
         )}
 
         {/* Skills Card */}
-        {hasSkills && (
+        {hasSkills &&
+          renderInteractiveCard(
+            <div className="group flex shrink-0 min-w-0 max-w-full items-center gap-2 rounded-lg border border-border/60 bg-card px-3 py-2 transition-all hover:border-border hover:shadow-sm cursor-pointer">
+              <Zap className="size-3.5 text-foreground group-hover:text-foreground/80 transition-colors" />
+              <span className="min-w-0 truncate text-xs font-medium text-foreground">
+                {configuredSkills.length > 0
+                  ? t("chat.statusBar.skillsConfigured")
+                  : t("chat.statusBar.skillsUsed")}
+              </span>
+              <Badge
+                variant="secondary"
+                className="text-xs h-5 px-1.5 bg-muted text-foreground"
+              >
+                {displaySkills.length}
+              </Badge>
+            </div>,
+            <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
+              {displaySkills.map((skill) => (
+                <div
+                  key={skill.id}
+                  className="flex items-center gap-2 text-sm px-1"
+                >
+                  {getSkillStatusIcon(skill.status)}
+                  <span className="text-foreground">{skill.name}</span>
+                </div>
+              ))}
+            </div>,
+          )}
+
+        {/* Presets Card */}
+        {hasPresets && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-border/60 hover:border-border hover:shadow-sm transition-all cursor-pointer group">
-                <Zap className="size-3.5 text-foreground group-hover:text-foreground/80 transition-colors" />
-                <span className="text-xs font-medium text-foreground">
-                  {configuredSkills.length > 0
-                    ? t("chat.statusBar.skillsConfigured")
-                    : t("chat.statusBar.skillsUsed")}
+              <div className="group flex shrink-0 min-w-0 max-w-full items-center gap-2 rounded-lg border border-border/60 bg-card px-3 py-2 transition-all hover:border-border hover:shadow-sm cursor-pointer">
+                <Plug className="size-3.5 text-foreground group-hover:text-foreground/80 transition-colors" />
+                <span className="min-w-0 truncate text-xs font-medium text-foreground">
+                  {t("chat.statusBar.pluginsConfigured")}
                 </span>
                 <Badge
                   variant="secondary"
                   className="text-xs h-5 px-1.5 bg-muted text-foreground"
                 >
-                  {displaySkills.length}
+                  {displayPresets.length}
                 </Badge>
               </div>
             </TooltipTrigger>
@@ -192,13 +290,13 @@ export function StatusBar({
               sideOffset={8}
             >
               <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
-                {displaySkills.map((skill) => (
+                {displayPresets.map((plugin) => (
                   <div
-                    key={skill.id}
+                    key={plugin.id}
                     className="flex items-center gap-2 text-sm px-1"
                   >
-                    {getSkillStatusIcon(skill.status)}
-                    <span className="text-foreground">{skill.name}</span>
+                    {getSkillStatusIcon(plugin.status)}
+                    <span className="text-foreground">{plugin.name}</span>
                   </div>
                 ))}
               </div>
@@ -207,45 +305,36 @@ export function StatusBar({
         )}
 
         {/* MCP Card */}
-        {hasMcp && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-border/60 hover:border-border hover:shadow-sm transition-all cursor-pointer group">
-                <Server className="size-3.5 text-foreground group-hover:text-foreground/80 transition-colors" />
-                <span className="text-xs font-medium text-foreground">
-                  {configuredMcpServers.length > 0
-                    ? t("chat.statusBar.mcpConfigured")
-                    : t("chat.statusBar.mcp")}
-                </span>
-                <Badge
-                  variant="secondary"
-                  className="text-xs h-5 px-1.5 bg-muted text-foreground"
+        {hasMcp &&
+          renderInteractiveCard(
+            <div className="group flex shrink-0 min-w-0 max-w-full items-center gap-2 rounded-lg border border-border/60 bg-card px-3 py-2 transition-all hover:border-border hover:shadow-sm cursor-pointer">
+              <Server className="size-3.5 text-foreground group-hover:text-foreground/80 transition-colors" />
+              <span className="min-w-0 truncate text-xs font-medium text-foreground">
+                {configuredMcpServers.length > 0
+                  ? t("chat.statusBar.mcpConfigured")
+                  : t("chat.statusBar.mcp")}
+              </span>
+              <Badge
+                variant="secondary"
+                className="text-xs h-5 px-1.5 bg-muted text-foreground"
+              >
+                {displayMcpServers.length}
+              </Badge>
+            </div>,
+            <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
+              {displayMcpServers.map((mcp, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-2 text-sm px-1"
                 >
-                  {displayMcpServers.length}
-                </Badge>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent
-              side="top"
-              className="p-2 bg-card border-border shadow-lg"
-              sideOffset={8}
-            >
-              <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
-                {displayMcpServers.map((mcp, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-2 text-sm px-1"
-                  >
-                    {getMcpStatusIcon(mcp.status)}
-                    <span className="text-foreground font-mono">
-                      {mcp.server_name}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </TooltipContent>
-          </Tooltip>
-        )}
+                  {getMcpStatusIcon(mcp.status)}
+                  <span className="text-foreground font-mono">
+                    {mcp.server_name}
+                  </span>
+                </div>
+              ))}
+            </div>,
+          )}
       </TooltipProvider>
     </div>
   );

@@ -17,6 +17,7 @@ class ErrorCode(Enum):
     ENV_VAR_ALREADY_EXISTS = (11002, "Environment variable already exists")
     MCP_SERVER_NOT_FOUND = (12001, "MCP server not found")
     MCP_SERVER_ALREADY_EXISTS = (12002, "MCP server already exists")
+    MCP_SERVER_INVALID_CONFIG = (12003, "Invalid MCP server config")
     SKILL_NOT_FOUND = (13001, "Skill not found")
     SKILL_ALREADY_EXISTS = (13002, "Skill already exists")
     SKILL_MODIFY_FORBIDDEN = (13003, "Skill modification forbidden")
@@ -25,6 +26,9 @@ class ErrorCode(Enum):
     SLASH_COMMAND_ALREADY_EXISTS = (15002, "Slash command already exists")
     SUBAGENT_NOT_FOUND = (16001, "Subagent not found")
     SUBAGENT_ALREADY_EXISTS = (16002, "Subagent already exists")
+    PLUGIN_NOT_FOUND = (17001, "Plugin not found")
+    PLUGIN_ALREADY_EXISTS = (17002, "Plugin already exists")
+    PLUGIN_MODIFY_FORBIDDEN = (17003, "Plugin modification forbidden")
 
     INTERNAL_ERROR = (50000, "Internal server error")
     DATABASE_ERROR = (50101, "Database operation failed")

@@ -3,6 +3,7 @@
 import * as React from "react";
 
 import { Coins } from "lucide-react";
+import { useT } from "@/lib/i18n/client";
 import {
   Tooltip,
   TooltipContent,
@@ -16,10 +17,12 @@ interface UsageTooltipProps {
 }
 
 export function UsageTooltip({ stats }: UsageTooltipProps) {
+  const { t } = useT("translation");
+
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}分${secs}秒`;
+    return t("usageTooltip.duration", { mins, secs });
   };
 
   return (
@@ -37,16 +40,18 @@ export function UsageTooltip({ stats }: UsageTooltipProps) {
           </div>
           <Separator />
           <div>
-            <div className="text-sm font-medium mb-2">本次会话:</div>
+            <div className="text-sm font-medium mb-2">
+              {t("usageTooltip.currentSession")}:
+            </div>
             <div className="text-xs space-y-1 text-muted-foreground">
               <div className="flex justify-between">
-                <span>Tokens:</span>
+                <span>{t("usageTooltip.tokens")}:</span>
                 <span className="font-medium text-foreground">
                   {stats.tokensUsed.toLocaleString()}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span>耗时:</span>
+                <span>{t("usageTooltip.duration")}:</span>
                 <span className="font-medium text-foreground">
                   {formatDuration(stats.duration)}
                 </span>
@@ -55,22 +60,24 @@ export function UsageTooltip({ stats }: UsageTooltipProps) {
           </div>
           <Separator />
           <div>
-            <div className="text-sm font-medium mb-2">使用统计:</div>
+            <div className="text-sm font-medium mb-2">
+              {t("usageTooltip.usageStatistics")}:
+            </div>
             <div className="text-xs space-y-1 text-muted-foreground">
               <div className="flex justify-between">
-                <span>今日:</span>
+                <span>{t("usageTooltip.today")}:</span>
                 <span className="font-medium text-foreground">
                   {stats.todayUsage.toLocaleString()} tokens
                 </span>
               </div>
               <div className="flex justify-between">
-                <span>本周:</span>
+                <span>{t("usageTooltip.thisWeek")}:</span>
                 <span className="font-medium text-foreground">
                   {stats.weekUsage.toLocaleString()} tokens
                 </span>
               </div>
               <div className="flex justify-between">
-                <span>本月:</span>
+                <span>{t("usageTooltip.thisMonth")}:</span>
                 <span className="font-medium text-foreground">
                   {stats.monthUsage.toLocaleString()} tokens
                 </span>

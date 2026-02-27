@@ -3,5 +3,6 @@
 .env
 
 .DS_Store
-uv.lock
-.spec-workflow/
+
+im.db
+im/*.db

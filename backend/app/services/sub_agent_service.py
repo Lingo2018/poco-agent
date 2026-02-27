@@ -14,6 +14,7 @@ from app.schemas.sub_agent import (
     SubAgentResponse,
     SubAgentUpdateRequest,
 )
+from app.utils.markdown_front_matter import remove_model_from_yaml_front_matter
 
 
 _SUBAGENT_NAME_PATTERN = re.compile(r"^[A-Za-z0-9._-]+$")
@@ -146,12 +147,13 @@ class SubAgentService:
             description = _require_non_empty(request.description, field="description")
             prompt = _require_non_empty(request.prompt, field="prompt")
             tools = _normalize_tools(request.tools)
-            model = request.model
+            model = None
             raw_markdown = None
         else:
             raw_markdown = _require_non_empty(
                 request.raw_markdown, field="raw_markdown"
             )
+            raw_markdown = remove_model_from_yaml_front_matter(raw_markdown)
             extracted_name = _extract_raw_front_matter_name(raw_markdown)
             if not extracted_name:
                 raise AppException(
@@ -166,7 +168,7 @@ class SubAgentService:
             description = (request.description or "").strip() or None
             prompt = None
             tools = _normalize_tools(request.tools)
-            model = request.model
+            model = None
 
         item = SubAgent(
             user_id=user_id,
@@ -227,11 +229,14 @@ class SubAgentService:
             item.prompt = request.prompt
         if request.tools is not None:
             item.tools = _normalize_tools(request.tools)
-        if request.model is not None:
-            item.model = request.model
+        # Subagent model overrides are intentionally unsupported. Always inherit
+        # the executor DEFAULT_MODEL.
+        item.model = None
 
         if request.raw_markdown is not None:
-            item.raw_markdown = request.raw_markdown
+            item.raw_markdown = remove_model_from_yaml_front_matter(
+                request.raw_markdown or ""
+            )
 
         # Validate payload based on the final mode.
         if item.mode == "structured":
@@ -252,6 +257,9 @@ class SubAgentService:
                     error_code=ErrorCode.BAD_REQUEST,
                     message="raw_markdown cannot be empty",
                 )
+            item.raw_markdown = remove_model_from_yaml_front_matter(
+                item.raw_markdown or ""
+            )
             extracted_name = _extract_raw_front_matter_name(item.raw_markdown or "")
             if not extracted_name:
                 raise AppException(
@@ -323,21 +331,22 @@ class SubAgentService:
                     description=description,
                     prompt=prompt,
                     tools=_normalize_tools(entry.tools),
-                    model=entry.model
-                    if entry.model in {"sonnet", "opus", "haiku", "inherit"}
-                    else None,
+                    model=None,
                 )
             else:
                 markdown = entry.raw_markdown or ""
                 if not markdown.strip():
                     continue
-                raw[name] = markdown
+                raw[name] = remove_model_from_yaml_front_matter(markdown)
 
         return SubAgentResolveResponse(structured_agents=structured, raw_agents=raw)
 
     @staticmethod
     def _to_response(item: SubAgent) -> SubAgentResponse:
         mode: SubAgentMode = "structured" if item.mode == "structured" else "raw"
+        raw_markdown = item.raw_markdown
+        if mode == "raw" and raw_markdown:
+            raw_markdown = remove_model_from_yaml_front_matter(raw_markdown)
         return SubAgentResponse(
             id=item.id,
             user_id=item.user_id,
@@ -347,10 +356,8 @@ class SubAgentService:
             description=item.description,
             prompt=item.prompt,
             tools=_normalize_tools(item.tools),
-            model=item.model
-            if item.model in {"sonnet", "opus", "haiku", "inherit"}
-            else None,
-            raw_markdown=item.raw_markdown,
+            model=None,
+            raw_markdown=raw_markdown,
             created_at=item.created_at,
             updated_at=item.updated_at,
         )

@@ -2,10 +2,18 @@ import { z } from "zod";
 import {
   projectsService,
   tasksService,
-} from "@/features/projects/services/projects-service";
+} from "@/features/projects/api/projects-api";
+
+// Validation error messages - these will be replaced with proper i18n when the action is called
+// The actual error messages will come from the translation file
+const VALIDATION_ERRORS = {
+  projectNameRequired: "validation.projectNameRequired",
+  selectProject: "validation.selectProject",
+  missingTaskId: "validation.missingTaskId",
+} as const;
 
 const createProjectSchema = z.object({
-  name: z.string().trim().min(1, "请输入项目名称"),
+  name: z.string().trim().min(1, VALIDATION_ERRORS.projectNameRequired),
   repo_url: z.string().trim().optional().nullable(),
   git_branch: z.string().trim().optional().nullable(),
   git_token_env_key: z.string().trim().optional().nullable(),
@@ -20,19 +28,23 @@ const listTasksSchema = z.object({
 });
 
 const updateProjectSchema = z.object({
-  projectId: z.string().trim().min(1, "请选择项目"),
-  name: z.string().trim().min(1, "请输入项目名称").optional(),
+  projectId: z.string().trim().min(1, VALIDATION_ERRORS.selectProject),
+  name: z
+    .string()
+    .trim()
+    .min(1, VALIDATION_ERRORS.projectNameRequired)
+    .optional(),
   repo_url: z.string().trim().optional().nullable(),
   git_branch: z.string().trim().optional().nullable(),
   git_token_env_key: z.string().trim().optional().nullable(),
 });
 
 const deleteProjectSchema = z.object({
-  projectId: z.string().trim().min(1, "请选择项目"),
+  projectId: z.string().trim().min(1, VALIDATION_ERRORS.selectProject),
 });
 
 const moveTaskToProjectSchema = z.object({
-  sessionId: z.string().trim().min(1, "缺少任务 ID"),
+  sessionId: z.string().trim().min(1, VALIDATION_ERRORS.missingTaskId),
   projectId: z.string().trim().min(1).nullable().optional(),
 });
 

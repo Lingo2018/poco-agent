@@ -12,12 +12,30 @@ from app.services.backend_client import BackendClient
 from app.services.executor_client import ExecutorClient
 from app.services.config_resolver import ConfigResolver
 from app.services.skill_stager import SkillStager
+from app.services.plugin_stager import PluginStager
 from app.services.attachment_stager import AttachmentStager
 from app.services.claude_md_stager import ClaudeMdStager
 from app.services.slash_command_stager import SlashCommandStager
 from app.services.sub_agent_stager import SubAgentStager
 
 logger = logging.getLogger(__name__)
+
+
+def _extract_enabled_skill_names(skills: object) -> list[str]:
+    if not isinstance(skills, dict):
+        return []
+
+    names: set[str] = set()
+    for raw_name, spec in skills.items():
+        if not isinstance(raw_name, str):
+            continue
+        name = raw_name.strip()
+        if not name:
+            continue
+        if isinstance(spec, dict) and spec.get("enabled") is False:
+            continue
+        names.add(name)
+    return sorted(names)
 
 
 class RunPullService:
@@ -30,6 +48,7 @@ class RunPullService:
         self.container_pool = TaskDispatcher.get_container_pool()
         self.config_resolver = ConfigResolver(self.backend_client)
         self.skill_stager = SkillStager()
+        self.plugin_stager = PluginStager()
         self.attachment_stager = AttachmentStager()
         self.claude_md_stager = ClaudeMdStager()
         self.slash_command_stager = SlashCommandStager()
@@ -240,6 +259,23 @@ class RunPullService:
             )
 
             step_started = time.perf_counter()
+            staged_plugins = self.plugin_stager.stage_plugins(
+                user_id=user_id,
+                session_id=session_id,
+                plugins=resolved_config.get("plugin_files") or {},
+            )
+            resolved_config["plugin_files"] = staged_plugins
+            logger.info(
+                "timing",
+                extra={
+                    "step": "run_dispatch_stage_plugins",
+                    "duration_ms": int((time.perf_counter() - step_started) * 1000),
+                    "plugins_staged": len(staged_plugins),
+                    **ctx,
+                },
+            )
+
+            step_started = time.perf_counter()
             staged_inputs = self.attachment_stager.stage_inputs(
                 user_id=user_id,
                 session_id=session_id,
@@ -257,8 +293,10 @@ class RunPullService:
             )
 
             step_started = time.perf_counter()
+            skill_names = _extract_enabled_skill_names(staged_skills)
             resolved_commands = await self.backend_client.resolve_slash_commands(
-                user_id=user_id
+                user_id=user_id,
+                skill_names=skill_names,
             )
             staged_commands = self.slash_command_stager.stage_commands(
                 user_id=user_id,

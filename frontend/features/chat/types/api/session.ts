@@ -101,14 +101,23 @@ export interface TaskConfig {
   git_branch?: string; // defaults to "main"
   /** Env var key holding a GitHub token (e.g. "GITHUB_TOKEN"). */
   git_token_env_key?: string | null;
+  /** Optional explicit model override for this session/run. */
+  model?: string | null;
   /** Built-in browser capability toggle (Playwright MCP is injected internally). */
   browser_enabled?: boolean;
   /** MCP server enable/disable toggles (true=enabled, false=disabled).
    *  Servers not in this object use their default enabled state from user installations.
    */
   mcp_config?: Record<string, boolean>;
+  /** Skill enable/disable toggles (true=enabled, false=disabled).
+   *  Skills not in this object use their default enabled state from user installs.
+   */
+  skill_config?: Record<string, boolean>;
+  /** Plugin enable/disable toggles (true=enabled, false=disabled).
+   *  Plugins not in this object use their default enabled state from user installs.
+   */
+  plugin_config?: Record<string, boolean>;
   /** Optional explicit subagent selection (by id). */
   subagent_ids?: number[];
-  skill_files?: Record<string, unknown>;
   input_files?: InputFile[];
 }

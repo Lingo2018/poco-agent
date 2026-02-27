@@ -158,16 +158,19 @@ class ContainerPool:
         image = self._resolve_executor_image(browser_enabled=browser_enabled)
         ports = {"8000/tcp": None}
         environment = {
-            "ANTHROPIC_AUTH_TOKEN": self.settings.anthropic_token,
             "ANTHROPIC_BASE_URL": self.settings.anthropic_base_url,
             "DEFAULT_MODEL": self.settings.default_model,
             "WORKSPACE_PATH": "/workspace",
             "USER_ID": user_id,
             "SESSION_ID": session_id,
+            "EXECUTOR_TIMEZONE": self.settings.executor_timezone,
             "ALL_PROXY": self.settings.api_proxy or "",
             "HTTPS_PROXY": self.settings.api_proxy or "",
             "HTTP_PROXY": self.settings.api_proxy or "",
         }
+        anthropic_api_key = (self.settings.anthropic_api_key or "").strip()
+        if anthropic_api_key:
+            environment["ANTHROPIC_API_KEY"] = anthropic_api_key
         if browser_enabled:
             environment["POCO_BROWSER_VIEWPORT_SIZE"] = (
                 self.settings.poco_browser_viewport_size

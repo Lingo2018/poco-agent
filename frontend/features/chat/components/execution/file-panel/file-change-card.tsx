@@ -1,3 +1,4 @@
+import * as React from "react";
 import {
   FilePlus,
   FileEdit,
@@ -8,19 +9,16 @@ import {
   Minus,
   Eye,
   EyeOff,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { FileChange } from "@/features/chat/types";
+import { useT } from "@/lib/i18n/client";
+import { cn } from "@/lib/utils";
 
 interface FileChangeCardProps {
   change: FileChange;
-  sessionStatus?:
-    | "running"
-    | "accepted"
-    | "completed"
-    | "failed"
-    | "canceled"
-    | "stopped";
+  sessionStatus?: "pending" | "running" | "completed" | "failed" | "canceled";
   onFileClick?: () => void;
 }
 
@@ -32,12 +30,12 @@ function getStatusConfig(status: FileChange["status"]) {
     case "added":
       return {
         icon: FilePlus,
-        color: "text-success",
+        color: "text-primary",
       };
     case "modified":
       return {
         icon: FileEdit,
-        color: "text-info",
+        color: "text-chart-2",
       };
     case "deleted":
       return {
@@ -47,7 +45,7 @@ function getStatusConfig(status: FileChange["status"]) {
     case "renamed":
       return {
         icon: GitCompare,
-        color: "text-renamed",
+        color: "text-chart-3",
       };
     default:
       return {
@@ -58,20 +56,6 @@ function getStatusConfig(status: FileChange["status"]) {
 }
 
 /**
- * Truncate file path intelligently
- * Shows filename and truncates middle of long paths
- */
-function truncatePath(path: string, maxLength: number = 50): string {
-  if (path.length <= maxLength) return path;
-
-  // If path is very long, show start...end
-  const startLength = Math.floor(maxLength / 2) - 2;
-  const endLength = Math.ceil(maxLength / 2) - 2;
-
-  return `${path.slice(0, startLength)}...${path.slice(-endLength)}`;
-}
-
-/**
  * Individual file change card
  */
 export function FileChangeCard({
@@ -79,17 +63,22 @@ export function FileChangeCard({
   sessionStatus,
   onFileClick,
 }: FileChangeCardProps) {
+  const { t } = useT("translation");
   const statusConfig = getStatusConfig(change.status);
   const StatusIcon = statusConfig.icon;
+  const [isDiffCollapsed, setIsDiffCollapsed] = React.useState(false);
 
   const addedLines = change.added_lines ?? 0;
   const deletedLines = change.deleted_lines ?? 0;
   const hasLineChanges = addedLines > 0 || deletedLines > 0;
-  const totalChanges = addedLines + deletedLines;
+  const diffLines = React.useMemo(
+    () => (change.diff ? change.diff.split("\n") : []),
+    [change.diff],
+  );
 
   // Determine if session is running (execution state)
   const isSessionRunning =
-    sessionStatus === "running" || sessionStatus === "accepted";
+    sessionStatus === "running" || sessionStatus === "pending";
 
   const handlePreviewClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -98,96 +87,153 @@ export function FileChangeCard({
     }
   };
 
+  const handleToggleDiffCollapse = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDiffCollapsed((prev) => !prev);
+  };
+
+  const getDiffLineClass = React.useCallback((line: string) => {
+    if (line.startsWith("+++ ") || line.startsWith("--- ")) {
+      return "text-muted-foreground";
+    }
+    if (line.startsWith("@@")) {
+      return "text-chart-2";
+    }
+    if (line.startsWith("+")) {
+      return "text-primary bg-primary/10";
+    }
+    if (line.startsWith("-")) {
+      return "text-destructive bg-destructive/10";
+    }
+    if (line.startsWith("\\")) {
+      return "text-muted-foreground";
+    }
+    return "text-foreground/80";
+  }, []);
+
+  const previewButton = (
+    <Button
+      variant="ghost"
+      size="icon"
+      className={`shrink-0 size-8 ${
+        isSessionRunning ? "opacity-50 cursor-not-allowed" : "hover:bg-muted"
+      }`}
+      onClick={handlePreviewClick}
+      disabled={isSessionRunning}
+      title={
+        isSessionRunning
+          ? t("fileChange.previewDisabled")
+          : t("fileChange.previewFile")
+      }
+    >
+      {isSessionRunning ? (
+        <EyeOff className="size-4" />
+      ) : (
+        <Eye className="size-4" />
+      )}
+    </Button>
+  );
+
   return (
-    <div className="rounded-lg border border-border bg-card overflow-hidden w-full">
-      {/* Header with path and status */}
-      <div className="flex items-center gap-3 px-4 py-3 min-w-0">
+    <div className="w-full min-w-0 max-w-full overflow-hidden rounded-lg border border-border bg-card">
+      {/* Header */}
+      <div className="flex w-full min-w-0 items-center gap-3 overflow-hidden px-4 py-3">
         <StatusIcon className={`size-5 shrink-0 ${statusConfig.color}`} />
 
-        <div className="flex-1 min-w-0">
+        <div className="w-0 flex-1 min-w-0 overflow-hidden">
           {change.status === "renamed" && change.old_path ? (
             <div className="flex items-center gap-2 min-w-0">
               <span
-                className="text-sm font-medium flex-1 min-w-0 truncate text-muted-foreground line-through"
+                className="w-0 flex-1 min-w-0 truncate text-sm font-medium text-muted-foreground line-through"
                 title={change.old_path}
               >
-                {truncatePath(change.old_path)}
+                {change.old_path}
               </span>
               <ArrowRight className="size-3.5 text-muted-foreground shrink-0" />
               <span
-                className="text-sm font-medium flex-1 min-w-0 truncate"
+                className="w-0 flex-1 min-w-0 truncate text-sm font-medium"
                 title={change.path}
               >
-                {truncatePath(change.path)}
+                {change.path}
               </span>
             </div>
           ) : (
             <p
-              className="text-sm font-medium min-w-0 truncate"
+              className="w-full min-w-0 truncate text-sm font-medium"
               title={change.path}
             >
-              {truncatePath(change.path)}
+              {change.path}
             </p>
           )}
         </div>
 
-        {/* Preview button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className={`shrink-0 size-8 ${
-            isSessionRunning
-              ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-muted"
-          }`}
-          onClick={handlePreviewClick}
-          disabled={isSessionRunning}
-          title={isSessionRunning ? "执行中，暂不可预览" : "预览文件"}
-        >
-          {isSessionRunning ? (
-            <EyeOff className="size-4" />
-          ) : (
-            <Eye className="size-4" />
-          )}
-        </Button>
+        {!hasLineChanges && <div className="shrink-0">{previewButton}</div>}
       </div>
 
       {/* Line changes statistics */}
       {hasLineChanges && (
-        <div className="flex items-center gap-4 px-4 py-2 bg-muted/30 text-xs">
-          {addedLines > 0 && (
-            <div className="flex items-center gap-1.5 text-success shrink-0">
-              <Plus className="size-3 shrink-0" />
-              <span className="font-medium shrink-0">{addedLines}</span>
-              <span className="text-muted-foreground shrink-0">行新增</span>
-            </div>
-          )}
-          {deletedLines > 0 && (
-            <div className="flex items-center gap-1.5 text-destructive shrink-0">
-              <Minus className="size-3 shrink-0" />
-              <span className="font-medium shrink-0">{deletedLines}</span>
-              <span className="text-muted-foreground shrink-0">行删除</span>
-            </div>
-          )}
-          <div className="ml-auto text-muted-foreground shrink-0">
-            共 {totalChanges} 行变更
+        <div className="flex min-w-0 items-center gap-3 overflow-hidden bg-muted/30 px-4 py-2 text-xs">
+          {change.diff ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-6 shrink-0 text-muted-foreground hover:text-foreground"
+              onClick={handleToggleDiffCollapse}
+              title={t("fileChange.viewDiff")}
+              aria-label={t("fileChange.viewDiff")}
+            >
+              <ChevronRight
+                className={cn(
+                  "size-3.5 transition-transform duration-200",
+                  isDiffCollapsed ? "rotate-0" : "rotate-90",
+                )}
+              />
+            </Button>
+          ) : null}
+          <div className="flex-1 min-w-0 items-center gap-3 overflow-hidden">
+            {(addedLines > 0 || deletedLines > 0) && (
+              <div className="flex gap-3 min-w-0 overflow-hidden">
+                <span className="flex items-center gap-1.5 min-w-0">
+                  <Plus className="size-3 shrink-0 text-primary" />
+                  <span className="font-medium shrink-0 text-primary">
+                    {addedLines}
+                  </span>
+                  <span className="text-muted-foreground shrink-0">
+                    {t("fileChange.linesAdded")}
+                  </span>
+                  <Minus className="size-3 shrink-0 text-destructive" />
+                  <span className="font-medium shrink-0 text-destructive">
+                    {deletedLines}
+                  </span>
+                  <span className="text-muted-foreground shrink-0">
+                    {t("fileChange.linesDeleted")}
+                  </span>
+                </span>
+              </div>
+            )}
           </div>
+          <div className="ml-auto flex items-center">{previewButton}</div>
         </div>
       )}
 
       {/* Diff preview (if available) */}
-      {change.diff && (
-        <div className="px-4 py-3 border-t border-border">
-          <details className="group">
-            <summary className="cursor-pointer text-xs font-medium text-muted-foreground hover:text-foreground transition-colors truncate">
-              查看差异
-            </summary>
-            <pre className="mt-2 text-xs font-mono bg-muted/50 rounded p-2 overflow-x-auto whitespace-pre max-h-40 overflow-y-auto">
-              <code className="block">{change.diff}</code>
-            </pre>
-          </details>
+      {change.diff && !isDiffCollapsed ? (
+        <div className="border-t border-border px-4 py-3">
+          <div className="w-full min-w-0">
+            <div className="w-full min-w-0 text-xs font-mono bg-muted/50 rounded p-2 whitespace-pre-wrap break-all">
+              {/* fuck you overflow! */}
+              {diffLines.map((line, index) => (
+                <div
+                  key={`${index}-${line}`}
+                  className={cn("w-full", getDiffLineClass(line))}
+                >
+                  {line}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

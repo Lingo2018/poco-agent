@@ -2,22 +2,23 @@
 
 import * as React from "react";
 import { ChatPanel } from "../execution/chat-panel/chat-panel";
-import { ArtifactsPanel } from "../execution/file-panel/artifacts-panel";
-import { ComputerPanel } from "../execution/computer-panel/computer-panel";
 import { MobileExecutionView } from "./mobile-execution-view";
 import { useExecutionSession } from "@/features/chat/hooks/use-execution-session";
 import { useTaskHistoryContext } from "@/features/projects/contexts/task-history-context";
-import { useIsMobile } from "@/lib/hooks/use-mobile";
-import { Layers, Loader2, Monitor } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import { useT } from "@/lib/i18n/client";
+import {
+  ChatPanelSkeleton,
+  RightPanelSkeleton,
+} from "@/features/chat/components/layout/execution-container-skeletons";
+import { ExecutionTabsSwitch } from "@/features/chat/components/layout/execution-tabs-switch";
+import { DesktopExecutionLayout } from "@/features/chat/components/layout/desktop-execution-layout";
 
 interface ExecutionContainerProps {
   sessionId: string;
@@ -32,7 +33,7 @@ export function ExecutionContainer({ sessionId }: ExecutionContainerProps) {
   });
   const isMobile = useIsMobile();
   const isSessionActive =
-    session?.status === "running" || session?.status === "accepted";
+    session?.status === "running" || session?.status === "pending";
   const browserEnabled = Boolean(
     session?.config_snapshot?.browser_enabled ||
     session?.state_patch?.browser?.enabled,
@@ -40,9 +41,12 @@ export function ExecutionContainer({ sessionId }: ExecutionContainerProps) {
 
   const defaultRightTab = isSessionActive ? "computer" : "artifacts";
   const [rightTab, setRightTab] = React.useState<string>(defaultRightTab);
+  const [isRightPanelCollapsed, setIsRightPanelCollapsed] =
+    React.useState(false);
   const didManualSwitchRef = React.useRef(false);
   const prevDefaultRef = React.useRef<string>(defaultRightTab);
   const lastSessionIdRef = React.useRef<string | null>(null);
+  const executionTabsHighlightId = React.useId();
 
   // Reset right panel tab when session changes.
   React.useEffect(() => {
@@ -62,11 +66,46 @@ export function ExecutionContainer({ sessionId }: ExecutionContainerProps) {
     }
   }, [defaultRightTab]);
 
+  React.useEffect(() => {
+    if (isMobile) return;
+
+    const handleToggleRightPanel = (event: KeyboardEvent) => {
+      if (!event.ctrlKey) return;
+      if (event.key.toLowerCase() !== "l") return;
+      event.preventDefault();
+      event.stopPropagation();
+      setIsRightPanelCollapsed((prev) => !prev);
+    };
+
+    window.addEventListener("keydown", handleToggleRightPanel, true);
+    return () => {
+      window.removeEventListener("keydown", handleToggleRightPanel, true);
+    };
+  }, [isMobile]);
+
   // Loading state
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-background select-text">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground/20" />
+      <div className="flex h-dvh min-h-0 min-w-0 overflow-hidden bg-background select-text">
+        <ResizablePanelGroup direction="horizontal" className="min-h-0 min-w-0">
+          <ResizablePanel
+            defaultSize={45}
+            minSize={30}
+            className="min-h-0 min-w-0 overflow-hidden"
+          >
+            <ChatPanelSkeleton />
+          </ResizablePanel>
+
+          <ResizableHandle withHandle />
+
+          <ResizablePanel
+            defaultSize={55}
+            minSize={30}
+            className="min-h-0 min-w-0 overflow-hidden"
+          >
+            <RightPanelSkeleton />
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </div>
     );
   }
@@ -74,11 +113,13 @@ export function ExecutionContainer({ sessionId }: ExecutionContainerProps) {
   // Error state
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen bg-background select-text">
+      <div className="flex items-center justify-center h-dvh bg-background select-text">
         <div className="text-center">
-          <p className="text-destructive mb-2">Error loading session</p>
+          <p className="text-destructive mb-2">
+            {t("chat.errors.loadSession", "Error loading session")}
+          </p>
           <p className="text-muted-foreground text-sm">
-            {error.message || "Unknown error"}
+            {error.message || t("common.unknownError", "Unknown error")}
           </p>
         </div>
       </div>
@@ -96,89 +137,42 @@ export function ExecutionContainer({ sessionId }: ExecutionContainerProps) {
     );
   }
 
-  // Desktop resizable layout
   const tabsSwitch = (
-    <TabsList>
-      <TabsTrigger value="computer">
-        <Monitor className="size-4" />
-        {t("mobile.computer")}
-        {session?.status ? (
-          <Badge
-            variant={isSessionActive ? "secondary" : "outline"}
-            className="ml-1"
-          >
-            {isSessionActive
-              ? t("computer.status.live")
-              : t("computer.status.replay")}
-          </Badge>
-        ) : null}
-      </TabsTrigger>
-      <TabsTrigger value="artifacts">
-        <Layers className="size-4" />
-        {t("mobile.artifacts")}
-      </TabsTrigger>
-    </TabsList>
+    <ExecutionTabsSwitch
+      rightTab={rightTab}
+      isSessionActive={isSessionActive}
+      sessionStatus={session?.status}
+      highlightId={executionTabsHighlightId}
+    />
+  );
+
+  const chatPanel = (
+    <ChatPanel
+      session={session}
+      statePatch={session?.state_patch}
+      progress={session?.progress}
+      currentStep={session?.state_patch.current_step ?? undefined}
+      updateSession={updateSession}
+      isRightPanelCollapsed={isRightPanelCollapsed}
+      onToggleRightPanel={() =>
+        setIsRightPanelCollapsed((collapsed) => !collapsed)
+      }
+    />
   );
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background select-text">
-      <ResizablePanelGroup direction="horizontal">
-        {/* Left panel - Chat with status cards (45%) */}
-        <ResizablePanel defaultSize={45} minSize={20}>
-          <div className="h-full flex flex-col min-w-0">
-            <ChatPanel
-              session={session}
-              statePatch={session?.state_patch}
-              progress={session?.progress}
-              currentStep={session?.state_patch.current_step ?? undefined}
-              updateSession={updateSession}
-            />
-          </div>
-        </ResizablePanel>
-
-        <ResizableHandle withHandle />
-
-        {/* Right panel - Artifacts (55%) */}
-        <ResizablePanel defaultSize={55} minSize={20}>
-          <div className="h-full flex flex-col bg-muted/30 min-w-0">
-            <Tabs
-              value={rightTab}
-              onValueChange={(value) => {
-                didManualSwitchRef.current = true;
-                setRightTab(value);
-              }}
-              className="h-full min-h-0 flex flex-col"
-            >
-              <div className="flex-1 min-h-0 overflow-hidden">
-                <TabsContent
-                  value="computer"
-                  className="h-full min-h-0 data-[state=inactive]:hidden"
-                >
-                  <ComputerPanel
-                    sessionId={sessionId}
-                    sessionStatus={session?.status}
-                    browserEnabled={browserEnabled}
-                    headerAction={tabsSwitch}
-                  />
-                </TabsContent>
-                <TabsContent
-                  value="artifacts"
-                  className="h-full min-h-0 data-[state=inactive]:hidden"
-                >
-                  <ArtifactsPanel
-                    fileChanges={
-                      session?.state_patch.workspace_state?.file_changes
-                    }
-                    sessionId={sessionId}
-                    sessionStatus={session?.status}
-                    headerAction={tabsSwitch}
-                  />
-                </TabsContent>
-              </div>
-            </Tabs>
-          </div>
-        </ResizablePanel>
-      </ResizablePanelGroup>
-    </div>
+    <DesktopExecutionLayout
+      sessionId={sessionId}
+      session={session}
+      rightTab={rightTab}
+      onRightTabChange={(value) => {
+        didManualSwitchRef.current = true;
+        setRightTab(value);
+      }}
+      isRightPanelCollapsed={isRightPanelCollapsed}
+      chatPanel={chatPanel}
+      tabsSwitch={tabsSwitch}
+      browserEnabled={browserEnabled}
+    />
   );
 }

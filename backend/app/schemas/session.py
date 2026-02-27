@@ -14,6 +14,8 @@ class TaskConfig(BaseModel):
     git_branch: str = "main"
     # Optional env var key holding a GitHub token (e.g. "GITHUB_TOKEN").
     git_token_env_key: str | None = None
+    # Optional explicit model override for this session/run.
+    model: str | None = None
     # Built-in browser capability toggle (Playwright MCP is injected internally by the executor).
     browser_enabled: bool = False
     # MCP server enable/disable toggles (true=enabled, false=disabled).
@@ -22,6 +24,9 @@ class TaskConfig(BaseModel):
     # Skill enable/disable toggles (true=enabled, false=disabled).
     # Skills not in this dict use their default enabled state from user installations.
     skill_config: dict[str, bool] = Field(default_factory=dict)
+    # Plugin enable/disable toggles (true=enabled, false=disabled).
+    # Plugins not in this dict use their default enabled state from user installations.
+    plugin_config: dict[str, bool] = Field(default_factory=dict)
     # Optional explicit subagent selection (by id). When omitted, backend resolves
     # enabled subagents as defaults.
     subagent_ids: list[int] = Field(default_factory=list)

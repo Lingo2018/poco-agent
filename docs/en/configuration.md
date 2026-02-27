@@ -34,9 +34,9 @@ Common:
 - `S3_REGION` (default `us-east-1`; Cloudflare R2 usually recommends `auto`)
 - `S3_FORCE_PATH_STYLE` (default `true` for MinIO/RustFS; Cloudflare R2 usually recommends `false`)
 - `S3_PRESIGN_EXPIRES`: presigned URL expiry in seconds (default `300`)
-- `OPENAI_API_KEY`: optional (used for session title generation; disabled if not set)
-- `OPENAI_BASE_URL`: optional (custom OpenAI-compatible gateway)
-- `OPENAI_DEFAULT_MODEL` (default `gpt-4o-mini`)
+- `ANTHROPIC_API_KEY`: optional (used for session title generation; disabled if not set)
+- `ANTHROPIC_BASE_URL`: optional (custom Anthropic API endpoint/proxy; default `https://api.anthropic.com`)
+- `DEFAULT_MODEL` (default `claude-sonnet-4-20250514`; also used for session title generation)
 - `MAX_UPLOAD_SIZE_MB` (default `100`)
 
 Logging (shared by all three Python services):
@@ -58,6 +58,7 @@ Required (otherwise it will not start or cannot dispatch tasks):
 - `EXECUTOR_IMAGE`: executor image name (manager launches it via Docker API). Recommended default: `ghcr.io/poco-ai/poco-executor:lite`
 - `EXECUTOR_BROWSER_IMAGE`: optional, executor image with desktop/browser stack (used when `browser_enabled=true`). Recommended: `ghcr.io/poco-ai/poco-executor:full`
 - `POCO_BROWSER_VIEWPORT_SIZE`: optional, browser viewport size (affects screenshots and responsive layouts), e.g. `1366x768` / `1920x1080`. The manager passes it through to executor containers (only when `browser_enabled=true`).
+- `EXECUTOR_TIMEZONE`: optional timezone passed through to executor containers (IANA timezone name such as `Asia/Shanghai` or `UTC`). Default `Asia/Shanghai`.
 - `EXECUTOR_PUBLISHED_HOST`: host used to access executor containers mapped to host ports (bare metal: `localhost`; in Compose: `host.docker.internal`)
 - `WORKSPACE_ROOT`: workspace root (**must be a host path**, bind-mounted into executor containers)
 - `S3_ENDPOINT` / `S3_ACCESS_KEY` / `S3_SECRET_KEY` / `S3_BUCKET`: used to export workspaces to object storage
@@ -65,7 +66,7 @@ Required (otherwise it will not start or cannot dispatch tasks):
 
 Execution model (required to run tasks):
 
-- `ANTHROPIC_AUTH_TOKEN`: Claude API token
+- `ANTHROPIC_API_KEY`: required
 - `ANTHROPIC_BASE_URL` (default `https://api.anthropic.com`)
 - `DEFAULT_MODEL` (default `claude-sonnet-4-20250514`)
 
@@ -90,7 +91,7 @@ Workspace cleanup (optional):
 
 Required (when running tasks):
 
-- `ANTHROPIC_AUTH_TOKEN`: Claude API token
+- `ANTHROPIC_API_KEY`: required
 - `ANTHROPIC_BASE_URL`: optional (same as above)
 - `DEFAULT_MODEL`: required (`executor/app/core/engine.py` reads `os.environ["DEFAULT_MODEL"]`)
 - `WORKSPACE_PATH`: workspace mount path (default `/workspace`)
@@ -99,6 +100,7 @@ Optional:
 
 - `WORKSPACE_GIT_IGNORE`: extra ignore rules written to `.git/info/exclude` (comma or newline separated)
 - `POCO_BROWSER_VIEWPORT_SIZE`: optional, browser viewport size (affects screenshots and responsive layouts), e.g. `1366x768` / `1920x1080` (only effective when `browser_enabled=true`)
+- `EXECUTOR_TIMEZONE`: optional timezone env for task execution (passed through by Executor Manager, default `Asia/Shanghai`)
 - `DEBUG` / `LOG_LEVEL` / `LOG_TO_FILE` etc. (same as above)
 
 ## Frontend (Next.js)

@@ -23,7 +23,6 @@ interface UseChatMessagesReturn {
   isTyping: boolean;
   showTypingIndicator: boolean;
   sendMessage: (content: string, attachments?: InputFile[]) => Promise<void>;
-  internalContextsByUserMessageId: Record<string, string[]>;
   runUsageByUserMessageId: Record<string, UsageResponse | null>;
 }
 
@@ -45,8 +44,6 @@ export function useChatMessages({
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  const [internalContextsByUserMessageId, setInternalContextsByUserMessageId] =
-    useState<Record<string, string[]>>({});
   const [runUsageByUserMessageId, setRunUsageByUserMessageId] = useState<
     Record<string, UsageResponse | null>
   >({});
@@ -150,10 +147,6 @@ export function useChatMessages({
       if (!normalizedContent && !hasAttachments) return;
 
       const sessionId = session.session_id;
-      console.log(
-        `[Chat] Sending message to session ${sessionId}:`,
-        normalizedContent,
-      );
       setIsTyping(true);
 
       // Create a new user message for instant UI update
@@ -174,16 +167,12 @@ export function useChatMessages({
           content: normalizedContent,
           attachments,
         });
-        console.log("[Chat] Message sent successfully");
 
         // Refresh runs so multi-turn conversations only show real user inputs.
         await refreshRealUserMessageIds();
 
         // Fetch latest messages immediately to confirm sync
         const server = await fetchMessagesWithFilter(sessionId);
-        setInternalContextsByUserMessageId(
-          server.internalContextsByUserMessageId,
-        );
         setMessages((prev) => mergeMessages(prev, server.messages));
       } catch (error) {
         console.error("[Chat] Failed to send message or get reply:", error);
@@ -207,7 +196,6 @@ export function useChatMessages({
       setIsLoadingHistory(true);
       setMessages([]);
       setIsTyping(false);
-      setInternalContextsByUserMessageId({});
       realUserMessageIdsRef.current = null;
       setRunUsageByUserMessageId({});
       lastLoadedSessionIdRef.current = session.session_id;
@@ -216,9 +204,6 @@ export function useChatMessages({
     const fetchMessages = async () => {
       try {
         const history = await fetchMessagesWithFilter(session.session_id);
-        setInternalContextsByUserMessageId(
-          history.internalContextsByUserMessageId,
-        );
 
         setMessages((prev) => {
           // If it's the first load (empty prev), just set it
@@ -238,17 +223,13 @@ export function useChatMessages({
     // Setup polling
     let interval: NodeJS.Timeout;
 
-    const isTerminal = ["completed", "failed", "stopped", "canceled"].includes(
+    const isTerminal = ["completed", "failed", "canceled"].includes(
       session.status,
     );
 
     if (session.session_id && !isTerminal) {
       interval = setInterval(fetchMessages, pollingInterval);
     } else if (session.session_id && isTerminal) {
-      console.log(
-        `%c [Message Polling] Stopped for session ${session.session_id}`,
-        "color: #f59e0b; font-weight: bold;",
-      );
       // Refresh run usage once the session becomes terminal so UI can display cost/tokens.
       void refreshRealUserMessageIds();
     }
@@ -277,7 +258,7 @@ export function useChatMessages({
 
   // Determine if session is running/active
   const isSessionActive =
-    session?.status === "running" || session?.status === "accepted";
+    session?.status === "running" || session?.status === "pending";
 
   // Reset typing state when session becomes inactive
   useEffect(() => {
@@ -314,7 +295,6 @@ export function useChatMessages({
     isTyping,
     showTypingIndicator,
     sendMessage,
-    internalContextsByUserMessageId,
     runUsageByUserMessageId,
   };
 }

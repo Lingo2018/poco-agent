@@ -33,11 +33,8 @@ if [[ -t 0 ]]; then
   INTERACTIVE=true
 fi
 ANTHROPIC_KEY=""
-OPENAI_KEY=""
 ANTHROPIC_BASE_URL=""
-OPENAI_BASE_URL=""
 DEFAULT_MODEL=""
-OPENAI_DEFAULT_MODEL=""
 # Language setting (en or zh)
 LANG="en"
 
@@ -60,7 +57,6 @@ msg() {
     "usage.no_start") [[ "$LANG" == "zh" ]] && echo "  --no-start                仅准备环境和目录" || echo "  --no-start                Only prepare env and directories" ;;
     "usage.force_env") [[ "$LANG" == "zh" ]] && echo "  --force-env               覆盖环境文件中的现有密钥" || echo "  --force-env               Overwrite existing keys in env file" ;;
     "usage.anthropic_key") [[ "$LANG" == "zh" ]] && echo "  --anthropic-key KEY       Anthropic API 密钥（写入环境文件）" || echo "  --anthropic-key KEY       Anthropic API key (writes to env)" ;;
-    "usage.openai_key") [[ "$LANG" == "zh" ]] && echo "  --openai-key KEY          OpenAI API 密钥（写入环境文件，可选）" || echo "  --openai-key KEY          OpenAI API key (writes to env, optional)" ;;
     "usage.lang") [[ "$LANG" == "zh" ]] && echo "  --lang LANG               语言设置 (en 或 zh，默认: en)" || echo "  --lang LANG               Language setting (en or zh, default: en)" ;;
     "usage.help") [[ "$LANG" == "zh" ]] && echo "  -h, --help                显示此帮助信息" || echo "  -h, --help                Show this help" ;;
     "usage.advanced") [[ "$LANG" == "zh" ]] && echo "高级选项:" || echo "Advanced options:" ;;
@@ -80,7 +76,7 @@ msg() {
     "error.missing_cmd") [[ "$LANG" == "zh" ]] && echo "缺少命令" || echo "Missing command" ;;
     "error.unknown_option") [[ "$LANG" == "zh" ]] && echo "未知选项" || echo "Unknown option" ;;
     "error.docker_not_found") [[ "$LANG" == "zh" ]] && echo "未找到 docker compose" || echo "docker compose not found" ;;
-    "error.anthropic_not_set") [[ "$LANG" == "zh" ]] && echo "未设置 ANTHROPIC_AUTH_TOKEN。请运行 ./scripts/quickstart.sh（交互式）或传递 --anthropic-key。" || echo "ANTHROPIC_AUTH_TOKEN is not set. Run ./scripts/quickstart.sh (interactive) or pass --anthropic-key." ;;
+    "error.anthropic_not_set") [[ "$LANG" == "zh" ]] && echo "未设置 Anthropic API Key。请在 .env 中设置 ANTHROPIC_API_KEY，或运行 ./scripts/quickstart.sh（交互式）并传递 --anthropic-key。" || echo "Anthropic API key is not set. Configure ANTHROPIC_API_KEY in .env, or run ./scripts/quickstart.sh (interactive) / pass --anthropic-key." ;;
 
     # Headers
     "header.quickstart") [[ "$LANG" == "zh" ]] && echo "Poco 快速启动" || echo "Poco Quickstart" ;;
@@ -102,23 +98,17 @@ msg() {
     # API Key prompts
     "prompt.anthropic_key") [[ "$LANG" == "zh" ]] && echo "请输入您的 Anthropic API 密钥（在 https://console.anthropic.com/ 获取）" || echo "Enter your Anthropic API key (get one at https://console.anthropic.com/)" ;;
     "prompt.anthropic_warn") [[ "$LANG" == "zh" ]] && echo "Anthropic API 密钥通常以 'sk-ant-' 开头，请仔细检查。" || echo "Anthropic API key usually starts with 'sk-ant-'. Please double-check." ;;
-    "prompt.openai_key") [[ "$LANG" == "zh" ]] && echo "请输入您的 OpenAI API 密钥（或按 Enter 跳过）" || echo "Enter your OpenAI API key (or press Enter to skip)" ;;
-    "prompt.openai_warn") [[ "$LANG" == "zh" ]] && echo "OpenAI API 密钥通常以 'sk-' 开头，请仔细检查。" || echo "OpenAI API key usually starts with 'sk-'. Please double-check." ;;
 
     # Success messages
     "success.env_created") [[ "$LANG" == "zh" ]] && echo "已从 .env.example 创建 .env" || echo "Created .env from .env.example" ;;
     "success.anthropic_configured") [[ "$LANG" == "zh" ]] && echo "已配置 Anthropic API 密钥" || echo "Anthropic API key configured" ;;
     "success.anthropic_base_url") [[ "$LANG" == "zh" ]] && echo "已配置 Anthropic 基础 URL" || echo "Anthropic base URL configured" ;;
     "success.default_model") [[ "$LANG" == "zh" ]] && echo "已配置默认模型" || echo "Default model configured" ;;
-    "success.openai_configured") [[ "$LANG" == "zh" ]] && echo "已配置 OpenAI API 密钥" || echo "OpenAI API key configured" ;;
-    "success.openai_base_url") [[ "$LANG" == "zh" ]] && echo "已配置 OpenAI 基础 URL" || echo "OpenAI base URL configured" ;;
-    "success.openai_model") [[ "$LANG" == "zh" ]] && echo "已配置 OpenAI 默认模型" || echo "OpenAI default model configured" ;;
     "success.s3_endpoint") [[ "$LANG" == "zh" ]] && echo "已配置 S3 公共端点" || echo "S3 public endpoint configured" ;;
     "success.bootstrap") [[ "$LANG" == "zh" ]] && echo "引导完成！" || echo "Bootstrap completed!" ;;
 
     # Info messages
     "info.anthropic_configured") [[ "$LANG" == "zh" ]] && echo "已配置 Anthropic API 密钥" || echo "Anthropic API key is configured" ;;
-    "info.openai_not_set") [[ "$LANG" == "zh" ]] && echo "未设置 OpenAI API 密钥（可选）" || echo "OpenAI API key not set (optional)" ;;
     "info.pulling_images") [[ "$LANG" == "zh" ]] && echo "正在拉取执行器镜像..." || echo "Pulling executor images..." ;;
 
     # Warnings
@@ -127,10 +117,8 @@ msg() {
     "warn.chmod_data_failed") [[ "$LANG" == "zh" ]] && echo "chmod RustFS 数据目录失败。您可能需要运行: sudo chown -R" || echo "Failed to chmod RustFS data dir. You may need to run: sudo chown -R" ;;
     "warn.chmod_workspace_failed") [[ "$LANG" == "zh" ]] && echo "chmod 工作空间目录失败。您可能需要运行: sudo chown -R" || echo "Failed to chmod workspace directories. You may need to run: sudo chown -R" ;;
     "warn.rustfs_init_failed") [[ "$LANG" == "zh" ]] && echo "rustfs-init 失败；您可以重试: docker compose --profile init up -d rustfs-init" || echo "rustfs-init failed; you can retry: docker compose --profile init up -d rustfs-init" ;;
-    "warn.anthropic_not_set") [[ "$LANG" == "zh" ]] && echo "未设置 ANTHROPIC_AUTH_TOKEN！" || echo "ANTHROPIC_AUTH_TOKEN is not set!" ;;
+    "warn.anthropic_not_set") [[ "$LANG" == "zh" ]] && echo "未设置 Anthropic API Key（ANTHROPIC_API_KEY）！" || echo "Anthropic API key is not set (ANTHROPIC_API_KEY)!" ;;
     "warn.default_model") [[ "$LANG" == "zh" ]] && echo "DEFAULT_MODEL 看起来不像 Claude 模型（应以 'claude-' 开头）。" || echo "DEFAULT_MODEL doesn't look like a Claude model (expected prefix 'claude-')." ;;
-    "warn.use_openai_model") [[ "$LANG" == "zh" ]] && echo "如果您想使用 OpenAI 模型，请设置 OPENAI_DEFAULT_MODEL。" || echo "If you meant an OpenAI model, set OPENAI_DEFAULT_MODEL instead." ;;
-    "warn.openai_model") [[ "$LANG" == "zh" ]] && echo "OPENAI_DEFAULT_MODEL 看起来不像典型的 OpenAI 模型名称（例如 gpt-4o-mini）。" || echo "OPENAI_DEFAULT_MODEL doesn't look like a typical OpenAI model name (e.g. gpt-4o-mini)." ;;
 
     # Language selection
     "lang.prompt") [[ "$LANG" == "zh" ]] && echo "请选择语言 / Please select language:" || echo "Please select language / 请选择语言:" ;;
@@ -151,7 +139,6 @@ usage() {
   echo "$(msg "usage.no_start")"
   echo "$(msg "usage.force_env")"
   echo "$(msg "usage.anthropic_key")"
-  echo "$(msg "usage.openai_key")"
   echo "$(msg "usage.lang")"
   echo "$(msg "usage.help")"
   echo ""
@@ -331,10 +318,7 @@ read_env_key() {
         return 1
       fi
       # 将示例占位符视为"未设置"
-      if [[ "$key" == "ANTHROPIC_AUTH_TOKEN" && "$value" == "sk-ant-xxxxx" ]]; then
-        return 1
-      fi
-      if [[ "$key" == "OPENAI_API_KEY" && "$value" == "sk-xxxxx" ]]; then
+      if [[ "$key" == "ANTHROPIC_API_KEY" && "$value" == "sk-ant-xxxxx" ]]; then
         return 1
       fi
       echo "$value"
@@ -342,6 +326,14 @@ read_env_key() {
     fi
   fi
   return 1
+}
+
+anthropic_api_key_state() {
+  if read_env_key "ANTHROPIC_API_KEY" >/dev/null 2>&1; then
+    echo "configured"
+    return
+  fi
+  echo "missing"
 }
 
 write_env_key() {
@@ -568,22 +560,15 @@ interactive_setup() {
   local existing_anthropic
   local existing_anthropic_base_url
   local existing_default_model
-  local existing_openai
-  local existing_openai_base_url
-  local existing_openai_model
   local existing_s3_endpoint
 
-  existing_anthropic="$(read_env_key "ANTHROPIC_AUTH_TOKEN" || true)"
+  existing_anthropic="$(read_env_key "ANTHROPIC_API_KEY" || true)"
   existing_anthropic_base_url="$(read_env_key "ANTHROPIC_BASE_URL" || true)"
   existing_default_model="$(read_env_key "DEFAULT_MODEL" || true)"
-  existing_openai="$(read_env_key "OPENAI_API_KEY" || true)"
-  existing_openai_base_url="$(read_env_key "OPENAI_BASE_URL" || true)"
-  existing_openai_model="$(read_env_key "OPENAI_DEFAULT_MODEL" || true)"
   existing_s3_endpoint="$(read_env_key "S3_PUBLIC_ENDPOINT" || true)"
 
   # FIX: Allow CLI args to override .env defaults during interactive setup
   if [[ -n "$ANTHROPIC_KEY" ]]; then existing_anthropic="$ANTHROPIC_KEY"; fi
-  if [[ -n "$OPENAI_KEY" ]]; then existing_openai="$OPENAI_KEY"; fi
 
   # Prompt for Anthropic key (required)
   print_header "$(msg "header.required_config")"
@@ -634,79 +619,6 @@ EOF
   DEFAULT_MODEL="$(prompt_for_text "$model_label" "${existing_default_model:-claude-sonnet-4-20250514}" "true")"
   if [[ -n "$DEFAULT_MODEL" ]] && [[ "$DEFAULT_MODEL" != claude-* ]]; then
     print_warn "$(msg "warn.default_model")"
-    print_warn "$(msg "warn.use_openai_model")"
-  fi
-
-  # Prompt for OpenAI key (optional)
-  print_header "$(msg "header.optional_config")"
-  if [[ "$LANG" == "zh" ]]; then
-    cat <<'EOF'
-
-OpenAI API 密钥是可选的，但如果您想要以下功能则建议配置：
-  • 与 Claude 一起使用 GPT 模型
-  • 访问 OpenAI 的工具和功能
-  • 比较不同 AI 提供商之间的结果
-
-EOF
-  else
-    cat <<'EOF'
-
-OpenAI API Key is optional but recommended if you want to:
-  • Use GPT models alongside Claude
-  • Access OpenAI's tools and capabilities
-  • Compare results between different AI providers
-
-EOF
-  fi
-  OPENAI_KEY="$(prompt_for_key "OpenAI API Key" \
-    "$(msg "prompt.openai_key")" \
-    "true" \
-    "$existing_openai")"
-  if [[ -n "$OPENAI_KEY" ]] && [[ "$OPENAI_KEY" != sk-* ]]; then
-    print_warn "$(msg "prompt.openai_warn")"
-  fi
-
-  if [[ -n "$OPENAI_KEY" ]]; then
-    # Prompt for OpenAI Base URL (only if key is set)
-    if [[ "$LANG" == "zh" ]]; then
-      cat <<'EOF'
-
-如果您使用代理或 OpenAI 的自定义 API 端点，请在下面输入基础 URL。
-否则，按 Enter 使用默认值 (https://api.openai.com/v1)。
-
-EOF
-    else
-      cat <<'EOF'
-
-If you use a proxy or custom API endpoint for OpenAI, enter the base URL below.
-Otherwise, press Enter to use the default (https://api.openai.com/v1).
-
-EOF
-    fi
-    local openai_base_label=$([[ "$LANG" == "zh" ]] && echo "OpenAI 基础 URL" || echo "OpenAI Base URL")
-    OPENAI_BASE_URL="$(prompt_for_text "$openai_base_label" "${existing_openai_base_url:-https://api.openai.com/v1}" "true")"
-
-    # Prompt for OpenAI Default Model
-    if [[ "$LANG" == "zh" ]]; then
-      cat <<'EOF'
-
-请输入要使用的默认 GPT 模型。按 Enter 使用默认值。
-常用选项: gpt-4o, gpt-4o-mini, gpt-4-turbo
-
-EOF
-    else
-      cat <<'EOF'
-
-Enter the default GPT model to use. Press Enter to use the default.
-Common options: gpt-4o, gpt-4o-mini, gpt-4-turbo
-
-EOF
-    fi
-    local openai_model_label=$([[ "$LANG" == "zh" ]] && echo "OpenAI 默认模型" || echo "OpenAI Default Model")
-    OPENAI_DEFAULT_MODEL="$(prompt_for_text "$openai_model_label" "${existing_openai_model:-gpt-4o-mini}" "true")"
-    if [[ -n "$OPENAI_DEFAULT_MODEL" ]] && [[ "$OPENAI_DEFAULT_MODEL" != gpt-* && "$OPENAI_DEFAULT_MODEL" != o1* && "$OPENAI_DEFAULT_MODEL" != o3* ]]; then
-      print_warn "$(msg "warn.openai_model")"
-    fi
   fi
 
   # Prompt for S3 public endpoint
@@ -715,7 +627,7 @@ EOF
   # Write all collected keys
   # NOTE: write_env_key now handles check-before-write logic correctly
   if [[ -n "$ANTHROPIC_KEY" ]]; then
-    write_env_key "ANTHROPIC_AUTH_TOKEN" "$ANTHROPIC_KEY"
+    write_env_key "ANTHROPIC_API_KEY" "$ANTHROPIC_KEY"
     print_success "$(msg "success.anthropic_configured")"
   fi
 
@@ -727,21 +639,6 @@ EOF
   if [[ -n "$DEFAULT_MODEL" ]]; then
     write_env_key "DEFAULT_MODEL" "$DEFAULT_MODEL"
     print_success "$(msg "success.default_model")"
-  fi
-
-  if [[ -n "$OPENAI_KEY" ]]; then
-    write_env_key "OPENAI_API_KEY" "$OPENAI_KEY"
-    print_success "$(msg "success.openai_configured")"
-  fi
-
-  if [[ -n "$OPENAI_BASE_URL" ]]; then
-    write_env_key "OPENAI_BASE_URL" "$OPENAI_BASE_URL"
-    print_success "$(msg "success.openai_base_url")"
-  fi
-
-  if [[ -n "$OPENAI_DEFAULT_MODEL" ]]; then
-    write_env_key "OPENAI_DEFAULT_MODEL" "$OPENAI_DEFAULT_MODEL"
-    print_success "$(msg "success.openai_model")"
   fi
 
   if [[ -n "$S3_PUBLIC_ENDPOINT" ]]; then
@@ -797,8 +694,6 @@ while [[ $# -gt 0 ]]; do
       INTERACTIVE=false; shift ;;
     --anthropic-key)
       ANTHROPIC_KEY="$2"; shift 2 ;;
-    --openai-key)
-      OPENAI_KEY="$2"; shift 2 ;;
     --lang)
       LANG="$2"; shift 2 ;;
     -h|--help)
@@ -835,13 +730,8 @@ fi
 # Handle API keys from CLI arguments (non-interactive mode).
 if [[ "$INTERACTIVE" = false ]]; then
   if [[ -n "$ANTHROPIC_KEY" ]]; then
-    write_env_key "ANTHROPIC_AUTH_TOKEN" "$ANTHROPIC_KEY"
+    write_env_key "ANTHROPIC_API_KEY" "$ANTHROPIC_KEY"
     print_success "$(msg "success.anthropic_configured")"
-  fi
-
-  if [[ -n "$OPENAI_KEY" ]]; then
-    write_env_key "OPENAI_API_KEY" "$OPENAI_KEY"
-    print_success "$(msg "success.openai_configured")"
   fi
 fi
 
@@ -900,9 +790,12 @@ chmod -R u+rwX "$DATA_DIR_ABS" 2>/dev/null || \
 chmod -R u+rwX "$WORKSPACE_DIR_ABS" 2>/dev/null || \
   warn "$(msg "warn.chmod_workspace_failed") \"$(id -u)\":\"$(id -g)\" \"$WORKSPACE_DIR_ABS\""
 
-if [[ "$START_ALL" = true ]] && ! read_env_key "ANTHROPIC_AUTH_TOKEN" >/dev/null 2>&1; then
-  print_error "$(msg "error.anthropic_not_set")"
-  exit 1
+if [[ "$START_ALL" = true ]]; then
+  anthropic_api_key_state_value="$(anthropic_api_key_state)"
+  if [[ "$anthropic_api_key_state_value" == "missing" ]]; then
+    print_error "$(msg "error.anthropic_not_set")"
+    exit 1
+  fi
 fi
 
 if [[ "$START_ALL" = true ]]; then
@@ -956,38 +849,35 @@ fi
 # Final status check
 print_header "$(msg "header.setup_complete")"
 
-# Check if Anthropic key is set
-if ! read_env_key "ANTHROPIC_AUTH_TOKEN" >/dev/null 2>&1; then
+# Check Anthropic credential state
+anthropic_api_key_state_value="$(anthropic_api_key_state)"
+if [[ "$anthropic_api_key_state_value" == "missing" ]]; then
   print_warn "$(msg "warn.anthropic_not_set")"
   if [[ "$LANG" == "zh" ]]; then
-    cat <<'EOF'
+    cat <<EOF
 
-  请在 .env 中设置您的 Anthropic API 密钥或运行:
+  请在 .env 中设置:
+    - ANTHROPIC_API_KEY
+
+  或运行:
     ./scripts/quickstart.sh
 
   在此获取密钥: https://console.anthropic.com/
 EOF
   else
-    cat <<'EOF'
+    cat <<EOF
 
-  Please set your Anthropic API key in .env or run:
+  Set in .env:
+    - ANTHROPIC_API_KEY
+
+  Or run:
     ./scripts/quickstart.sh
 
-  Get your key at: https://console.anthropic.com/
+  Get credentials at: https://console.anthropic.com/
 EOF
   fi
 else
   print_success "$(msg "info.anthropic_configured")"
-fi
-
-# Remind about optional keys
-if ! read_env_key "OPENAI_API_KEY" >/dev/null 2>&1; then
-  print_info "$(msg "info.openai_not_set")"
-  if [[ "$LANG" == "zh" ]]; then
-    echo "  如果您想使用 GPT 模型，可以稍后在 .env 中添加"
-  else
-    echo "  Add it later in .env if you want to use GPT models"
-  fi
 fi
 
 echo ""
@@ -995,7 +885,7 @@ print_success "$(msg "success.bootstrap")"
 echo ""
 if [[ "$LANG" == "zh" ]]; then
   echo "后续步骤:"
-  echo "  1. 确保在 .env 中设置了 ANTHROPIC_AUTH_TOKEN"
+  echo "  1. 确保在 .env 中已设置 ANTHROPIC_API_KEY"
   if [[ "$START_ALL" = true ]]; then
     echo "  2. 打开浏览器: http://localhost:3000"
     echo "  3. 查看日志: docker compose logs -f backend executor-manager frontend"
@@ -1005,7 +895,7 @@ if [[ "$LANG" == "zh" ]]; then
   fi
 else
   echo "Next steps:"
-  echo "  1. Make sure ANTHROPIC_AUTH_TOKEN is set in .env"
+  echo "  1. Make sure ANTHROPIC_API_KEY is set in .env"
   if [[ "$START_ALL" = true ]]; then
     echo "  2. Open browser: http://localhost:3000"
     echo "  3. View logs: docker compose logs -f backend executor-manager frontend"

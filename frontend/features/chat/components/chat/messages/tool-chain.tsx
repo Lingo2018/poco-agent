@@ -2,26 +2,42 @@
 
 import * as React from "react";
 import {
-  SquareTerminal,
-  CheckCircle2,
-  XCircle,
-  Loader2,
   ChevronDown,
   ChevronRight,
+  Loader2,
+  Wrench,
+  XCircle,
+  CheckCircle2,
+  Bot,
+  MessageSquare,
+  SquareTerminal,
+  Pencil,
+  FileEdit,
+  FileText,
+  Folder,
+  Search,
+  Notebook,
+  Globe,
+  Sparkles,
+  ListTodo,
+  History,
+  ListChecks,
+  Database,
   AppWindow,
+  Server,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import type { ToolUseBlock, ToolResultBlock } from "@/features/chat/types";
 import { useT } from "@/lib/i18n/client";
+import { cn } from "@/lib/utils";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Badge } from "@/components/ui/badge";
 
 interface ToolChainProps {
   blocks: (ToolUseBlock | ToolResultBlock)[];
+  sessionStatus?: string;
 }
 
 interface ToolStepProps {
@@ -31,7 +47,67 @@ interface ToolStepProps {
   onToggle: () => void;
 }
 
+type ToolStepPair = {
+  use: ToolUseBlock;
+  result?: ToolResultBlock;
+};
+
 const POCO_PLAYWRIGHT_MCP_PREFIX = "mcp____poco_playwright__";
+
+type BrowserToolMeta = {
+  action: string;
+  summary: string | null;
+};
+
+type McpToolMeta = {
+  server: string;
+  action: string | null;
+};
+
+type SkillToolMeta = {
+  name: string | null;
+};
+
+const TOOL_NAME_TRANSLATION_KEY_MAP: Record<string, string> = {
+  skill: "skill",
+  task: "task",
+  askuserquestion: "askUserQuestion",
+  bash: "bash",
+  edit: "edit",
+  read: "read",
+  write: "write",
+  glob: "glob",
+  grep: "grep",
+  notebookedit: "notebookEdit",
+  webfetch: "webFetch",
+  websearch: "webSearch",
+  todowrite: "todoWrite",
+  bashoutput: "bashOutput",
+  killbash: "killBash",
+  exitplanmode: "exitPlanMode",
+  listmcpresources: "listMcpResources",
+  readmcpresource: "readMcpResource",
+};
+
+function parseJsonLike(value: unknown): unknown {
+  if (typeof value !== "string") return value;
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    return value;
+  }
+}
+
+function stringifyForDisplay(value: unknown): string {
+  if (typeof value === "string") return value;
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return String(value);
+  }
+}
 
 function truncateMiddle(value: string, maxLen: number): string {
   const text = value.trim();
@@ -49,203 +125,279 @@ function pickFirstString(
   if (!input) return null;
   for (const key of keys) {
     const value = input[key];
-    if (typeof value === "string") {
-      const trimmed = value.trim();
-      if (trimmed) return trimmed;
-    }
+    if (typeof value !== "string") continue;
+    const trimmed = value.trim();
+    if (trimmed) return trimmed;
   }
   return null;
 }
 
+function normalizeToolName(name: string): string {
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_-]/g, "");
+}
+
+function prettifyMcpPart(value: string): string {
+  return value
+    .trim()
+    .replace(/^_+|_+$/g, "")
+    .replaceAll("_", " ");
+}
+
+function getGenericMcpToolMeta(toolName: string): McpToolMeta | null {
+  const trimmed = toolName.trim();
+  if (!trimmed.startsWith("mcp__")) return null;
+  if (trimmed.startsWith(POCO_PLAYWRIGHT_MCP_PREFIX)) return null;
+
+  const body = trimmed.slice("mcp__".length);
+  if (!body) return null;
+
+  const parts = body.split("__").filter((part) => part.length > 0);
+  if (parts.length === 0) return null;
+
+  const server = prettifyMcpPart(parts[0] ?? "");
+  const actionRaw = parts.slice(1).join("__");
+  const action = prettifyMcpPart(actionRaw);
+
+  return {
+    server: server || "mcp",
+    action: action || null,
+  };
+}
+
+function getBrowserToolMeta(toolUse: ToolUseBlock): BrowserToolMeta | null {
+  if (!toolUse.name.startsWith(POCO_PLAYWRIGHT_MCP_PREFIX)) return null;
+
+  const rawTool = toolUse.name.slice(POCO_PLAYWRIGHT_MCP_PREFIX.length).trim();
+  if (!rawTool) return null;
+
+  const action = rawTool.startsWith("browser_")
+    ? rawTool.slice("browser_".length)
+    : rawTool;
+
+  const summary = (() => {
+    const input = toolUse.input;
+    if (action === "navigate") {
+      return pickFirstString(input, ["url", "href"]);
+    }
+    if (action === "click" || action === "hover") {
+      return pickFirstString(input, ["selector", "text", "role", "name"]);
+    }
+    if (action === "type" || action === "fill" || action === "press") {
+      return (
+        pickFirstString(input, ["selector", "role", "name", "text"]) ||
+        pickFirstString(input, ["key", "value"])
+      );
+    }
+    if (action === "screenshot") {
+      return pickFirstString(input, ["path", "filename"]);
+    }
+    return pickFirstString(input, [
+      "url",
+      "selector",
+      "text",
+      "role",
+      "name",
+      "value",
+      "query",
+      "path",
+      "key",
+    ]);
+  })();
+
+  return {
+    action,
+    summary: summary ? truncateMiddle(summary, 100) : null,
+  };
+}
+
+function getSkillToolMeta(toolUse: ToolUseBlock): SkillToolMeta | null {
+  const normalizedName = normalizeToolName(toolUse.name || "");
+  if (normalizedName !== "skill") return null;
+
+  return {
+    name: pickFirstString(toolUse.input, ["skill", "skill_name", "name"]),
+  };
+}
+
+function renderToolIcon(toolName: string): React.ReactNode {
+  if (toolName.startsWith(POCO_PLAYWRIGHT_MCP_PREFIX)) {
+    return <AppWindow className="size-3.5 text-muted-foreground" />;
+  }
+  if (getGenericMcpToolMeta(toolName)) {
+    return <Server className="size-3.5 text-muted-foreground" />;
+  }
+
+  const normalized = normalizeToolName(toolName);
+  switch (normalized) {
+    case "skill":
+      return <Sparkles className="size-3.5 text-muted-foreground" />;
+    case "task":
+      return <Bot className="size-3.5 text-muted-foreground" />;
+    case "askuserquestion":
+      return <MessageSquare className="size-3.5 text-muted-foreground" />;
+    case "bash":
+      return <SquareTerminal className="size-3.5 text-muted-foreground" />;
+    case "edit":
+      return <Pencil className="size-3.5 text-muted-foreground" />;
+    case "read":
+      return <FileText className="size-3.5 text-muted-foreground" />;
+    case "write":
+      return <FileEdit className="size-3.5 text-muted-foreground" />;
+    case "glob":
+      return <Folder className="size-3.5 text-muted-foreground" />;
+    case "grep":
+      return <Search className="size-3.5 text-muted-foreground" />;
+    case "notebookedit":
+      return <Notebook className="size-3.5 text-muted-foreground" />;
+    case "webfetch":
+    case "websearch":
+      return <Globe className="size-3.5 text-muted-foreground" />;
+    case "todowrite":
+      return <ListTodo className="size-3.5 text-muted-foreground" />;
+    case "bashoutput":
+      return <History className="size-3.5 text-muted-foreground" />;
+    case "killbash":
+      return <XCircle className="size-3.5 text-muted-foreground" />;
+    case "exitplanmode":
+      return <ListChecks className="size-3.5 text-muted-foreground" />;
+    case "listmcpresources":
+    case "readmcpresource":
+      return <Database className="size-3.5 text-muted-foreground" />;
+    default:
+      return <Wrench className="size-3.5 text-muted-foreground" />;
+  }
+}
+
 function ToolStep({ toolUse, toolResult, isOpen, onToggle }: ToolStepProps) {
   const { t } = useT("translation");
-  const isCompleted = !!toolResult;
-  const isError = toolResult?.is_error;
-  const isLoading = !isCompleted;
-  const isTaskTool = toolUse.name === "Task";
 
-  const playwrightBrowserMeta = React.useMemo(() => {
-    if (!toolUse.name.startsWith(POCO_PLAYWRIGHT_MCP_PREFIX)) return null;
+  const state: "running" | "failed" | "completed" = !toolResult
+    ? "running"
+    : toolResult.is_error
+      ? "failed"
+      : "completed";
 
-    const rawTool = toolUse.name
-      .slice(POCO_PLAYWRIGHT_MCP_PREFIX.length)
-      .trim();
-    if (!rawTool) return null;
+  const stateIcon =
+    state === "running" ? (
+      <Loader2 className="size-3.5 animate-spin text-muted-foreground" />
+    ) : state === "failed" ? (
+      <XCircle className="size-3.5 text-destructive" />
+    ) : (
+      <CheckCircle2 className="size-3.5 text-primary" />
+    );
 
-    const action = rawTool.startsWith("browser_")
-      ? rawTool.slice("browser_".length)
-      : rawTool;
-
-    const summary = (() => {
-      const input = toolUse.input;
-      if (action === "navigate") {
-        return pickFirstString(input, ["url", "href"]);
-      }
-      if (action === "click" || action === "hover") {
-        return pickFirstString(input, ["selector", "text", "role", "name"]);
-      }
-      if (action === "type" || action === "fill" || action === "press") {
-        return (
-          pickFirstString(input, ["selector", "role", "name", "text"]) ||
-          pickFirstString(input, ["key", "value"])
-        );
-      }
-      if (action === "screenshot") {
-        return pickFirstString(input, ["path", "filename"]);
-      }
-      return pickFirstString(input, [
-        "url",
-        "selector",
-        "text",
-        "role",
-        "name",
-        "value",
-        "query",
-        "path",
-      ]);
-    })();
-
-    return {
-      toolName: rawTool,
-      action,
-      summary: summary ? truncateMiddle(summary, 80) : null,
-    };
-  }, [toolUse.input, toolUse.name]);
-
-  const taskMeta = React.useMemo(() => {
-    if (!isTaskTool) return null;
-    const input = toolUse.input || {};
-    const subagentType =
-      typeof input["subagent_type"] === "string"
-        ? input["subagent_type"]
-        : typeof input["subagentType"] === "string"
-          ? input["subagentType"]
-          : "";
-    const description =
-      typeof input["description"] === "string" ? input["description"] : "";
-    return {
-      subagentType: subagentType.trim(),
-      description: description.trim(),
-    };
-  }, [isTaskTool, toolUse.input]);
+  const inputText = React.useMemo(
+    () => stringifyForDisplay(toolUse.input ?? {}),
+    [toolUse.input],
+  );
 
   const outputText = React.useMemo(() => {
     if (!toolResult) return "";
-    if (!isTaskTool) return toolResult.content;
-    try {
-      const parsed = JSON.parse(toolResult.content);
-      if (
-        parsed &&
-        typeof parsed === "object" &&
-        "result" in parsed &&
-        typeof (parsed as { result?: unknown }).result === "string"
-      ) {
-        const result = (parsed as { result: string }).result.trim();
-        if (result) return result;
-      }
-    } catch {
-      // fall back to raw content
+    const parsed = parseJsonLike(toolResult.content);
+    const text = stringifyForDisplay(parsed);
+    return text.trim() ? text : t("chat.toolCards.text.empty");
+  }, [toolResult, t]);
+
+  const browserMeta = React.useMemo(
+    () => getBrowserToolMeta(toolUse),
+    [toolUse],
+  );
+  const mcpMeta = React.useMemo(
+    () => getGenericMcpToolMeta(toolUse.name || ""),
+    [toolUse.name],
+  );
+  const skillMeta = React.useMemo(() => getSkillToolMeta(toolUse), [toolUse]);
+  const toolLabel = React.useMemo(() => {
+    if (browserMeta) {
+      const action = browserMeta.action.replaceAll("_", " ");
+      return `${t("chat.statusBar.browser")}（${action}）`;
     }
-    return toolResult.content;
-  }, [isTaskTool, toolResult]);
-
-  const toolLabel = playwrightBrowserMeta
-    ? `${t("chat.statusBar.browser")} (${playwrightBrowserMeta.toolName})`
-    : toolUse.name;
-
-  const toolDescription =
-    taskMeta?.description || playwrightBrowserMeta?.summary || null;
+    if (mcpMeta) {
+      if (mcpMeta.action) {
+        return `MCP（${mcpMeta.server} / ${mcpMeta.action}）`;
+      }
+      return `MCP（${mcpMeta.server}）`;
+    }
+    if (skillMeta) {
+      const base = t("chat.toolCards.tools.skill").trim();
+      if (skillMeta.name) {
+        return `${base}（${skillMeta.name}）`;
+      }
+      return base;
+    }
+    const normalizedName = normalizeToolName(toolUse.name || "");
+    const translationKey = TOOL_NAME_TRANSLATION_KEY_MAP[normalizedName];
+    if (translationKey) {
+      return t(`chat.toolCards.tools.${translationKey}`).trim();
+    }
+    return (toolUse.name || t("chat.toolCards.tools.tool")).trim();
+  }, [browserMeta, mcpMeta, skillMeta, t, toolUse.name]);
+  const detailIcon = isOpen ? (
+    <ChevronDown className="size-3.5 text-muted-foreground" />
+  ) : (
+    <ChevronRight className="size-3.5 text-muted-foreground" />
+  );
 
   return (
-    <div className="border border-border/50 rounded-md bg-muted/30 overflow-hidden mb-2 last:mb-0">
+    <div className="mb-2 min-w-0 max-w-full last:mb-0">
       <Collapsible open={isOpen} onOpenChange={onToggle}>
-        <CollapsibleTrigger className="flex items-center w-full p-2 hover:bg-muted/50 transition-colors gap-2 text-left">
-          <div className="shrink-0">
-            {isLoading ? (
-              <Loader2 className="size-4 animate-spin text-primary" />
-            ) : isError ? (
-              <XCircle className="size-4 text-destructive" />
-            ) : (
-              <CheckCircle2 className="size-4 text-success" />
-            )}
-          </div>
-
-          <div className="flex-1 min-w-0 flex items-center gap-2">
-            {playwrightBrowserMeta ? (
-              <AppWindow className="size-3.5 text-muted-foreground/80 shrink-0" />
-            ) : null}
-            <span className="text-xs font-mono font-medium text-foreground truncate">
-              {toolLabel}
-              {taskMeta?.subagentType ? ` (${taskMeta.subagentType})` : ""}
+        <CollapsibleTrigger className="group/tool flex w-full min-w-0 max-w-full items-center gap-2 overflow-hidden rounded-[0.5rem] border border-border/60 bg-card/70 px-2.5 py-1 text-left transition-colors hover:bg-muted/50">
+          <span className="relative flex size-5 shrink-0 items-center justify-center rounded-md border border-border/60 bg-muted/30">
+            <span className="flex items-center justify-center transition-opacity md:group-hover/tool:opacity-0">
+              {renderToolIcon(toolUse.name || "")}
             </span>
-            {toolDescription ? (
-              <span className="text-[11px] text-muted-foreground truncate">
-                {toolDescription}
-              </span>
-            ) : null}
+            <span className="absolute inset-0 hidden items-center justify-center opacity-0 transition-opacity md:flex md:group-hover/tool:opacity-100">
+              {detailIcon}
+            </span>
+          </span>
+
+          <div className="min-w-0 flex-1 overflow-hidden">
+            <div className="truncate text-[11px] font-medium text-muted-foreground">
+              {toolLabel}
+            </div>
           </div>
 
-          <div className="shrink-0 flex items-center gap-2">
-            {isLoading ? (
-              <Badge
-                variant="outline"
-                className="h-4 px-1 text-[10px] bg-background text-muted-foreground rounded-sm border-transparent animate-pulse"
-              >
-                {t("status.running")}
-              </Badge>
-            ) : null}
-            {isOpen ? (
-              <ChevronDown className="size-3.5 text-muted-foreground" />
-            ) : (
-              <ChevronRight className="size-3.5 text-muted-foreground" />
-            )}
+          <div className="flex shrink-0 items-center gap-2">
+            <span
+              className="inline-flex size-5 items-center justify-center"
+              aria-label={state}
+              title={state}
+            >
+              {stateIcon}
+            </span>
+            <span className="md:hidden">{detailIcon}</span>
           </div>
         </CollapsibleTrigger>
 
         <CollapsibleContent>
-          <div className="p-2 pt-0 space-y-2 text-xs font-mono border-t border-border/50 bg-background/50">
-            {/* Input */}
-            <div className="mt-2">
-              <div className="text-[10px] uppercase text-muted-foreground mb-1 select-none">
-                {t("chat.input", "Input")}
-              </div>
-              <div className="bg-muted/50 p-2 rounded overflow-x-auto text-foreground/90">
-                <pre className="whitespace-pre-wrap break-all">
-                  {JSON.stringify(toolUse.input, null, 2)}
-                </pre>
-              </div>
+          <div className="mt-2 min-w-0 max-w-full overflow-hidden rounded-[0.5rem] border border-border/60 bg-muted/20 p-2.5 text-[11px] text-muted-foreground">
+            <div className="mb-2 text-[10px] uppercase tracking-wide text-muted-foreground">
+              {t("chat.input")}
+            </div>
+            <div className="min-w-0 max-w-full overflow-hidden rounded-lg border border-border/60 bg-background/60 p-2">
+              <pre className="whitespace-pre-wrap break-all font-mono text-[11px] text-muted-foreground/90">
+                {inputText}
+              </pre>
             </div>
 
-            {/* Output */}
-            {isCompleted && (
-              <div>
-                <div className="text-[10px] uppercase text-muted-foreground mb-1 select-none flex items-center gap-1">
-                  {t("chat.output", "Output")}
+            {toolResult ? (
+              <div className="mt-3">
+                <div className="mb-2 text-[10px] uppercase tracking-wide text-muted-foreground">
+                  {t("chat.output")}
                 </div>
                 <div
                   className={cn(
-                    "p-2 rounded overflow-x-auto text-foreground/90",
-                    isError
-                      ? "bg-destructive/10 text-destructive border border-destructive/20"
-                      : "bg-muted/50",
+                    "min-w-0 max-w-full overflow-hidden rounded-lg border p-2",
+                    toolResult.is_error
+                      ? "border-destructive/30 bg-destructive/5"
+                      : "border-border/60 bg-background/60",
                   )}
                 >
-                  <pre className="whitespace-pre-wrap break-all">
+                  <pre className="whitespace-pre-wrap break-all font-mono text-[11px] text-muted-foreground/90">
                     {outputText}
-                  </pre>
-                </div>
-              </div>
-            )}
-
-            {toolUse.subagent_transcript &&
-            toolUse.subagent_transcript.length > 0 ? (
-              <div>
-                <div className="text-[10px] uppercase text-muted-foreground mb-1 select-none">
-                  {t("chat.subagentTranscript", "子代理过程")}
-                </div>
-                <div className="bg-muted/50 p-2 rounded overflow-x-auto text-foreground/90">
-                  <pre className="whitespace-pre-wrap break-all">
-                    {toolUse.subagent_transcript.join("\n\n")}
                   </pre>
                 </div>
               </div>
@@ -257,101 +409,77 @@ function ToolStep({ toolUse, toolResult, isOpen, onToggle }: ToolStepProps) {
   );
 }
 
-export function ToolChain({ blocks }: ToolChainProps) {
+export function ToolChain({ blocks, sessionStatus }: ToolChainProps) {
   const { t } = useT("translation");
   const [openStepId, setOpenStepId] = React.useState<string | null>(null);
 
-  // Group blocks into steps (Use + Result pair)
-  const steps = React.useMemo(() => {
-    const result: { use: ToolUseBlock; result?: ToolResultBlock }[] = [];
-    const useMap = new Map<string, ToolUseBlock>();
+  const normalizedSessionStatus = (sessionStatus || "").trim().toLowerCase();
+  const isTerminalSession = ["completed", "failed", "canceled"].includes(
+    normalizedSessionStatus,
+  );
 
-    // First pass: find all uses
+  const terminalToolResultText = React.useMemo(() => {
+    if (normalizedSessionStatus === "failed") return t("status.failed");
+    if (normalizedSessionStatus === "canceled") return t("status.canceled");
+    return t("status.completed");
+  }, [normalizedSessionStatus, t]);
+
+  const terminalToolResultIsError = React.useMemo(() => {
+    if (!isTerminalSession) return false;
+    return normalizedSessionStatus !== "completed";
+  }, [isTerminalSession, normalizedSessionStatus]);
+
+  const steps = React.useMemo(() => {
+    const result: ToolStepPair[] = [];
+
     for (const block of blocks) {
       if (block._type === "ToolUseBlock") {
-        useMap.set(block.id, block);
         result.push({ use: block });
       }
     }
 
-    // Second pass: attach results
     for (const block of blocks) {
       if (block._type === "ToolResultBlock") {
         const step = result.find((s) => s.use.id === block.tool_use_id);
-        if (step) {
-          step.result = block;
-        }
+        if (step) step.result = block;
       }
     }
-    return result;
-  }, [blocks]);
 
-  const isRunning = steps.some((s) => !s.result);
-  // Initialize open if running, closed if completed (history)
-  const [isExpanded, setIsExpanded] = React.useState(isRunning);
-  const prevIsRunning = React.useRef(isRunning);
-
-  // Auto-open the running step
-  // Auto-open the running step logic removed per user request
-  // React.useEffect(() => {
-  //   const runningStep = steps.find((s) => !s.result);
-  //   if (runningStep) {
-  //     setOpenStepId(runningStep.use.id);
-  //   }
-  // }, [steps]);
-
-  // Auto-expand when new tool call starts (do NOT auto-collapse when finished)
-  React.useEffect(() => {
-    // If we transitioned from not running to running (new tool call), auto-expand
-    if (!prevIsRunning.current && isRunning) {
-      setIsExpanded(true);
+    if (isTerminalSession) {
+      for (const step of result) {
+        if (step.result) continue;
+        step.result = {
+          _type: "ToolResultBlock",
+          tool_use_id: step.use.id,
+          content: terminalToolResultText,
+          is_error: terminalToolResultIsError,
+        };
+      }
     }
-    prevIsRunning.current = isRunning;
-  }, [isRunning]);
+
+    return result;
+  }, [
+    blocks,
+    isTerminalSession,
+    terminalToolResultIsError,
+    terminalToolResultText,
+  ]);
 
   if (steps.length === 0) return null;
 
   return (
-    <div className="w-full my-2 rounded-md border border-border/60 bg-muted/20 px-3 py-2">
-      <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
-        <CollapsibleTrigger className="flex items-center gap-2 w-full cursor-pointer select-none text-xs font-medium text-muted-foreground hover:text-foreground transition-colors group">
-          <div className="flex items-center gap-1.5">
-            <SquareTerminal className="size-3.5" />
-            <span>{t("chat.toolExecution", "Tool Execution")}</span>
-            {steps.length > 0 && (
-              <span className="opacity-70">({steps.length})</span>
-            )}
-          </div>
-
-          {/* Show little badges if collapsed */}
-          {!isExpanded && (
-            <div className="flex items-center gap-1 ml-auto">
-              {/* Just show one badge to indicate status if not expanded */}
-              {isRunning ? (
-                <Loader2 className="size-3 animate-spin text-primary" />
-              ) : (
-                <CheckCircle2 className="size-3 text-success" />
-              )}
-            </div>
-          )}
-        </CollapsibleTrigger>
-
-        <CollapsibleContent>
-          <div className="space-y-1 mt-2 border-t border-border/50 pt-2">
-            {steps.map((step) => (
-              <ToolStep
-                key={step.use.id}
-                toolUse={step.use}
-                toolResult={step.result}
-                isOpen={openStepId === step.use.id}
-                onToggle={() =>
-                  setOpenStepId(openStepId === step.use.id ? null : step.use.id)
-                }
-              />
-            ))}
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
+    <div className="my-2 w-full min-w-0 max-w-full overflow-hidden pl-5 md:max-w-[42rem]">
+      {steps.map((step) => (
+        <ToolStep
+          key={step.use.id}
+          toolUse={step.use}
+          toolResult={step.result}
+          isOpen={openStepId === step.use.id}
+          onToggle={() =>
+            setOpenStepId(openStepId === step.use.id ? null : step.use.id)
+          }
+        />
+      ))}
     </div>
   );
 }

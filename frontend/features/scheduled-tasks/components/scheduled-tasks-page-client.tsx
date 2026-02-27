@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
-import { useAppShell } from "@/components/shared/app-shell-context";
+import { useAppShell } from "@/components/shell/app-shell-context";
 import { CreateScheduledTaskDialog } from "@/features/scheduled-tasks/components/create-scheduled-task-dialog";
 import { ScheduledTaskEditDialog } from "@/features/scheduled-tasks/components/scheduled-task-edit-dialog";
 import { ScheduledTasksHeader } from "@/features/scheduled-tasks/components/scheduled-tasks-header";
@@ -33,7 +33,7 @@ export function ScheduledTasksPageClient() {
       <div className="flex flex-1 flex-col overflow-hidden">
         <PullToRefresh onRefresh={store.refresh} isLoading={store.isLoading}>
           <div className="flex flex-1 flex-col px-6 py-6 overflow-auto">
-            <div className="w-full max-w-6xl mx-auto">
+            <div className="w-full">
               <ScheduledTasksTable
                 tasks={store.tasks}
                 savingId={store.savingId}

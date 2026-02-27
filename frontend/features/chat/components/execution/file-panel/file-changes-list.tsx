@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useT } from "@/lib/i18n/client";
 import { FileChangeCard } from "./file-change-card";
@@ -7,103 +8,125 @@ import type { FileChange } from "@/features/chat/types";
 
 interface FileChangesListProps {
   fileChanges?: FileChange[];
-  sessionStatus?:
-    | "running"
-    | "accepted"
-    | "completed"
-    | "failed"
-    | "canceled"
-    | "stopped";
+  sessionStatus?: "pending" | "running" | "completed" | "failed" | "canceled";
   onFileClick?: (filePath: string) => void;
 }
 
-/**
- * Summary statistics for file changes
- */
-interface FileChangesSummaryProps {
-  fileChanges: FileChange[];
+interface Summary {
+  added: number;
+  modified: number;
+  deleted: number;
+  renamed: number;
 }
 
-function FileChangesSummary({ fileChanges }: FileChangesSummaryProps) {
-  const { t } = useT("translation");
-  const summary = fileChanges.reduce(
-    (acc, change) => {
-      switch (change.status) {
-        case "added":
-          acc.added++;
-          break;
-        case "modified":
-          acc.modified++;
-          break;
-        case "deleted":
-          acc.deleted++;
-          break;
-        case "renamed":
-          acc.renamed++;
-          break;
-      }
-      acc.totalLines += (change.added_lines || 0) + (change.deleted_lines || 0);
-      return acc;
-    },
-    { added: 0, modified: 0, deleted: 0, renamed: 0, totalLines: 0 },
-  );
+interface ArtifactsSummaryBarProps {
+  summary: Summary;
+  t: (key: string) => string;
+}
 
+function ArtifactsSummaryBar({ summary, t }: ArtifactsSummaryBarProps) {
   return (
-    <div className="flex flex-wrap items-center gap-3 px-4 py-3 bg-muted/30 border-b border-border text-sm">
-      <div className="flex items-center gap-2 min-w-0">
+    <div
+      className="
+        flex items-center gap-3
+        px-4 py-3
+        bg-muted/30
+        border-b border-border
+        text-sm
+        min-w-0 max-w-full
+        overflow-hidden
+        [container-type:inline-size]
+      "
+    >
+      {/* 左侧总计 */}
+      <div className="flex shrink-0 items-center gap-2">
         <span className="text-muted-foreground">
           {t("artifacts.summary.total")}
         </span>
-        <span className="font-semibold">
-          {fileChanges.length} {t("artifacts.summary.totalFiles", "个文件")}
-        </span>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
+      {/* 右侧统计 */}
+      <div className="flex flex-nowrap gap-2 min-w-0 overflow-hidden">
         {summary.added > 0 && (
-          <div className="flex items-center gap-1.5 text-success">
-            <div className="w-2 h-2 rounded-full bg-success" />
-            <span>
-              +{summary.added} {t("artifacts.summary.added")}
-            </span>
-          </div>
+          <Badge
+            color="added"
+            prefix="+"
+            value={summary.added}
+            label={t("artifacts.summary.added")}
+          />
         )}
 
         {summary.modified > 0 && (
-          <div className="flex items-center gap-1.5 text-info">
-            <div className="w-2 h-2 rounded-full bg-info" />
-            <span>
-              {summary.modified} {t("artifacts.summary.modified")}
-            </span>
-          </div>
+          <Badge
+            color="modified"
+            value={summary.modified}
+            label={t("artifacts.summary.modified")}
+          />
         )}
 
         {summary.deleted > 0 && (
-          <div className="flex items-center gap-1.5 text-destructive">
-            <div className="w-2 h-2 rounded-full bg-destructive" />
-            <span>
-              -{summary.deleted} {t("artifacts.summary.deleted")}
-            </span>
-          </div>
+          <Badge
+            color="deleted"
+            prefix="-"
+            value={summary.deleted}
+            label={t("artifacts.summary.deleted")}
+          />
         )}
 
         {summary.renamed > 0 && (
-          <div className="flex items-center gap-1.5 text-renamed">
-            <div className="w-2 h-2 rounded-full bg-renamed" />
-            <span>
-              {summary.renamed} {t("artifacts.summary.renamed")}
-            </span>
-          </div>
+          <Badge
+            color="renamed"
+            value={summary.renamed}
+            label={t("artifacts.summary.renamed")}
+          />
         )}
       </div>
-
-      {summary.totalLines > 0 && (
-        <div className="ml-auto text-xs text-muted-foreground">
-          {summary.totalLines.toLocaleString()}{" "}
-          {t("artifacts.summary.lineChanges")}
-        </div>
-      )}
     </div>
+  );
+}
+
+interface BadgeProps {
+  value: number;
+  label: string;
+  prefix?: string;
+  color: "added" | "modified" | "deleted" | "renamed";
+}
+
+function Badge({ value, label, prefix = "", color }: BadgeProps) {
+  const colorMap = {
+    added: "bg-primary/10 text-primary",
+    modified: "bg-chart-2/10 text-chart-2",
+    deleted: "bg-destructive/10 text-destructive",
+    renamed: "bg-chart-3/10 text-chart-3",
+  };
+
+  return (
+    <span
+      className={`
+        inline-flex items-center
+        px-2 py-0.5
+        rounded-full
+        text-xs font-medium
+        whitespace-nowrap
+        shrink-0
+        ${colorMap[color]}
+      `}
+    >
+      {/* 数字永远显示 */}
+      {prefix}
+      {value}
+
+      {/* 文字：当容器小于 360px 自动隐藏 */}
+      <span
+        className="
+          ml-1
+          transition-all
+          [@container(max-width:360px)]:hidden
+        "
+      >
+        {label}
+      </span>
+    </span>
   );
 }
 
@@ -127,11 +150,32 @@ export function FileChangesList({
     );
   }
 
+  const summary = fileChanges.reduce(
+    (acc, change) => {
+      switch (change.status) {
+        case "added":
+          acc.added++;
+          break;
+        case "modified":
+          acc.modified++;
+          break;
+        case "deleted":
+          acc.deleted++;
+          break;
+        case "renamed":
+          acc.renamed++;
+          break;
+      }
+      return acc;
+    },
+    { added: 0, modified: 0, deleted: 0, renamed: 0 },
+  );
+
   return (
-    <div className="flex flex-col h-full">
-      <FileChangesSummary fileChanges={fileChanges} />
-      <ScrollArea className="flex-1">
-        <div className="px-4 py-4 space-y-3">
+    <div className="flex flex-col h-full min-w-0 max-w-full overflow-hidden">
+      <ArtifactsSummaryBar summary={summary} t={t} />
+      <ScrollArea className="flex-1 min-w-0 max-w-full overflow-hidden [&_[data-slot=scroll-area-viewport]]:overflow-x-hidden">
+        <div className="w-full min-w-0 max-w-full px-4 py-4 space-y-3">
           {fileChanges.map((change, index) => (
             <FileChangeCard
               key={`${change.path}-${index}`}

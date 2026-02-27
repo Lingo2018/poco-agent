@@ -1,14 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
-import {
-  ArrowLeft,
-  MoreHorizontal,
-  PenSquare,
-  Share2,
-  Trash2,
-} from "lucide-react";
+import { MoreHorizontal, PenSquare, Share2, Trash2 } from "lucide-react";
 
 import { useT } from "@/lib/i18n/client";
 import { Button } from "@/components/ui/button";
@@ -19,10 +12,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Separator } from "@/components/ui/separator";
 import type { ProjectItem } from "@/features/projects/types";
 import { RenameProjectDialog } from "@/features/projects/components/rename-project-dialog";
-import { useAppShell } from "@/components/shared/app-shell-context";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,6 +24,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { PageHeaderShell } from "@/components/shared/page-header-shell";
 
 interface ProjectHeaderProps {
   project?: ProjectItem;
@@ -46,15 +38,9 @@ export function ProjectHeader({
   onDeleteProject,
 }: ProjectHeaderProps) {
   const { t } = useT("translation");
-  const router = useRouter();
-  const { lng } = useAppShell();
   const [isRenameDialogOpen, setIsRenameDialogOpen] = React.useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const [isDeleting, setIsDeleting] = React.useState(false);
-
-  const handleGoBack = React.useCallback(() => {
-    router.push(`/${lng}/home`);
-  }, [router, lng]);
 
   const handleRename = React.useCallback(
     (newName: string) => {
@@ -76,31 +62,29 @@ export function ProjectHeader({
   }, [onDeleteProject, project]);
 
   return (
-    <header className="flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-border px-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-      <div className="flex w-full items-center gap-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleGoBack}
-          className="size-8 text-muted-foreground hover:bg-sidebar-accent"
-        >
-          <ArrowLeft className="size-4" />
-        </Button>
-
-        <Separator orientation="vertical" className="mx-2 h-4" />
-
-        <div className="flex flex-1 items-center gap-2">
-          <span className="text-base">{project?.icon || "📁"}</span>
-          <span className="text-sm font-medium">{project?.name}</span>
-        </div>
-
-        <div className="flex items-center gap-1">
+    <>
+      <PageHeaderShell
+        left={
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            <div className="flex flex-col min-w-0">
+              <p className="truncate text-base font-semibold text-foreground">
+                {project?.name ?? t("project.untitled", "Untitled Project")}
+              </p>
+              {project?.description ? (
+                <p className="truncate text-xs text-muted-foreground">
+                  {project.description}
+                </p>
+              ) : null}
+            </div>
+          </div>
+        }
+        right={
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                className="size-8 text-muted-foreground hover:bg-sidebar-accent"
+                className="size-8 text-muted-foreground hover:bg-muted"
               >
                 <MoreHorizontal className="size-4" />
               </Button>
@@ -118,18 +102,19 @@ export function ProjectHeader({
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    className="text-destructive focus:text-destructive focus:bg-destructive/10"
+                    className="text-destructive focus:bg-destructive/10 focus:text-destructive"
                     onClick={() => setIsDeleteDialogOpen(true)}
                   >
-                    <Trash2 className="size-4" />
+                    <Trash2 className="size-4 text-destructive" />
                     <span>{t("project.delete")}</span>
                   </DropdownMenuItem>
                 </>
               )}
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
-      </div>
+        }
+      />
+
       <RenameProjectDialog
         open={isRenameDialogOpen}
         onOpenChange={setIsRenameDialogOpen}
@@ -161,6 +146,6 @@ export function ProjectHeader({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </header>
+    </>
   );
 }

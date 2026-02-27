@@ -2,7 +2,6 @@ from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session
 
 from app.models.mcp_server import McpServer
-from app.models.user_mcp_install import UserMcpInstall
 
 
 class McpServerRepository:
@@ -35,21 +34,11 @@ class McpServerRepository:
 
     @staticmethod
     def list_visible(session_db: Session, user_id: str) -> list[McpServer]:
-        hidden_server_ids = (
-            session_db.query(UserMcpInstall.server_id)
-            .filter(
-                UserMcpInstall.user_id == user_id,
-                UserMcpInstall.is_deleted.is_(True),
-            )
-            .scalar_subquery()
-        )
-
         user_mcp_names = (
             session_db.query(McpServer.name)
             .filter(
                 McpServer.scope == "user",
                 McpServer.owner_user_id == user_id,
-                ~McpServer.id.in_(hidden_server_ids),
             )
             .scalar_subquery()
         )
@@ -59,12 +48,10 @@ class McpServerRepository:
                 and_(
                     McpServer.scope == "user",
                     McpServer.owner_user_id == user_id,
-                    ~McpServer.id.in_(hidden_server_ids),
                 ),
                 and_(
                     McpServer.scope == "system",
                     ~McpServer.name.in_(user_mcp_names),
-                    ~McpServer.id.in_(hidden_server_ids),
                 ),
             )
         )

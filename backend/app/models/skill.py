@@ -14,6 +14,7 @@ class Skill(Base, TimestampMixin):
     owner_user_id: Mapped[str] = mapped_column(String(255), nullable=False)
     # Location info for staging the skill into workspace (e.g. {"s3_key": "...", "is_prefix": true}).
     entry: Mapped[dict] = mapped_column(JSON, nullable=False)
+    source: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
     __table_args__ = (
         UniqueConstraint("name", "owner_user_id", name="uq_skill_name_owner"),

@@ -10,15 +10,65 @@ import {
   File as FileIcon,
   ChevronRight,
   ChevronDown,
+  Download,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { FileNode } from "@/features/chat/types";
+import { apiClient, API_ENDPOINTS } from "@/services/api-client";
+import { toast } from "sonner";
+import { PanelHeaderAction } from "@/components/shared/panel-header";
+import { useT } from "@/lib/i18n/client";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FileSidebarProps {
   files: FileNode[];
   onFileSelect: (file: FileNode) => void;
   selectedFile?: FileNode;
+  sessionId?: string;
+  embedded?: boolean;
 }
+
+const isSameOriginUrl = (url: string) => {
+  try {
+    return (
+      new URL(url, window.location.origin).origin === window.location.origin
+    );
+  } catch {
+    return false;
+  }
+};
+
+const triggerDownload = (url: string, filename: string) => {
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+const downloadFileFromUrl = async (url: string, filename: string) => {
+  const absoluteUrl = new URL(url, window.location.origin).toString();
+  try {
+    const response = await fetch(absoluteUrl, {
+      credentials: isSameOriginUrl(absoluteUrl) ? "include" : "omit",
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const blob = await response.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    triggerDownload(blobUrl, filename);
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+  } catch (error) {
+    console.warn(
+      "[Artifacts] Failed to download as blob, fallback to direct URL",
+      error,
+    );
+    triggerDownload(absoluteUrl, filename);
+  }
+};
 
 function FileTreeItem({
   node,
@@ -32,6 +82,7 @@ function FileTreeItem({
   level?: number;
 }) {
   const [isExpanded, setIsExpanded] = React.useState(level === 0);
+  const isMobile = useIsMobile();
 
   // Check if this node or any of its children is the selected one
   const containsSelected = React.useMemo(() => {
@@ -77,6 +128,8 @@ function FileTreeItem({
       case "js":
       case "jsx":
       case "json":
+      case "excalidraw":
+      case "drawio":
       case "py":
         return <FileCode className={cn("size-4", className)} />;
       case "jpg":
@@ -97,54 +150,67 @@ function FileTreeItem({
       onSelect(node);
     }
   };
+  // Keep indentation inside the row box so nested nodes never exceed sidebar width.
+  const paddingStartRem = 0.5 + Math.min(level, 12) * 0.5;
+  const iconColorClass =
+    selectedId === node.id
+      ? "text-sidebar-accent-foreground"
+      : "text-sidebar-foreground/70";
 
-  const INDENT_CLASSES = [
-    "pl-2",
-    "pl-5",
-    "pl-8",
-    "pl-12",
-    "pl-14",
-    "pl-16",
-    "pl-20",
-  ];
-  const indentClass =
-    INDENT_CLASSES[Math.min(level, INDENT_CLASSES.length - 1)];
+  const renderNodeIcon = () => {
+    if (node.type !== "folder") {
+      return getFileIcon(node.name, node.type, iconColorClass);
+    }
+
+    const folderIcon = getFileIcon(node.name, node.type, iconColorClass);
+    const chevronIcon = isExpanded ? (
+      <ChevronDown className={cn("size-4", iconColorClass)} />
+    ) : (
+      <ChevronRight className={cn("size-4", iconColorClass)} />
+    );
+
+    if (isMobile) {
+      return isExpanded ? folderIcon : chevronIcon;
+    }
+
+    return (
+      <span className="relative inline-flex items-center justify-center">
+        <span className="transition-opacity duration-150 group-hover/item:opacity-0">
+          {folderIcon}
+        </span>
+        <span className="absolute inset-0 transition-opacity duration-150 opacity-0 group-hover/item:opacity-100">
+          {chevronIcon}
+        </span>
+      </span>
+    );
+  };
+  const nodeIcon = renderNodeIcon();
 
   return (
-    <div className="w-full min-w-0">
+    <div className="w-full min-w-0 max-w-full basis-full overflow-hidden">
       <div
         className={cn(
-          "flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors min-w-0 group/item",
-          indentClass,
+          "group/item relative box-border flex w-full min-w-0 max-w-full items-center gap-2 overflow-hidden rounded-md py-1.5 transition-colors cursor-pointer",
           selectedId === node.id
             ? "bg-sidebar-accent text-sidebar-accent-foreground"
             : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
         )}
+        style={{
+          paddingInlineStart: `${paddingStartRem}rem`,
+          paddingInlineEnd: "0.5rem",
+        }}
         onClick={handleClick}
       >
-        <div className="shrink-0 w-3 flex items-center justify-center">
-          {node.type === "folder" &&
-            (isExpanded ? (
-              <ChevronDown className="size-3 text-sidebar-foreground/70" />
-            ) : (
-              <ChevronRight className="size-3 text-sidebar-foreground/70" />
-            ))}
-        </div>
-        <span className="shrink-0">
-          {getFileIcon(
-            node.name,
-            node.type,
-            selectedId === node.id
-              ? "text-sidebar-accent-foreground"
-              : "text-sidebar-foreground/70",
-          )}
-        </span>
-        <span className="text-sm flex-1 min-w-0 truncate" title={node.name}>
+        <span className="shrink-0">{nodeIcon}</span>
+        <span
+          className="block w-0 flex-1 min-w-0 max-w-full truncate text-sm"
+          title={node.name}
+        >
           {node.name}
         </span>
       </div>
       {node.type === "folder" && isExpanded && node.children && (
-        <div className="w-full min-w-0">
+        <div className="w-full min-w-0 max-w-full basis-full overflow-hidden">
           {node.children.map((child) => (
             <FileTreeItem
               key={child.id}
@@ -164,17 +230,59 @@ export function FileSidebar({
   files,
   onFileSelect,
   selectedFile,
+  sessionId,
+  embedded = false,
 }: FileSidebarProps) {
+  const { t } = useT("translation");
+
+  const handleDownload = async () => {
+    if (!sessionId) return;
+    try {
+      const response = await apiClient.get<{
+        url?: string | null;
+        filename?: string | null;
+      }>(API_ENDPOINTS.sessionWorkspaceArchive(sessionId));
+
+      if (response.url) {
+        const filename = response.filename || `workspace-${sessionId}.zip`;
+        await downloadFileFromUrl(response.url, filename);
+        toast.success(t("fileSidebar.downloadStarted"));
+      } else {
+        toast.error(t("fileSidebar.archiveNotAvailable"));
+      }
+    } catch (error) {
+      console.error("[Artifacts] Failed to download workspace archive", error);
+      toast.error(t("fileSidebar.downloadFailed"));
+    }
+  };
+
   return (
-    <aside className="flex h-full min-h-0 min-w-0 flex-col border-l border-border/60 bg-sidebar/60 text-sidebar-foreground">
-      <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-sidebar-foreground/70">
-        文件列表
+    <aside
+      className={cn(
+        "flex h-full w-full min-h-0 min-w-0 max-w-full flex-col overflow-hidden text-sidebar-foreground",
+        embedded
+          ? "border-0 bg-transparent"
+          : "border-l border-border/60 bg-sidebar/60",
+      )}
+    >
+      <div className="flex w-full min-w-0 items-center justify-between overflow-hidden px-3 py-2">
+        <span className="min-w-0 truncate text-xs font-semibold uppercase tracking-wide text-sidebar-foreground/70">
+          {t("fileSidebar.title")}
+        </span>
+        {sessionId && (
+          <PanelHeaderAction
+            onClick={handleDownload}
+            aria-label={t("fileSidebar.downloadAll")}
+          >
+            <Download className="size-4" />
+          </PanelHeaderAction>
+        )}
       </div>
-      <ScrollArea className="flex-1 min-h-0">
-        <div className="px-2 py-2 space-y-1 min-w-0 overflow-hidden">
+      <ScrollArea className="h-full w-full flex-1 min-h-0 max-w-full [&_[data-slot=scroll-area-scrollbar]]:hidden [&_[data-slot=scroll-area-viewport]]:w-full [&_[data-slot=scroll-area-viewport]]:overflow-x-hidden [&_[data-slot=scroll-area-viewport]]:scrollbar-hide">
+        <div className="w-full min-w-0 max-w-full space-y-1 overflow-hidden px-2 py-2">
           {files.length === 0 ? (
             <p className="text-xs text-sidebar-foreground/60 px-2 py-1">
-              暂无文件
+              {t("fileSidebar.noFiles")}
             </p>
           ) : (
             files.map((file) => (

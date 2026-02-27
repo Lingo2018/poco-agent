@@ -5,18 +5,25 @@ import { useRouter } from "next/navigation";
 
 import { useT } from "@/lib/i18n/client";
 
-import { useAutosizeTextarea } from "../hooks/use-autosize-textarea";
+import {
+  TaskEntrySection,
+  type ComposerMode,
+  type TaskSendOptions,
+  submitScheduledTask,
+  submitTask,
+  useAutosizeTextarea,
+  useComposerModeHotkeys,
+} from "@/features/task-composer";
+import type { ModelConfigResponse } from "@/features/chat/types";
 
 import { HomeHeader } from "./home-header";
-import { TaskComposer } from "./task-composer";
-import { ConnectorsBar } from "./connectors-bar";
-import { createSessionAction } from "@/features/chat/actions/session-actions";
-import type { ComposerMode, TaskSendOptions } from "./task-composer";
+import { ConnectorsBar } from "@/features/connectors";
 
-import { useAppShell } from "@/components/shared/app-shell-context";
-import { scheduledTasksService } from "@/features/scheduled-tasks/services/scheduled-tasks-service";
+import { useAppShell } from "@/components/shell/app-shell-context";
 import { toast } from "sonner";
-import type { TaskConfig } from "@/features/chat/types/api/session";
+import { modelConfigService } from "@/features/home/api/model-config-api";
+
+const MODEL_STORAGE_KEY = "poco_selected_model";
 
 export function HomePageClient() {
   const { t } = useT("translation");
@@ -29,7 +36,68 @@ export function HomePageClient() {
   const [mode, setMode] = React.useState<ComposerMode>("task");
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
+  const [modelConfig, setModelConfig] =
+    React.useState<ModelConfigResponse | null>(null);
+  const [selectedModel, setSelectedModel] = React.useState<string | null>(null);
+
   useAutosizeTextarea(textareaRef, inputValue);
+  useComposerModeHotkeys({ textareaRef, setMode });
+
+  React.useEffect(() => {
+    let active = true;
+    modelConfigService
+      .get()
+      .then((cfg) => {
+        if (!active) return;
+        setModelConfig(cfg);
+      })
+      .catch((error) => {
+        console.error("[Home] Failed to load model config:", error);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  React.useEffect(() => {
+    const defaultModel = (modelConfig?.default_model || "").trim();
+    if (!defaultModel) return;
+
+    let saved: string | null = null;
+    try {
+      saved = localStorage.getItem(MODEL_STORAGE_KEY);
+    } catch {
+      saved = null;
+    }
+
+    const cleaned = (saved || "").trim();
+    if (!cleaned || cleaned === defaultModel) {
+      setSelectedModel(null);
+      return;
+    }
+
+    const allowed = new Set(
+      (modelConfig?.model_list || [])
+        .map((m) => (m || "").trim())
+        .filter(Boolean),
+    );
+    setSelectedModel(allowed.has(cleaned) ? cleaned : null);
+  }, [modelConfig]);
+
+  const handleSelectModel = React.useCallback((model: string | null) => {
+    const cleaned = (model || "").trim();
+    const next = cleaned ? cleaned : null;
+    setSelectedModel(next);
+    try {
+      if (!next) {
+        localStorage.removeItem(MODEL_STORAGE_KEY);
+      } else {
+        localStorage.setItem(MODEL_STORAGE_KEY, next);
+      }
+    } catch {
+      // Ignore storage failures (e.g., privacy mode).
+    }
+  }, []);
 
   // Determine if connectors bar should be expanded
   const shouldExpandConnectors = isInputFocused || inputValue.trim().length > 0;
@@ -54,48 +122,20 @@ export function HomePageClient() {
       }
 
       setIsSubmitting(true);
-      console.log("[Home] Sending task:", inputValue, { mode });
 
       try {
-        // Build config object (shared by plan/task, and also used to pin scheduled task config)
-        const config: TaskConfig & Record<string, unknown> = {};
-        if (inputFiles.length > 0) {
-          config.input_files = inputFiles;
-        }
-        if (repoUrl) {
-          config.repo_url = repoUrl;
-          config.git_branch = gitBranch;
-          if (gitTokenEnvKey) {
-            config.git_token_env_key = gitTokenEnvKey;
-          }
-        }
-        if (options?.browser_enabled) {
-          config.browser_enabled = true;
-        }
-
         if (mode === "scheduled") {
-          const name =
-            (scheduledTask?.name || "").trim() ||
-            inputValue.trim().slice(0, 32);
-          const cron = (scheduledTask?.cron || "").trim() || "*/5 * * * *";
-          const timezone = (scheduledTask?.timezone || "").trim() || "UTC";
-          const enabled = Boolean(scheduledTask?.enabled ?? true);
-          const reuseSession = Boolean(scheduledTask?.reuse_session ?? true);
-
-          const created = await scheduledTasksService.create({
-            name,
-            cron,
-            timezone,
+          const created = await submitScheduledTask({
             prompt: inputValue,
-            enabled,
-            reuse_session: reuseSession,
-            config: Object.keys(config).length > 0 ? config : undefined,
+            mode,
+            options,
+            selectedModel,
           });
 
           toast.success(t("library.scheduledTasks.toasts.created"));
           setInputValue("");
           router.push(
-            `/${lng}/capabilities/scheduled-tasks/${created.scheduled_task_id}`,
+            `/${lng}/capabilities/scheduled-tasks/${created.scheduledTaskId}`,
           );
           return;
         }
@@ -140,35 +180,23 @@ export function HomePageClient() {
           );
         }
 
-        // 1. Call create session API
-        const session = await createSessionAction({
-          prompt: inputValue,
-          config: Object.keys(config).length > 0 ? config : undefined,
-          projectId: finalProjectId,
-          permission_mode: mode === "plan" ? "plan" : "default",
-          schedule_mode: runSchedule?.schedule_mode,
-          timezone: runSchedule?.timezone,
-          scheduled_at: runSchedule?.scheduled_at,
-        });
-        console.log("session", session);
+        const session = await submitTask(
+          {
+            prompt: inputValue,
+            mode,
+            options: {
+              ...options,
+              run_schedule: runSchedule,
+              scheduled_task: scheduledTask,
+            },
+            selectedModel,
+            projectId: finalProjectId,
+          },
+          { addTask },
+        );
         const sessionId = session.sessionId;
-        console.log("sessionId", sessionId);
-
-        // 2. Save prompt to localStorage for compatibility/fallback
-        localStorage.setItem(`session_prompt_${sessionId}`, inputValue);
-
-        // 3. Add to local history (persisted via localStorage in hook)
-        addTask(inputValue, {
-          id: sessionId,
-          timestamp: new Date().toISOString(),
-          status: "running",
-          projectId: finalProjectId,
-        });
-
-        console.log("[Home] Navigating to chat session:", sessionId);
+        if (!sessionId) return;
         setInputValue("");
-
-        // 4. Navigate to the chat page
         router.push(`/${lng}/chat/${sessionId}`);
       } catch (error) {
         console.error("[Home] Failed to create session:", error);
@@ -176,37 +204,44 @@ export function HomePageClient() {
         setIsSubmitting(false);
       }
     },
-    [addProject, addTask, inputValue, isSubmitting, lng, mode, router, t],
+    [
+      addProject,
+      addTask,
+      inputValue,
+      isSubmitting,
+      lng,
+      mode,
+      router,
+      selectedModel,
+      t,
+    ],
   );
 
   return (
     <div className="flex flex-1 flex-col min-h-0">
-      <HomeHeader onOpenSettings={openSettings} />
+      <HomeHeader
+        onOpenSettings={openSettings}
+        modelConfig={modelConfig}
+        selectedModel={selectedModel}
+        onSelectModel={handleSelectModel}
+      />
 
-      <div className="flex flex-1 flex-col items-center justify-start px-6 pt-[20vh] min-h-0 overflow-auto">
-        <div className="w-full max-w-2xl">
-          {/* 欢迎语 */}
-          <div className="mb-8 text-center">
-            <h1 className="text-3xl font-medium tracking-tight text-foreground">
-              {t("hero.title")}
-            </h1>
-          </div>
-
-          <TaskComposer
-            textareaRef={textareaRef}
-            value={inputValue}
-            onChange={setInputValue}
-            mode={mode}
-            onModeChange={setMode}
-            onSend={handleSendTask}
-            isSubmitting={isSubmitting}
-            onFocus={() => setIsInputFocused(true)}
-            onBlur={() => setIsInputFocused(false)}
-          />
-
-          <ConnectorsBar forceExpanded={shouldExpandConnectors} />
-        </div>
-      </div>
+      <TaskEntrySection
+        title={t("hero.title")}
+        mode={mode}
+        onModeChange={setMode}
+        toggleDisabled={isSubmitting}
+        footer={<ConnectorsBar forceExpanded={shouldExpandConnectors} />}
+        composerProps={{
+          textareaRef,
+          value: inputValue,
+          onChange: setInputValue,
+          onSend: handleSendTask,
+          isSubmitting,
+          onFocus: () => setIsInputFocused(true),
+          onBlur: () => setIsInputFocused(false),
+        }}
+      />
     </div>
   );
 }

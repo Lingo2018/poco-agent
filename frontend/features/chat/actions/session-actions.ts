@@ -1,5 +1,16 @@
 import { z } from "zod";
-import { chatService } from "@/features/chat/services/chat-service";
+import { chatService } from "@/features/chat/api/chat-api";
+
+// Validation error message keys
+const VALIDATION_ERRORS = {
+  taskContentRequired: "validation.taskContentRequired",
+  selectExecutionTime: "validation.selectExecutionTime",
+  nightlyNoTime: "validation.nightlyNoTime",
+  missingSessionId: "validation.missingSessionId",
+  messageContentRequired: "validation.messageContentRequired",
+  sessionNameRequired: "validation.sessionNameRequired",
+  sessionNameTooLong: "validation.sessionNameTooLong",
+} as const;
 
 const inputFileSchema = z
   .object({
@@ -18,9 +29,11 @@ const configSchema = z
     repo_url: z.string().optional().nullable(),
     git_branch: z.string().optional(),
     git_token_env_key: z.string().optional().nullable(),
+    model: z.string().optional().nullable(),
     browser_enabled: z.boolean().optional(),
     mcp_config: z.record(z.string(), z.boolean()).optional(),
-    skill_files: z.record(z.string(), z.unknown()).optional(),
+    skill_config: z.record(z.string(), z.boolean()).optional(),
+    plugin_config: z.record(z.string(), z.boolean()).optional(),
     input_files: z.array(inputFileSchema).optional(),
   })
   .passthrough();
@@ -44,7 +57,7 @@ const createSessionSchema = z
       return hasPrompt || hasFiles;
     },
     {
-      message: "请输入任务内容",
+      message: VALIDATION_ERRORS.taskContentRequired,
       path: ["prompt"],
     },
   )
@@ -54,7 +67,7 @@ const createSessionSchema = z
       return Boolean((data.scheduled_at || "").trim());
     },
     {
-      message: "请选择执行时间",
+      message: VALIDATION_ERRORS.selectExecutionTime,
       path: ["scheduled_at"],
     },
   )
@@ -64,14 +77,14 @@ const createSessionSchema = z
       return !data.scheduled_at;
     },
     {
-      message: "夜间执行不支持设置执行时间",
+      message: VALIDATION_ERRORS.nightlyNoTime,
       path: ["scheduled_at"],
     },
   );
 
 const sendMessageSchema = z
   .object({
-    sessionId: z.string().trim().min(1, "缺少会话 ID"),
+    sessionId: z.string().trim().min(1, VALIDATION_ERRORS.missingSessionId),
     content: z.string(),
     attachments: z.array(inputFileSchema).optional(),
   })
@@ -80,7 +93,7 @@ const sendMessageSchema = z
       data.content.trim().length > 0 ||
       (data.attachments && data.attachments.length > 0),
     {
-      message: "请输入消息内容",
+      message: VALIDATION_ERRORS.messageContentRequired,
       path: ["content"],
     },
   );
@@ -137,7 +150,7 @@ export async function sendMessageAction(input: SendMessageInput) {
 }
 
 const cancelSessionSchema = z.object({
-  sessionId: z.string().trim().min(1, "缺少会话 ID"),
+  sessionId: z.string().trim().min(1, VALIDATION_ERRORS.missingSessionId),
   reason: z.string().optional().nullable(),
 });
 
@@ -151,7 +164,7 @@ export async function cancelSessionAction(input: CancelSessionInput) {
 }
 
 const deleteSessionSchema = z.object({
-  sessionId: z.string().trim().min(1, "缺少会话 ID"),
+  sessionId: z.string().trim().min(1, VALIDATION_ERRORS.missingSessionId),
 });
 
 export type DeleteSessionInput = z.infer<typeof deleteSessionSchema>;
@@ -162,8 +175,12 @@ export async function deleteSessionAction(input: DeleteSessionInput) {
 }
 
 const renameSessionTitleSchema = z.object({
-  sessionId: z.string().trim().min(1, "缺少会话 ID"),
-  title: z.string().trim().min(1, "请输入会话名称").max(255, "会话名称过长"),
+  sessionId: z.string().trim().min(1, VALIDATION_ERRORS.missingSessionId),
+  title: z
+    .string()
+    .trim()
+    .min(1, VALIDATION_ERRORS.sessionNameRequired)
+    .max(255, VALIDATION_ERRORS.sessionNameTooLong),
 });
 
 export type RenameSessionTitleInput = z.infer<typeof renameSessionTitleSchema>;

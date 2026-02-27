@@ -2,7 +2,7 @@ import logging
 import unicodedata
 import uuid
 
-from openai import OpenAI
+from anthropic import Anthropic
 
 from app.core.database import SessionLocal
 from app.core.settings import get_settings
@@ -22,14 +22,27 @@ SYSTEM_PROMPT = (
 class SessionTitleService:
     def __init__(self) -> None:
         settings = get_settings()
-        self._enabled = bool(settings.openai_api_key)
-        self._client = OpenAI(
-            api_key=settings.openai_api_key,
-            base_url=settings.openai_base_url or None,
+        api_key = (settings.anthropic_api_key or "").strip()
+        self._enabled = bool(api_key)
+        base_url = (settings.anthropic_base_url or "").strip() or (
+            "https://api.anthropic.com"
         )
-        self._model = settings.openai_default_model
+        base_url = base_url.rstrip("/")
+        # The SDK expects a base URL without a trailing "/v1".
+        if base_url.endswith("/v1"):
+            base_url = base_url[: -len("/v1")]
+
+        self._client: Anthropic | None = None
+        self._model = settings.default_model
         if not self._enabled:
-            logger.warning("OPENAI_API_KEY is not set; title generation disabled")
+            logger.warning("ANTHROPIC_API_KEY is not set; title generation disabled")
+        else:
+            self._client = Anthropic(
+                api_key=api_key,
+                base_url=base_url,
+                timeout=15.0,
+                max_retries=2,
+            )
 
     def generate_and_update(self, session_id: uuid.UUID, prompt: str) -> None:
         if not prompt or not prompt.strip():
@@ -58,26 +71,36 @@ class SessionTitleService:
             db.close()
 
     def _generate_title(self, prompt: str) -> str | None:
-        if not self._enabled:
+        if not self._enabled or self._client is None:
             return None
+
         try:
-            response = self._client.chat.completions.create(
+            message = self._client.messages.create(
                 model=self._model,
-                messages=[
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": prompt},
-                ],
+                messages=[{"role": "user", "content": prompt}],
+                system=SYSTEM_PROMPT,
                 temperature=0.2,
                 max_tokens=32,
             )
         except Exception as exc:
-            logger.exception("OpenAI title generation failed: %s", exc)
+            logger.exception("Anthropic title generation failed: %s", exc)
             return None
 
-        if not response.choices:
-            return None
+        text_parts: list[str] = []
+        for block in getattr(message, "content", []) or []:
+            if isinstance(block, dict):
+                block_type = block.get("type")
+                text = block.get("text")
+            else:
+                block_type = getattr(block, "type", None)
+                text = getattr(block, "text", None)
 
-        content = response.choices[0].message.content or ""
+            if block_type != "text":
+                continue
+            if isinstance(text, str) and text:
+                text_parts.append(text)
+
+        content = "".join(text_parts).strip()
         cleaned = self._sanitize_title(content)
         if not cleaned:
             return None

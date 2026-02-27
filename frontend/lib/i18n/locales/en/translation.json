@@ -7,6 +7,7 @@
     "newTask": "New Task",
     "search": "Search",
     "library": "Capabilities",
+    "openMain": "Open main sidebar",
     "scheduledTasks": "Scheduled Tasks",
     "projects": "Projects",
     "newProject": "New Project",
@@ -19,15 +20,23 @@
     "rename": "Rename",
     "moveToProject": "Move to project",
     "delete": "Delete",
+    "askTag": "ask",
     "shareTitle": "Share Poco with friends",
     "shareDesc": "Get 500 points each",
     "user": "User",
+    "defaultUserName": "Poco User",
     "removeFromProject": "Remove from project",
-    "plan": "Pro Plan"
+    "batchOperations": "Batch Operations",
+    "holdToSelect": "Hold to select",
+    "holdToExitSelect": "Hold to exit selection",
+    "moveToHere": "Move here",
+    "plan": "Pro Plan",
+    "onboarding": "Guided tutorial"
   },
   "header": {
     "workspace": "Poco 1.0",
     "switchWorkspace": "Switch workspace",
+    "switchModel": "Switch model",
     "notifications": "Notifications",
     "more": "More",
     "repoLink": "Project repository",
@@ -40,6 +49,11 @@
     "voiceInput": "Voice input",
     "send": "Send",
     "placeholder": "Assign a task or ask any question",
+    "inputPrompts": {
+      "taskDefault": "Assign any task to Poco (Ask Poco Anything)",
+      "planDefault": "Create a task plan with Poco",
+      "shortcutHint": "/ for Slash Command, Shift+Enter for new line, Enter to send"
+    },
     "tools": "Connect your tools to Poco",
     "importLocal": "Import from local file",
     "importFigma": "Import from Figma (coming soon)",
@@ -55,6 +69,11 @@
       "scheduledHelp": "Run on a Cron schedule and optionally reuse the workspace.",
       "planPlaceholder": "Describe a complex task. I will propose a plan first, then execute after you confirm…",
       "planPrefix": "First, propose a clear execution plan (steps with checkpoints). Do not execute yet. After I confirm, execute step by step.\\n\\nTask: {{prompt}}"
+    },
+    "modeLabels": {
+      "task": "Task Mode",
+      "plan": "Plan Mode",
+      "scheduled": "Scheduled Mode"
     },
     "repo": {
       "toggle": "Repository settings",
@@ -87,7 +106,12 @@
       }
     },
     "browser": {
-      "toggle": "Browser"
+      "toggle": "Browser",
+      "enabledTooltipTitle": "Browser is enabled",
+      "enabledTooltipDescription": "Poco will use the browser to view web pages, extract page information, and complete web-related actions.",
+      "disabledTooltipTitle": "Browser is disabled",
+      "disabledTooltipDescription": "Turn it on to let Poco use the browser for web viewing and web-related tasks.",
+      "enabledHint": "Enabled"
     },
     "runSchedule": {
       "toggle": "Run time",
@@ -146,6 +170,7 @@
     "more": "More"
   },
   "hints": {
+    "slashCommand": "use Slash Command",
     "send": "Send",
     "newLine": "New line",
     "separator": ","
@@ -193,6 +218,9 @@
     "askUserRequired": "Please answer all questions before submitting",
     "askUserSubmitted": "Answers submitted",
     "askUserFailed": "Submission failed, please try again",
+    "askUserCompleteTitle": "All set",
+    "askUserCompleteHint": "Submitting your answers...",
+    "askUserRetry": "Retry",
     "planApprovalTitle": "Plan approval",
     "planApprovalHint": "Please review the execution plan below. Approving it will start execution and may modify files / run commands.",
     "planApprovalApprove": "Approve & run",
@@ -211,13 +239,25 @@
     "thinkingTitle": "Thinking",
     "toolExecution": "Tool Execution",
     "subagentTranscript": "Subagent transcript",
+    "subagentExecution": "Subagent",
     "input": "Input",
     "output": "Output",
     "scrollToLatestMessage": "Jump to latest message",
+    "userPromptTimelineJump": "Jump to user prompt {{index}}",
+    "userPromptTimelineEmpty": "(Empty prompt)",
     "expand": "Expand",
     "collapse": "Collapse",
     "copyMessage": "Copy message",
+    "formulaCopied": "Copied",
     "editMessage": "Edit message",
+    "quoteModify": "Quote Reply",
+    "exportImage": "Generate conversation image",
+    "exportLongImage": "Export long image",
+    "exportMultiImage": "Export multiple images",
+    "exportImageSuccess": "Conversation image generated",
+    "exportImageMultiSuccess": "Exported {{count}} images",
+    "exportImageEmpty": "No conversation content to export",
+    "exportImageFailed": "Failed to generate conversation image",
     "statusBar": {
       "browser": "Browser",
       "openDesktop": "Open desktop",
@@ -225,7 +265,185 @@
       "skillsConfigured": "Skills (configured)",
       "skillsUsed": "Skills",
       "mcpConfigured": "MCP servers (configured)",
-      "mcp": "MCP servers"
+      "mcp": "MCP servers",
+      "pluginsConfigured": "Presets (configured)"
+    },
+    "typingWords": [
+      "Accomplishing",
+      "Actioning",
+      "Actualizing",
+      "Baking",
+      "Brewing",
+      "Calculating",
+      "Cerebrating",
+      "Churning",
+      "Clauding",
+      "Coalescing",
+      "Cogitating",
+      "Computing",
+      "Conjuring",
+      "Considering",
+      "Cooking",
+      "Crafting",
+      "Creating",
+      "Crunching",
+      "Deliberating",
+      "Determining",
+      "Doing",
+      "Effecting",
+      "Finagling",
+      "Forging",
+      "Forming",
+      "Generating",
+      "Hatching",
+      "Herding",
+      "Honking",
+      "Hustling",
+      "Ideating",
+      "Inferring",
+      "Manifesting",
+      "Marinating",
+      "Moseying",
+      "Mulling",
+      "Mustering",
+      "Musing",
+      "Noodling",
+      "Percolating",
+      "Pondering",
+      "Processing",
+      "Puttering",
+      "Reticulating",
+      "Ruminating",
+      "Schlepping",
+      "Shucking",
+      "Simmering",
+      "Smooshing",
+      "Spinning",
+      "Stewing",
+      "Synthesizing",
+      "Thinking",
+      "Transmuting",
+      "Vibing",
+      "Working"
+    ],
+    "collapseRightPanel": "Collapse output panel",
+    "expandRightPanel": "Expand output panel",
+    "toolCards": {
+      "tools": {
+        "skill": "Skill",
+        "task": "Run task",
+        "askUserQuestion": "Ask user",
+        "bash": "Run command",
+        "edit": "Edit file",
+        "read": "Read file",
+        "write": "Write file",
+        "glob": "Match files",
+        "grep": "Search text",
+        "notebookEdit": "Edit notebook",
+        "webFetch": "Fetch webpage",
+        "webSearch": "Search web",
+        "todoWrite": "Update todos",
+        "bashOutput": "Command output",
+        "killBash": "Terminate command",
+        "exitPlanMode": "Exit plan mode",
+        "listMcpResources": "List MCP resources",
+        "readMcpResource": "Read MCP resource",
+        "browser": "Browser",
+        "tool": "Tool"
+      },
+      "summary": {
+        "questions": "{{count}} questions",
+        "todos": "{{count}} todos",
+        "items": "{{count}} items"
+      },
+      "fields": {
+        "description": "Description",
+        "prompt": "Prompt",
+        "subagentType": "Subagent",
+        "questions": "Questions",
+        "question": "Question",
+        "options": "Options",
+        "command": "Command",
+        "timeout": "Timeout",
+        "runInBackground": "Background",
+        "glob": "Glob filter",
+        "type": "Type",
+        "outputMode": "Output mode",
+        "ignoreCase": "Ignore case",
+        "showLineNumber": "Line number",
+        "beforeContext": "Before context",
+        "afterContext": "After context",
+        "context": "Context",
+        "headLimit": "Head limit",
+        "multiline": "Multiline",
+        "filePath": "File path",
+        "oldString": "Old text",
+        "newString": "New text",
+        "replaceAll": "Replace all",
+        "newSource": "New source",
+        "content": "Content",
+        "offset": "Offset",
+        "limit": "Limit",
+        "pattern": "Pattern",
+        "path": "Path",
+        "query": "Query",
+        "url": "URL",
+        "statusCode": "Status code",
+        "searchPath": "Search path",
+        "allowedDomains": "Allowed domains",
+        "blockedDomains": "Blocked domains",
+        "filter": "Filter",
+        "href": "Href",
+        "selector": "Selector",
+        "text": "Text",
+        "role": "Role",
+        "name": "Name",
+        "value": "Value",
+        "button": "Button",
+        "key": "Key",
+        "server": "Server",
+        "uri": "URI",
+        "notebookPath": "Notebook path",
+        "editMode": "Edit mode",
+        "cellId": "Cell ID",
+        "cellType": "Cell type",
+        "shellId": "Shell ID",
+        "bashId": "Bash ID",
+        "status": "Status",
+        "killed": "Killed",
+        "exitCode": "Exit code",
+        "approved": "Approved",
+        "answer": "Answer",
+        "output": "Output",
+        "result": "Result",
+        "usage": "Usage",
+        "duration": "Duration",
+        "cost": "Cost",
+        "total": "Total",
+        "message": "Message",
+        "bytes": "Bytes",
+        "replacements": "Replacements",
+        "totalLines": "Total lines",
+        "linesReturned": "Returned lines",
+        "mimeType": "MIME type",
+        "fileSize": "File size",
+        "editType": "Edit type",
+        "finalUrl": "Final URL",
+        "totalResults": "Total results",
+        "totalMatches": "Total matches",
+        "matches": "Matches",
+        "files": "Files",
+        "results": "Results",
+        "resources": "Resources",
+        "stats": "Stats",
+        "contents": "Contents",
+        "multiSelect": "Multi-select"
+      },
+      "text": {
+        "rawOutput": "Raw output",
+        "structured": "Structured data",
+        "empty": "No data"
+      }
     }
   },
   "status": {
@@ -298,7 +516,8 @@
         "browser": "Browser",
         "terminal": "Terminal"
       },
-      "limitHint": "Showing only the first {{limit}} steps"
+      "limitHint": "Showing only the first {{limit}} steps",
+      "liveLabel": "Live"
     },
     "browser": {
       "screenshotAlt": "Browser screenshot",
@@ -326,10 +545,11 @@
     "viewer": {
       "loadingEngine": "Loading preview engine...",
       "loadingDoc": "Reading document...",
+      "parseError": "Failed to parse Excalidraw file",
       "fetchError": "Failed to fetch document content",
       "retry": "Retry",
       "selectFile": "Please select a file from the right to preview",
-      "supportedFormats": "Supports PDF, Office documents and common image formats",
+      "supportedFormats": "Supports PDF, Office documents, common image formats, MP4 videos, XMind files, .excalidraw files, and .drawio files",
       "processing": "File processing",
       "notSupported": "Preview not supported for this format",
       "openInNewWindow": "Open in new window",
@@ -337,11 +557,12 @@
     },
     "summary": {
       "total": "Total",
+      "totalFiles": "files",
       "added": "Added",
       "modified": "Modified",
       "deleted": "Deleted",
       "renamed": "Renamed",
-      "lineChanges": "line changes"
+      "totalfiles": "files"
     }
   },
   "search": {
@@ -353,8 +574,22 @@
   },
   "library": {
     "title": "Capabilities",
-    "subtitle": "Manage your skills, plugins and tools",
+    "subtitle": "Manage your skills, presets and tools",
     "comingSoon": "Coming Soon",
+    "mobile": {
+      "back": "Back to capabilities"
+    },
+    "sidebar": {
+      "title": "Capability Shortcuts",
+      "description": "Select a capability to jump to its configuration.",
+      "mobile": "Browse capabilities",
+      "groups": {
+        "core": "Core",
+        "automation": "Automation",
+        "integrations": "Integrations",
+        "labs": "Labs"
+      }
+    },
     "skillsStore": {
       "title": "Skills",
       "description": "Browse and install community-contributed AI skills",
@@ -376,9 +611,18 @@
       "feature3": "Real-time monitoring",
       "action": "Manage Servers"
     },
+    "pluginsStore": {
+      "title": "Presets",
+      "description": "Browse and install capability presets"
+    },
     "envVars": {
       "title": "Environment Variables",
+      "sidebarTitle": "Environment Variables",
       "description": "Store API keys and secrets used by skills and MCP servers.",
+      "header": {
+        "title": "Environment Variables",
+        "add": "Add Variable"
+      },
       "copied": "Copied to clipboard",
       "copy": "Copy",
       "copyError": "Copy failed",
@@ -487,6 +731,8 @@
         "title": "Slash Commands",
         "add": "Add Command"
       },
+      "searchPlaceholder": "Search commands...",
+      "addCard": "Add a slash command",
       "summary": "Commands",
       "enabled": "Enabled",
       "mode": {
@@ -524,7 +770,8 @@
         "updated": "Command updated",
         "deleted": "Command deleted",
         "error": "Action failed"
-      }
+      },
+      "empty": "No commands yet"
     },
     "subAgents": {
       "card": {
@@ -540,6 +787,7 @@
         "add": "Add Sub Agent"
       },
       "searchPlaceholder": "Search sub agents...",
+      "addCard": "Add a sub agent",
       "summary": "Sub Agents",
       "enabled": "Enabled",
       "empty": "No sub agents yet",
@@ -601,7 +849,7 @@
         "title": "Scheduled Tasks",
         "create": "Create Task",
         "createTitle": "Create Scheduled Task",
-        "trigger": "Run Now",
+        "trigger": "Execute",
         "empty": "No scheduled tasks yet"
       },
       "detail": {
@@ -713,7 +961,7 @@
     "more": {
       "title": "More",
       "description": "Explore more features and extensions",
-      "feature1": "Plugin marketplace",
+      "feature1": "Preset marketplace",
       "feature2": "Integration guides",
       "feature3": "API documentation",
       "action": "Learn More"
@@ -723,6 +971,8 @@
         "title": "Skills",
         "subtitle": "Explore and manage AI capabilities"
       },
+      "searchPlaceholder": "Search skills...",
+      "addCard": "Add a skill",
       "items": {
         "webSearch": {
           "name": "Web Search",
@@ -746,6 +996,10 @@
         }
       }
     },
+    "pluginsPage": {
+      "searchPlaceholder": "Search presets...",
+      "addCard": "Add a preset"
+    },
     "skillsManager": {
       "stats": {
         "available": "Available",
@@ -760,7 +1014,8 @@
         "user": "User"
       },
       "fields": {
-        "id": "id"
+        "id": "id",
+        "source": "Source"
       },
       "actions": {
         "install": "Install",
@@ -772,15 +1027,18 @@
         "installed": "Skill installed",
         "uninstalled": "Skill uninstalled",
         "enabled": "Skill enabled",
-        "disabled": "Skill disabled"
+        "disabled": "Skill disabled",
+        "actionFailed": "Operation failed, please try again later"
       },
-      "empty": "No skills yet"
+      "empty": "No skills yet",
+      "unknownSkill": "Unknown skill"
     },
     "skillsImport": {
       "title": "Import Skills",
       "tabs": {
         "zip": "Upload Zip",
-        "github": "GitHub URL"
+        "github": "GitHub URL",
+        "command": "Import via npx command"
       },
       "fields": {
         "zip": "Zip file",
@@ -789,11 +1047,13 @@
       },
       "placeholders": {
         "githubUrl": "https://github.com/owner/repo",
-        "name": "e.g. my-skill"
+        "name": "e.g. my-skill",
+        "command": "npx skills add https://github.com/owner/repo --skill my-skill"
       },
       "hints": {
         "github": "Defaults to main/master (public github.com repos only)",
-        "nameRequired": "SKILL.md is at archive root; a name is required"
+        "nameRequired": "SKILL.md is at archive root; a name is required",
+        "command": "Paste an add command, and we will parse the GitHub URL and --skill automatically."
       },
       "actions": {
         "back": "Back",
@@ -836,15 +1096,123 @@
         "discoverError": "Discover failed, please try again later",
         "committed": "Import succeeded",
         "commitError": "Import failed, please try again later",
-        "partialFailed": "Some skills failed to import. Please review the details."
+        "partialFailed": "Some skills failed to import. Please review the details.",
+        "commitTimeout": "Import timed out, please try again later",
+        "invalidCommand": "Unable to parse command. Please include a github.com URL."
+      },
+      "progress": {
+        "title": "Import progress",
+        "value": "Progress",
+        "jobId": "Job ID"
+      }
+    },
+    "pluginsManager": {
+      "stats": {
+        "enabled": "Enabled"
+      },
+      "scope": {
+        "system": "System",
+        "user": "User"
+      },
+      "fields": {
+        "id": "id",
+        "source": "Source"
+      },
+      "actions": {
+        "install": "Install",
+        "uninstall": "Uninstall"
+      },
+      "toasts": {
+        "loadError": "Failed to load presets",
+        "actionError": "Operation failed, please try again later",
+        "installed": "Preset installed",
+        "uninstalled": "Preset uninstalled",
+        "enabled": "Preset enabled",
+        "disabled": "Preset disabled",
+        "actionFailed": "Operation failed, please try again later",
+        "exclusiveEnabled": "(Other presets were turned off)"
+      },
+      "empty": "No presets yet",
+      "unknownPlugin": "Unknown preset"
+    },
+    "pluginsImport": {
+      "title": "Import Presets",
+      "description": "Upload a preset zip or import from a public GitHub repository.",
+      "relativePath": "Relative path",
+      "tabs": {
+        "zip": "Upload Zip",
+        "github": "GitHub URL"
+      },
+      "fields": {
+        "zip": "Zip file",
+        "githubUrl": "GitHub public repo URL",
+        "nameOverride": "Preset name"
+      },
+      "placeholders": {
+        "githubUrl": "https://github.com/owner/repo",
+        "name": "e.g. my-preset"
+      },
+      "hints": {
+        "github": "Defaults to main/master (public github.com repos only)"
+      },
+      "actions": {
+        "back": "Back",
+        "discover": "Discover",
+        "discovering": "Discovering...",
+        "commit": "Import & Install",
+        "committing": "Importing..."
+      },
+      "preview": {
+        "found": "Found",
+        "items": "preset definitions",
+        "overwrite": "will overwrite",
+        "overwriteItems": "existing presets",
+        "willOverwrite": "Overwrite",
+        "root": "Root",
+        "path": "Path",
+        "unnamed": "Unnamed",
+        "pagination": {
+          "page": "Page {{page}} / {{pages}}",
+          "prev": "Previous",
+          "next": "Next"
+        },
+        "selection": {
+          "selectPage": "Select page",
+          "clearPage": "Clear page selection",
+          "selectAll": "Select all",
+          "clearAll": "Clear all selections"
+        }
+      },
+      "result": {
+        "title": "Import result",
+        "success": "Success",
+        "failed": "Failed"
+      },
+      "toasts": {
+        "missingZip": "Please choose a zip file",
+        "missingGithubUrl": "Please enter a GitHub URL",
+        "discovered": "Discovered. Please confirm what to import.",
+        "discoverError": "Discover failed, please try again later",
+        "committed": "Import succeeded",
+        "commitError": "Import failed, please try again later",
+        "partialFailed": "Some presets failed to import. Please review the details.",
+        "commitTimeout": "Import timed out, please try again later"
+      },
+      "progress": {
+        "title": "Import progress",
+        "value": "Progress",
+        "jobId": "Job ID"
       }
     },
     "mcpLibrary": {
       "header": {
         "title": "MCP Servers",
         "subtitle": "Manage Model Context Protocol integrations",
-        "settings": "Global Settings"
+        "settings": "Global Settings",
+        "add": "Add MCP"
       },
+      "searchPlaceholder": "Search servers...",
+      "addCard": "Add an MCP",
       "status": {
         "enabled": "Enabled",
         "disabled": "Disabled"
@@ -881,7 +1249,26 @@
         "enabled": "MCP server enabled",
         "disabled": "MCP server disabled",
         "uninstalled": "MCP server uninstalled",
-        "error": "Operation failed, please try again"
+        "error": "Operation failed, please try again",
+        "actionFailed": "Operation failed, please try again",
+        "created": "MCP server created",
+        "updated": "MCP server updated"
+      }
+    },
+    "sources": {
+      "github": "GitHub",
+      "zip": "ZIP",
+      "system": "System",
+      "manual": "Manual",
+      "unknown": "Unknown"
+    },
+    "presets": {
+      "title": "Presets",
+      "description": "Manage reusable capability presets"
+    },
+    "presetsPage": {
+      "header": {
+        "title": "Presets"
       }
     }
   },
@@ -896,6 +1283,7 @@
   },
   "project": {
     "subtitle": "{{count}} tasks",
+    "titleWithCount": "{{name}} · {{count}} tasks",
     "share": "Share Project",
     "settings": "Project Settings",
     "rename": "Rename Project",
@@ -921,11 +1309,16 @@
   },
   "common": {
     "cancel": "Cancel",
+    "close": "Close",
     "create": "Create",
     "delete": "Delete",
+    "deleted": "Deleted",
+    "edit": "Edit",
     "save": "Save",
+    "saving": "Saving...",
     "confirm": "Confirm",
-    "enabled": "Enabled"
+    "enabled": "Enabled",
+    "disabled": "Disabled"
   },
   "pagination": {
     "previous": "Previous",
@@ -934,5 +1327,393 @@
     "of": "/ {{total}}",
     "rowsPerPage": "Rows per page",
     "items": "items"
+  },
+  "settings": {
+    "dialogTitle": "Settings",
+    "sidebar": {
+      "account": "Account",
+      "settings": "Settings",
+      "models": "Models",
+      "usage": "Usage",
+      "shortcuts": "Shortcuts"
+    },
+    "upgrade": "Upgrade",
+    "credits": "Credits",
+    "freeCredits": "Free credits",
+    "dailyRefresh": "Daily refresh credits",
+    "dailyRefreshHint": "Refreshes to {{max}} every day at {{time}}",
+    "generalSettings": "General Settings",
+    "darkMode": "Dark mode",
+    "backend": "Backend",
+    "modelConfigTitle": "Model Configuration",
+    "modelGlm": "GLM-4.7",
+    "modelGlmDescription": "Enable GLM model for task execution",
+    "apiKeys": "API Keys",
+    "openAiApiKey": "OpenAI API Key",
+    "openAiApiKeyHint": "Used for OpenAI-compatible models.",
+    "openAiApiKeyPlaceholder": "Enter your OpenAI API key",
+    "openAiBaseUrl": "OpenAI Base URL",
+    "openAiBaseUrlHint": "Override the default OpenAI API endpoint.",
+    "openAiBaseUrlPlaceholder": "https://api.openai.com/v1",
+    "anthropicApiKey": "Anthropic API Key",
+    "anthropicApiKeyHint": "Used for Anthropic-compatible models.",
+    "anthropicApiKeyPlaceholder": "Enter your Anthropic API key",
+    "anthropicBaseUrl": "Anthropic Base URL",
+    "anthropicBaseUrlHint": "Override the default Anthropic API endpoint.",
+    "anthropicBaseUrlPlaceholder": "https://api.anthropic.com",
+    "claudeCode": "Claude Code",
+    "language": "Language",
+    "english": "English",
+    "simplifiedChinese": "简体中文",
+    "noUsageData": "No usage data yet",
+    "getHelp": "Get Help",
+    "getHelpUrl": "https://github.com/poco-ai/poco-agent/issues",
+    "theme": "Theme",
+    "systemMode": "System",
+    "lightMode": "Light mode",
+    "claude": "Claude",
+    "french": "Français",
+    "japanese": "日本語",
+    "german": "Deutsch",
+    "russian": "Русский",
+    "shortcuts": {
+      "title": "Keyboard Shortcuts",
+      "description": "Read-only shortcut reference for the current app version.",
+      "currentPlatform": "Current: {{platform}}",
+      "alternatePlatform": "Also on {{platform}}",
+      "or": "or",
+      "platform": {
+        "mac": "macOS",
+        "windows": "Windows"
+      },
+      "items": {
+        "toggleMainSidebar": {
+          "action": "Toggle main sidebar",
+          "hint": "Collapse or expand the primary left sidebar."
+        },
+        "togglePlanMode": {
+          "action": "Switch mode (planning)",
+          "hint": "Cycle composer mode while the main input is focused."
+        },
+        "switchPromptHistory": {
+          "action": "Browse prompt history",
+          "hint": "Use in chat input to recall previous prompts."
+        },
+        "slashCommand": {
+          "action": "Slash command",
+          "hint": "Type / to open slash command suggestions."
+        },
+        "search": {
+          "action": "Global search",
+          "hint": "Open or close global search dialog."
+        },
+        "toggleOutputPanel": {
+          "action": "Toggle output panel",
+          "hint": "Collapse or expand computer/artifacts panel in chat."
+        },
+        "jumpUserPrompts": {
+          "action": "Jump user prompts",
+          "hint": "When output panel is collapsed, use J/K to jump between user messages."
+        },
+        "openSettings": {
+          "action": "Open settings",
+          "hint": "Open the settings dialog."
+        }
+      }
+    }
+  },
+  "validation": {
+    "projectNameRequired": "Please enter a project name",
+    "selectProject": "Please select a project",
+    "missingTaskId": "Missing task ID",
+    "taskContentRequired": "Please enter task content",
+    "selectExecutionTime": "Please select execution time",
+    "nightlyNoTime": "Nightly execution does not support setting execution time",
+    "missingSessionId": "Missing session ID",
+    "missingToolUseId": "Missing tool use ID",
+    "messageContentRequired": "Please enter message content",
+    "sessionNameRequired": "Please enter session name",
+    "sessionNameTooLong": "Session name too long"
+  },
+  "user": {
+    "plan": {
+      "free": "Free"
+    },
+    "credits": {
+      "unlimited": "Unlimited"
+    }
+  },
+  "fileSidebar": {
+    "title": "File List",
+    "fileList": "File List",
+    "downloadAll": "Download all",
+    "noFiles": "No files yet",
+    "downloadStarted": "Starting workspace archive download",
+    "downloadStart": "Starting workspace archive download",
+    "archiveNotAvailable": "Archive file not available yet",
+    "archiveUnavailable": "Archive file not available yet",
+    "downloadFailed": "Download failed"
+  },
+  "pullToRefresh": {
+    "refreshing": "Refreshing...",
+    "releaseToRefresh": "Release to refresh",
+    "pullToRefresh": "Pull to refresh"
+  },
+  "usageTooltip": {
+    "currentSession": "Current session:",
+    "duration": "Duration:",
+    "tokens": "Tokens",
+    "usageStatistics": "Usage statistics",
+    "usageStats": "Usage stats:",
+    "today": "Today:",
+    "thisWeek": "This week:",
+    "thisMonth": "This month:",
+    "durationFormat": "{{mins}}m {{secs}}s"
+  },
+  "cardNav": {
+    "turnOffAll": "Turn off all",
+    "turnOnAll": "Turn on all",
+    "noMcpInstalled": "No MCP installed",
+    "noSkillsInstalled": "No skills installed",
+    "noPluginsInstalled": "No presets installed",
+    "fallbackMcp": "MCP #{{id}}",
+    "fallbackSkill": "Skill #{{id}}",
+    "fallbackPreset": "Preset #{{id}}",
+    "oneClickClose": "Turn off all",
+    "notInstalledMcp": "No MCP installed",
+    "notInstalledSkill": "No skills installed",
+    "mcp": "MCP",
+    "skills": "Skills",
+    "plugins": "Presets",
+    "apps": "Apps",
+    "comingSoon": "Coming soon",
+    "clickForDetails": "Click for details",
+    "connectTools": "Connect your tools to Poco"
+  },
+  "fileChange": {
+    "previewDisabled": "Executing, preview not available",
+    "executingNoPreview": "Executing, preview not available",
+    "previewFile": "Preview file",
+    "linesAdded": "lines added",
+    "linesDeleted": "lines deleted",
+    "totalChanges": "{{count}} line changes",
+    "viewDiff": "View diff"
+  },
+  "computerPanel": {
+    "all": "All"
+  },
+  "chatPanel": {
+    "fileAttachment": "[+{{count}} files]",
+    "skillsUsed": "Skills used",
+    "conversationHistory": "Conversation history",
+    "loading": "Loading...",
+    "noHistory": "No history yet",
+    "session": "Session",
+    "status": "Status:"
+  },
+  "artifactsPanel": {
+    "documentPreview": "Document preview",
+    "workspacePreview": "Workspace file preview",
+    "sidebarOpen": "Sidebar open",
+    "sidebarClosed": "Sidebar closed",
+    "sidebarClose": "Sidebar close",
+    "fileChanges": "File changes",
+    "totalFiles": "files"
+  },
+  "mcpGrid": {
+    "availableServers": "Available servers: {{count}}",
+    "enabledServers": "Enabled: {{count}}",
+    "turnOffAll": "Turn off all",
+    "noMcpServers": "No MCP servers yet",
+    "system": "System",
+    "user": "User",
+    "uninstall": "Uninstall",
+    "settings": "Settings"
+  },
+  "skillsGrid": {
+    "turnOffAll": "Turn off all"
+  },
+  "pluginsGrid": {
+    "turnOffAll": "Turn off all"
+  },
+  "mcpSettings": {
+    "configureServer": "Configure MCP Server",
+    "fullJsonConfig": "Complete JSON configuration",
+    "mcpName": "MCP Name",
+    "jsonConfig": "Complete JSON configuration",
+    "invalidJson": "Invalid JSON configuration",
+    "nameRequired": "Name is required",
+    "saveFailed": "Failed to save MCP server"
+  },
+  "queryActions": {
+    "taskNameRequired": "Please enter a task name",
+    "renameFailed": "Failed to rename",
+    "creditUnlimited": "Unlimited credits"
+  },
+  "chatInput": {
+    "connect": "Connect",
+    "cancelTask": "Cancel task"
+  },
+  "chatContainer": {
+    "loading": "Loading..."
+  },
+  "projectDialogs": {
+    "cancel": "Cancel",
+    "create": "Create",
+    "selectProject": "Select a project to move this task",
+    "noProject": "No project",
+    "move": "Move"
+  },
+  "connectors": {
+    "title": "Connectors",
+    "apps": "Apps",
+    "search": "Search connectors",
+    "inDevelopment": "In development",
+    "details": "Details",
+    "connectNow": "Connect now",
+    "connected": "Connected",
+    "enabled": "Enabled",
+    "coreCapabilities": "Core capabilities",
+    "gmail": {
+      "description": "Draft emails, search conversations, and quickly generate summaries"
+    },
+    "gcal": {
+      "description": "View schedules, optimize time and activity management"
+    },
+    "gdrive": {
+      "description": "Quickly access files, intelligently search content, and let Poco help you manage documents more efficiently"
+    },
+    "outlookMail": {
+      "description": "Seamlessly write, search, and manage your Outlook emails in Poco"
+    },
+    "github": {
+      "description": "Manage code repositories, collaborative development, and code review"
+    },
+    "slack": {
+      "description": "Read and write Slack conversations in Poco"
+    },
+    "notion": {
+      "description": "Search and update content, automate workflows"
+    },
+    "filesystem": {
+      "description": "Allow reading and writing files on the local file system"
+    },
+    "postgres": {
+      "description": "Read-only database access for PostgreSQL"
+    },
+    "sentry": {
+      "description": "Retrieve and analyze error reports from Sentry"
+    },
+    "webSearch": {
+      "description": "Perform real-time web searches to retrieve up-to-date information."
+    },
+    "codeInterpreter": {
+      "description": "Execute Python code safely in a sandboxed environment."
+    }
+  },
+  "connectorCapabilities": {
+    "automation": {
+      "title": "Automation workflows",
+      "description": "Event-driven triggering for complex task flows"
+    },
+    "assistant": {
+      "title": "Smart collaboration assistant",
+      "description": "AI deeply understands context and provides suggestions"
+    },
+    "security": {
+      "title": "Security management system",
+      "description": "Enterprise-level encryption to ensure data security"
+    },
+    "search": {
+      "title": "Global search index",
+      "description": "Cross-platform query with millisecond-level recall"
+    }
+  },
+  "mcpHeader": {
+    "mcpManagement": "MCP server management",
+    "searchPlaceholder": "Search servers...",
+    "addMcp": "Add MCP"
+  },
+  "skillsHeader": {
+    "skillsManagement": "Skills management"
+  },
+  "models": {
+    "defaultTag": "Default",
+    "claudeSonnet45": {
+      "description": "Balance speed and intelligence"
+    },
+    "claudeOpus45": {
+      "description": "The most powerful model"
+    },
+    "gpt4Turbo": {
+      "description": "Fast and efficient"
+    }
+  },
+  "creditsPopover": {
+    "proPlan": "Pro Plan",
+    "credits": "Credits",
+    "unlimited": "Unlimited",
+    "freeCredits": "Free credits",
+    "dailyRefresh": "Daily refresh credits",
+    "dailyRefreshHint": "Refreshes to 9999 every day at 00:00",
+    "viewUsage": "View usage"
+  },
+  "actions": {
+    "processing": "Processing..."
+  },
+  "filesidebar": {
+    "title": "File List"
+  },
+  "onboarding": {
+    "close": "Close tutorial",
+    "skip": "Skip",
+    "back": "Back",
+    "next": "Next",
+    "done": "Finish",
+    "progress": "Step {{current}} / {{total}}",
+    "targetUnavailable": "This area is collapsed or unavailable right now. Continue to the next step.",
+    "letsStart": "Let's get started.",
+    "steps": {
+      "welcome": {
+        "title": "Welcome to Poco",
+        "description": "This quick tutorial highlights the core areas you will use most often. You can reopen it anytime from the desktop sidebar quick menu or the mobile Settings page."
+      },
+      "workspace": {
+        "title": "Main workspace",
+        "description": "Your main content appears here, including task creation, chat execution, and capability management pages."
+      },
+      "newTask": {
+        "title": "Create a new task",
+        "description": "Use this button to quickly start a fresh task and jump into execution."
+      },
+      "projects": {
+        "title": "Projects section",
+        "description": "Create, rename, and manage projects here to organize work by project."
+      },
+      "capabilities": {
+        "title": "Capabilities entry",
+        "description": "Start from the sidebar entry, then open the Skills page for detailed management."
+      },
+      "modeToggle": {
+        "title": "Pick a run mode",
+        "description": "Switch between Task, Step-by-step, and Scheduled modes before sending your prompt."
+      },
+      "composer": {
+        "title": "Task composer",
+        "description": "Write instructions, attach files, set repository options, and launch execution from here."
+      },
+      "quickMenu": {
+        "title": "Quick settings menu",
+        "description": "Use this menu for language/theme/backend preferences, and restart this tutorial anytime."
+      },
+      "taskList": {
+        "title": "Task list",
+        "description": "This list lets you revisit all unassigned tasks and quickly reopen any recent execution session."
+      },
+      "skillsDetail": {
+        "title": "Skills page",
+        "description": "This is the Skills view inside Capabilities, where you browse and manage skills."
+      }
+    }
   }
 }

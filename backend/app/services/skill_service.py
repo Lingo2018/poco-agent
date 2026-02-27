@@ -6,7 +6,9 @@ from app.core.errors.error_codes import ErrorCode
 from app.core.errors.exceptions import AppException
 from app.models.skill import Skill
 from app.repositories.skill_repository import SkillRepository
+from app.schemas.source import SourceInfo
 from app.schemas.skill import SkillCreateRequest, SkillResponse, SkillUpdateRequest
+from app.services.source_utils import infer_capability_source
 
 
 _SKILL_NAME_PATTERN = re.compile(r"^[A-Za-z0-9._-]+$")
@@ -53,6 +55,7 @@ class SkillService:
             scope=scope,
             owner_user_id=user_id,
             entry=request.entry or {},
+            source={"kind": "manual"},
         )
 
         SkillRepository.create(db, skill)
@@ -129,10 +132,16 @@ class SkillService:
 
     @staticmethod
     def _to_response(skill: Skill) -> SkillResponse:
+        source_dict = infer_capability_source(
+            scope=skill.scope,
+            source=getattr(skill, "source", None),
+            entry=skill.entry,
+        )
         return SkillResponse(
             id=skill.id,
             name=skill.name,
             entry=skill.entry,
+            source=SourceInfo.model_validate(source_dict),
             scope=skill.scope,
             owner_user_id=skill.owner_user_id,
             created_at=skill.created_at,

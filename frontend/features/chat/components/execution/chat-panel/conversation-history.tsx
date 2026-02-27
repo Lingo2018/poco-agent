@@ -8,6 +8,7 @@ import { listSessionsAction } from "@/features/chat/actions/query-actions";
 import type { SessionResponse } from "@/features/chat/types";
 import { formatDistanceToNow } from "date-fns";
 import { zhCN } from "date-fns/locale";
+import { useT } from "@/lib/i18n/client";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface ConversationHistoryProps {
@@ -15,6 +16,7 @@ interface ConversationHistoryProps {
 }
 
 export function ConversationHistory({}: ConversationHistoryProps) {
+  const { t } = useT("translation");
   const [history, setHistory] = React.useState<SessionResponse[]>([]);
   const [loading, setLoading] = React.useState(true);
 
@@ -37,16 +39,20 @@ export function ConversationHistory({}: ConversationHistoryProps) {
       <CardHeader className="py-3 px-4">
         <CardTitle className="text-sm font-semibold flex items-center gap-2">
           <History className="size-4 text-foreground" />
-          <span>对话历史</span>
+          <span>{t("chatPanel.conversationHistory")}</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="px-4 pb-4 pt-0">
         <ScrollArea className="h-[100px]">
           <div className="space-y-2 pr-2">
             {loading ? (
-              <p className="text-xs text-muted-foreground p-2">加载中...</p>
+              <p className="text-xs text-muted-foreground p-2">
+                {t("chatPanel.loading")}
+              </p>
             ) : history.length === 0 ? (
-              <p className="text-xs text-muted-foreground p-2">暂无历史记录</p>
+              <p className="text-xs text-muted-foreground p-2">
+                {t("chatPanel.noHistory")}
+              </p>
             ) : (
               history.map((item) => (
                 <div
@@ -60,7 +66,8 @@ export function ConversationHistory({}: ConversationHistoryProps) {
                     <div className="flex items-center justify-between gap-2">
                       <p className="text-xs font-medium truncate">
                         {/* Fallback title using ID since backend doesn't provide title yet */}
-                        会话 {item.session_id.substring(0, 6)}
+                        {t("chatPanel.session")}{" "}
+                        {item.session_id.substring(0, 6)}
                       </p>
                       <span className="text-xs text-muted-foreground shrink-0">
                         {formatDistanceToNow(new Date(item.updated_at), {
@@ -70,7 +77,7 @@ export function ConversationHistory({}: ConversationHistoryProps) {
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground truncate mt-0.5">
-                      状态: {item.status}
+                      {t("chatPanel.status")}: {item.status}
                     </p>
                   </div>
                 </div>

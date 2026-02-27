@@ -18,7 +18,7 @@ export function SkillUsageCard({ skills }: SkillUsageCardProps) {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "completed":
-        return <CheckCircle2 className="size-3 text-success" />;
+        return <CheckCircle2 className="size-3 text-primary" />;
       case "failed":
         return <XCircle className="size-3 text-destructive" />;
       case "running":
@@ -56,7 +56,7 @@ export function SkillUsageCard({ skills }: SkillUsageCardProps) {
       <CardHeader className="py-3 px-4 shrink-0">
         <CardTitle className="text-sm font-semibold flex items-center gap-2">
           <Zap className="size-4 text-foreground" />
-          <span className="flex-1">技能使用</span>
+          <span className="flex-1">{t("chatPanel.skillsUsed")}</span>
           <Badge variant="outline" className="text-xs">
             {skills.length}
           </Badge>

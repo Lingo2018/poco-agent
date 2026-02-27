@@ -5,20 +5,14 @@ import { useT } from "@/lib/i18n/client";
  * Empty state component for artifacts panel
  */
 interface ArtifactsEmptyProps {
-  sessionStatus?:
-    | "running"
-    | "accepted"
-    | "completed"
-    | "failed"
-    | "canceled"
-    | "stopped";
+  sessionStatus?: "pending" | "running" | "completed" | "failed" | "canceled";
 }
 
 /**
  * Empty state component for artifacts panel
  */
 export function ArtifactsEmpty({ sessionStatus }: ArtifactsEmptyProps) {
-  const isRunning = sessionStatus === "running" || sessionStatus === "accepted";
+  const isRunning = sessionStatus === "running" || sessionStatus === "pending";
   const { t } = useT("translation");
 
   if (isRunning) {

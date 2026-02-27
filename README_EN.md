@@ -3,7 +3,7 @@
 
 # Poco: Your Pocket Coworker
 
-**A cloud-based Claude Code Agent Platform delivering a Manus-like experience**
+A cloud-based Claude Code Agent Platform delivering a Manus-like experience
 
 Think of it as a **safer** (sandboxed isolation), **more beautiful** (modern UI), and **simpler to configure** (ready-to-use) alternative to **OpenClaw**.
 
@@ -14,7 +14,7 @@ Think of it as a **safer** (sandboxed isolation), **more beautiful** (modern UI)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green.svg)](https://fastapi.tiangolo.com/)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/poco-ai/poco-agent)
 
-[English](./README_EN.md) | [中文](./README_zh.md)
+[English](./README_EN.md) | [中文](./README.md)
 
 </div>
 
@@ -32,40 +32,23 @@ Think of it as a **safer** (sandboxed isolation), **more beautiful** (modern UI)
 ![home](assets/home.png)
 
 <details>
-<summary><strong>Click to view more feature screenshots</strong></summary>
+<summary><strong>Click to view more feature demos</strong></summary>
 <br>
 
-**1. Beautiful frontend output rendering**
-
-![output](assets/output.png)
-
-**2. Full MCP/skills support with easy configuration**
-
-![home](assets/capability.png)
-
-![skills](assets/skills.png)
-
-**3. Scheduled tasks**
-
-![schedule](assets/schedule.png)
-
-</details>
-
-<details>
-<summary><strong>Click to view feature demos</strong></summary>
-<br>
-
-**1. Mobile operation demo**
-Perfectly adapted for mobile - your AI Coworker in your pocket.
-![Demo4](https://github.com/user-attachments/assets/ccf680bb-358c-4fc9-ad97-50f75b5ea3ac)
-
-**2. Coding and output preview**
-Create a game through a few conversations with live preview on the right.
-![Demo1](https://github.com/user-attachments/assets/0ef59c4c-8363-44a6-b9ed-7005ccfd71cb)
-
-**3. Complex file processing**
-Supports reading and analyzing various project files.
-![Demo3](https://github.com/user-attachments/assets/8135dab4-6396-4af8-97af-6f665853fb56)
+1. Artifact rendering, supports browser and terminal review
+   ![output](assets/output.png)
+   ![output-computer](assets/output-computer.png)
+   <video src="https://github.com/user-attachments/assets/3d732f0b-3f32-4aca-ab61-ec28c5fd274e" controls="controls"></video>
+   ![HTML](https://github.com/user-attachments/assets/0ef59c4c-8363-44a6-b9ed-7005ccfd71cb)
+   ![Multiple-file](https://github.com/user-attachments/assets/8135dab4-6396-4af8-97af-6f665853fb56)
+2. Full Plugin/MCP/Skills/Subagent/Slash Commands support with easy configuration
+   ![mcp](assets/mcp.png)
+   ![skills](assets/skills.png)
+   <video src="https://github.com/user-attachments/assets/60df5a0f-c338-44ad-af03-e1ebb98d5743" controls="controls"></video>
+3. Scheduled tasks
+   ![schedule](assets/schedule.png)
+4. Mobile optimization - your AI Coworker in your pocket
+   <video src="https://github.com/user-attachments/assets/a8364763-8edf-4bb1-b873-5c27755a5712" controls="controls"></video>
 
 </details>
 
@@ -77,15 +60,9 @@ Run the interactive setup script to automatically generate configuration and sta
 ./scripts/quickstart.sh
 ```
 
-Visit: http://localhost:3000 after startup completes.
+Visit: `http://localhost:3000` after startup completes.
 
-For detailed deployment documentation and troubleshooting, please refer to the [Deployment Guide](./docs/README.md).
-
-## Community
-
-Scan to join our WeChat group:
-
-<img src="assets/wx_group.jpg" alt="WeChat Group QR Code" width="180">
+For detailed deployment documentation and troubleshooting, please refer to the [Deployment Guide](./docs/en/README.md).
 
 ## Star History
 

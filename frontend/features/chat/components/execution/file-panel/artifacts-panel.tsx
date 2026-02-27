@@ -9,18 +9,15 @@ import { ArtifactsEmpty } from "./artifacts-empty";
 import { useArtifacts } from "./hooks/use-artifacts";
 import type { FileChange, FileNode } from "@/features/chat/types";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n/client";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 interface ArtifactsPanelProps {
   fileChanges?: FileChange[];
   sessionId?: string;
-  sessionStatus?:
-    | "running"
-    | "accepted"
-    | "completed"
-    | "failed"
-    | "canceled"
-    | "stopped";
+  sessionStatus?: "pending" | "running" | "completed" | "failed" | "canceled";
   headerAction?: React.ReactNode;
+  hideHeader?: boolean;
 }
 
 /**
@@ -47,8 +44,12 @@ export function ArtifactsPanel({
   sessionId,
   sessionStatus,
   headerAction,
+  hideHeader = false,
 }: ArtifactsPanelProps) {
+  const { t } = useT("translation");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = React.useState(false);
+  const [isExpandedPreviewOpen, setIsExpandedPreviewOpen] =
+    React.useState(false);
   const {
     files,
     selectedFile,
@@ -57,10 +58,24 @@ export function ArtifactsPanel({
     closeViewer,
     ensureFreshFile,
   } = useArtifacts({ sessionId, sessionStatus });
+  const openExpandedPreview = React.useCallback(() => {
+    setIsExpandedPreviewOpen(true);
+  }, []);
+
+  React.useEffect(() => {
+    if (viewMode !== "document" || !selectedFile) {
+      setIsExpandedPreviewOpen(false);
+    }
+  }, [selectedFile, viewMode]);
+
   const mainContent = (() => {
     if (viewMode === "document") {
       return (
-        <DocumentViewer file={selectedFile} ensureFreshFile={ensureFreshFile} />
+        <DocumentViewer
+          file={selectedFile}
+          ensureFreshFile={ensureFreshFile}
+          onOpenPreviewWindow={openExpandedPreview}
+        />
       );
     }
 
@@ -130,21 +145,34 @@ export function ArtifactsPanel({
 
   return (
     <div className="flex h-full min-h-0 flex-col min-w-0 overflow-hidden">
-      <ArtifactsHeader
-        title="文件变更"
-        selectedFile={selectedFile}
-        isSidebarCollapsed={isSidebarCollapsed}
-        onToggleSidebar={handleToggleSidebar}
-        sessionId={sessionId}
-        headerAction={headerAction}
-      />
+      {!hideHeader ? (
+        <ArtifactsHeader
+          title={t("artifactsPanel.fileChanges")}
+          selectedFile={selectedFile}
+          isSidebarCollapsed={isSidebarCollapsed}
+          onToggleSidebar={handleToggleSidebar}
+          sessionId={sessionId}
+          headerAction={headerAction}
+        />
+      ) : null}
       <div
         className={cn(
           "flex-1 min-h-0 grid grid-cols-1 gap-0 transition-all duration-200 overflow-hidden",
-          isSidebarCollapsed ? "md:grid-cols-1" : "md:grid-cols-[2fr_1fr]",
+          isSidebarCollapsed
+            ? "grid-cols-1"
+            : hideHeader
+              ? "grid-cols-[minmax(0,70%)_minmax(0,30%)]"
+              : "md:grid-cols-[minmax(0,3fr)_minmax(0,1fr)]",
         )}
       >
-        <div className="min-w-0 border-b border-border/60 bg-background md:border-b-0 overflow-hidden">
+        <div
+          className={cn(
+            "min-w-0 bg-background overflow-hidden",
+            hideHeader
+              ? "border-r border-border/60"
+              : "border-b border-border/60 md:border-b-0",
+          )}
+        >
           <div className="flex h-full flex-col overflow-hidden">
             <div className="flex-1 min-h-0 overflow-hidden p-3 sm:p-4">
               {contentNode}
@@ -152,7 +180,14 @@ export function ArtifactsPanel({
           </div>
         </div>
         {!isSidebarCollapsed && (
-          <div className="min-w-0 border-t border-border/60 bg-muted/30 md:border-t-0">
+          <div
+            className={cn(
+              "h-full w-full min-h-0 min-w-0 overflow-hidden bg-muted/30",
+              hideHeader
+                ? undefined
+                : "border-t border-border/60 md:border-t-0",
+            )}
+          >
             <FileSidebar
               files={files}
               onFileSelect={(file) => {
@@ -163,10 +198,33 @@ export function ArtifactsPanel({
                 selectFile(file);
               }}
               selectedFile={selectedFile}
+              sessionId={sessionId}
             />
           </div>
         )}
       </div>
+      <Dialog
+        open={isExpandedPreviewOpen && Boolean(selectedFile)}
+        onOpenChange={setIsExpandedPreviewOpen}
+      >
+        <DialogContent
+          className="h-[90vh] w-[80vw] max-w-[80vw] overflow-hidden border-0 bg-transparent p-0 shadow-none sm:max-w-[80vw]"
+          showCloseButton={false}
+        >
+          <DialogTitle className="sr-only">
+            {t("fileChange.previewFile")}
+          </DialogTitle>
+          <div className="h-full min-h-0 overflow-hidden">
+            <DocumentViewer
+              file={selectedFile}
+              ensureFreshFile={ensureFreshFile}
+              onClose={() => {
+                setIsExpandedPreviewOpen(false);
+              }}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

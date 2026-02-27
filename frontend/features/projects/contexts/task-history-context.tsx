@@ -1,7 +1,14 @@
+"use client";
+
 import { createContext, useContext } from "react";
+import type { TaskHistoryItem } from "@/features/projects/types";
 
 interface TaskHistoryContextValue {
   refreshTasks: () => Promise<void>;
+  touchTask: (
+    taskId: string,
+    updates: Partial<Omit<TaskHistoryItem, "id">> & { bumpToTop?: boolean },
+  ) => void;
 }
 
 const TaskHistoryContext = createContext<TaskHistoryContextValue | null>(null);

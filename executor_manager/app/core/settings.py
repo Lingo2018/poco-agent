@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import Field
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -85,7 +85,7 @@ class Settings(BaseSettings):
         default=360, alias="TASK_PULL_NIGHTLY_WINDOW_MINUTES"
     )
 
-    anthropic_token: str = Field(default="", alias="ANTHROPIC_AUTH_TOKEN")
+    anthropic_api_key: str = Field(default="", alias="ANTHROPIC_API_KEY")
     anthropic_base_url: str = Field(
         default="https://api.anthropic.com", alias="ANTHROPIC_BASE_URL"
     )
@@ -106,6 +106,7 @@ class Settings(BaseSettings):
     poco_browser_viewport_size: str = Field(
         default="1366x768", alias="POCO_BROWSER_VIEWPORT_SIZE"
     )
+    executor_timezone: str = Field(default="Asia/Shanghai", alias="EXECUTOR_TIMEZONE")
     # When the manager spawns executor containers via the Docker daemon, it maps the executor
     # service to a host port and then calls back into it. This host must be reachable from the
     # manager process itself (e.g. "localhost" on bare-metal, or "host.docker.internal" when
@@ -148,6 +149,13 @@ class Settings(BaseSettings):
         case_sensitive=False,
         extra="ignore",
     )
+
+    @model_validator(mode="after")
+    def validate_anthropic_credentials(self) -> "Settings":
+        """Ensure Anthropic API key is configured."""
+        if not (self.anthropic_api_key or "").strip():
+            raise ValueError("Missing Anthropic credential; set ANTHROPIC_API_KEY.")
+        return self
 
 
 @lru_cache

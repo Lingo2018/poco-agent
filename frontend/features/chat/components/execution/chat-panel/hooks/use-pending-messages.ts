@@ -39,7 +39,7 @@ export function usePendingMessages({
 
   // Determine if session is running/active
   const isSessionActive =
-    session?.status === "running" || session?.status === "accepted";
+    session?.status === "running" || session?.status === "pending";
   const isSessionCanceled = session?.status === "canceled";
 
   // Reset auto-send lock when session becomes active

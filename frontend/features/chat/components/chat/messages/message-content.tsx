@@ -3,13 +3,14 @@
 import * as React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
 import type { MessageBlock } from "@/features/chat/types";
 import type { ToolUseBlock, ToolResultBlock } from "@/features/chat/types";
-import { Brain } from "lucide-react";
 import { ToolChain } from "./tool-chain";
 import remarkBreaks from "remark-breaks";
+import rehypeKatex from "rehype-katex";
 import { MarkdownCode, MarkdownPre } from "@/components/shared/markdown-code";
-import { useT } from "@/lib/i18n/client";
+import { AdaptiveMarkdown } from "@/components/shared/adaptive-markdown";
 
 type LinkProps = {
   children?: React.ReactNode;
@@ -32,11 +33,11 @@ const ImgBlock = ({
 
 export function MessageContent({
   content,
+  sessionStatus,
 }: {
   content: string | MessageBlock[];
+  sessionStatus?: string;
 }) {
-  const { t } = useT("translation");
-
   // Helper function to extract text content from message
   const getTextContent = (content: string | MessageBlock[]): string => {
     const clean = (text: string) => text.replace(/\uFFFD/g, "");
@@ -64,9 +65,10 @@ export function MessageContent({
   // If content is string, render as before
   if (typeof content === "string") {
     return (
-      <div className="prose prose-base dark:prose-invert max-w-none break-words break-all w-full min-w-0 [&_pre]:whitespace-pre-wrap [&_pre]:break-words [&_code]:break-words [&_p]:break-words [&_p]:break-all [&_*]:break-words [&_*]:break-all">
+      <AdaptiveMarkdown className="prose prose-base dark:prose-invert w-full min-w-0 max-w-none overflow-hidden break-words break-all [&_pre]:whitespace-pre-wrap [&_pre]:break-words [&_code]:break-words [&_p]:break-words [&_p]:break-all [&_*]:break-words [&_*]:break-all">
         <ReactMarkdown
-          remarkPlugins={[remarkGfm, remarkBreaks]}
+          remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
+          rehypePlugins={[rehypeKatex]}
           components={{
             pre: MarkdownPre,
             code: MarkdownCode,
@@ -100,7 +102,7 @@ export function MessageContent({
             img: ImgBlock,
             table: ({ children }) => (
               <div className="overflow-x-auto my-4 rounded-lg border border-border">
-                <table className="w-full border-collapse text-sm">
+                <table className="w-full table-fixed border-collapse text-sm">
                   {children}
                 </table>
               </div>
@@ -112,12 +114,12 @@ export function MessageContent({
               <tbody className="divide-y divide-border">{children}</tbody>
             ),
             th: ({ children }) => (
-              <th className="border-b border-border px-4 py-3 text-left font-semibold text-foreground">
+              <th className="border-b border-border px-4 py-3 text-left font-semibold text-foreground break-words">
                 {children}
               </th>
             ),
             td: ({ children }) => (
-              <td className="border-b border-border px-4 py-3 text-foreground">
+              <td className="border-b border-border px-4 py-3 text-foreground break-words">
                 {children}
               </td>
             ),
@@ -125,29 +127,42 @@ export function MessageContent({
         >
           {textContent}
         </ReactMarkdown>
-      </div>
+      </AdaptiveMarkdown>
     );
   }
 
   // Handle array of blocks (Tools + Text)
-  // We need to group them: sequence of tool blocks -> ToolChain, sequence of text blocks -> Markdown
+  // We need to group them: sequence of tool/subagent blocks -> dedicated chain, sequence of text blocks -> Markdown
+  const toolUseTypeById = new Map<string, "tool" | "subagent">();
+  for (const block of content) {
+    if (block._type === "ToolUseBlock") {
+      toolUseTypeById.set(
+        block.id,
+        block.name === "Task" ? "subagent" : "tool",
+      );
+    }
+  }
+
   const groups: {
-    type: "text" | "tool" | "thinking";
+    type: "text" | "tool" | "subagent" | "thinking";
     blocks: MessageBlock[];
   }[] = [];
   let currentGroup: {
-    type: "text" | "tool" | "thinking";
+    type: "text" | "tool" | "subagent" | "thinking";
     blocks: MessageBlock[];
   } | null = null;
 
   for (const block of content) {
-    const isTool =
-      block._type === "ToolUseBlock" || block._type === "ToolResultBlock";
-    const type = isTool
-      ? "tool"
-      : block._type === "ThinkingBlock"
-        ? "thinking"
-        : "text";
+    let type: "text" | "tool" | "subagent" | "thinking";
+    if (block._type === "ToolUseBlock") {
+      type = block.name === "Task" ? "subagent" : "tool";
+    } else if (block._type === "ToolResultBlock") {
+      type = toolUseTypeById.get(block.tool_use_id) ?? "tool";
+    } else if (block._type === "ThinkingBlock") {
+      type = "thinking";
+    } else {
+      type = "text";
+    }
 
     if (!currentGroup || currentGroup.type !== type) {
       currentGroup = { type, blocks: [] };
@@ -157,13 +172,14 @@ export function MessageContent({
   }
 
   return (
-    <div className="space-y-4 w-full min-w-0">
+    <div className="w-full min-w-0 space-y-4 overflow-hidden">
       {groups.map((group, index) => {
-        if (group.type === "tool") {
+        if (group.type === "tool" || group.type === "subagent") {
           return (
             <ToolChain
               key={index}
               blocks={group.blocks as (ToolUseBlock | ToolResultBlock)[]}
+              sessionStatus={sessionStatus}
             />
           );
         } else if (group.type === "thinking") {
@@ -175,20 +191,14 @@ export function MessageContent({
           if (!thinking) return null;
 
           return (
-            <details
+            <div
               key={index}
-              className="rounded-md border border-border/60 bg-muted/20 px-3 py-2"
+              className="my-2 w-full min-w-0 max-w-full overflow-hidden pl-5"
             >
-              <summary className="cursor-pointer text-xs font-medium text-muted-foreground hover:text-foreground flex items-center gap-2 select-none">
-                <div className="flex items-center gap-1.5">
-                  <Brain className="size-3.5" />
-                  <span>{t("chat.thinkingTitle", "思考过程")}</span>
-                </div>
-              </summary>
-              <div className="mt-2 border-t border-border/50 pt-2 text-xs whitespace-pre-wrap break-words break-all font-mono text-foreground/90">
+              <pre className="whitespace-pre-wrap break-words [overflow-wrap:anywhere] font-mono text-[11px] text-muted-foreground/90">
                 {thinking}
-              </div>
-            </details>
+              </pre>
+            </div>
           );
         } else {
           const text = group.blocks
@@ -197,12 +207,13 @@ export function MessageContent({
           if (!text.trim()) return null;
 
           return (
-            <div
+            <AdaptiveMarkdown
               key={index}
-              className="prose prose-base dark:prose-invert max-w-none break-words break-all w-full min-w-0 [&_pre]:whitespace-pre-wrap [&_pre]:break-words [&_code]:break-words [&_p]:break-words [&_p]:break-all [&_*]:break-words [&_*]:break-all"
+              className="prose prose-base dark:prose-invert w-full min-w-0 max-w-none overflow-hidden break-words break-all [&_pre]:whitespace-pre-wrap [&_pre]:break-words [&_code]:break-words [&_p]:break-words [&_p]:break-all [&_*]:break-words [&_*]:break-all"
             >
               <ReactMarkdown
-                remarkPlugins={[remarkGfm, remarkBreaks]}
+                remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
+                rehypePlugins={[rehypeKatex]}
                 components={{
                   pre: MarkdownPre,
                   code: MarkdownCode,
@@ -236,7 +247,7 @@ export function MessageContent({
                   img: ImgBlock,
                   table: ({ children }) => (
                     <div className="overflow-x-auto my-4 rounded-lg border border-border">
-                      <table className="w-full border-collapse text-sm">
+                      <table className="w-full table-fixed border-collapse text-sm">
                         {children}
                       </table>
                     </div>
@@ -248,12 +259,12 @@ export function MessageContent({
                     <tbody className="divide-y divide-border">{children}</tbody>
                   ),
                   th: ({ children }) => (
-                    <th className="border-b border-border px-4 py-3 text-left font-semibold text-foreground">
+                    <th className="border-b border-border px-4 py-3 text-left font-semibold text-foreground break-words">
                       {children}
                     </th>
                   ),
                   td: ({ children }) => (
-                    <td className="border-b border-border px-4 py-3 text-foreground">
+                    <td className="border-b border-border px-4 py-3 text-foreground break-words">
                       {children}
                     </td>
                   ),
@@ -261,7 +272,7 @@ export function MessageContent({
               >
                 {text}
               </ReactMarkdown>
-            </div>
+            </AdaptiveMarkdown>
           );
         }
       })}

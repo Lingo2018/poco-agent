@@ -14,8 +14,8 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { mcpService } from "@/features/mcp/services/mcp-service";
-import type { McpDisplayItem } from "@/features/mcp/hooks/use-mcp-catalog";
+import { mcpService } from "@/features/capabilities/mcp/api/mcp-api";
+import type { McpDisplayItem } from "@/features/capabilities/mcp/hooks/use-mcp-catalog";
 
 const MCP_LIMIT = 3;
 

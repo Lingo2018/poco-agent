@@ -31,9 +31,9 @@
 - `S3_REGION`（默认 `us-east-1`；Cloudflare R2 通常建议设为 `auto`）
 - `S3_FORCE_PATH_STYLE`（默认 `true`，对 MinIO/RustFS 一般需要；Cloudflare R2 通常建议设为 `false`）
 - `S3_PRESIGN_EXPIRES`：预签名 URL 过期秒数（默认 `300`）
-- `OPENAI_API_KEY`：可选（用于会话标题自动生成等；未设置则禁用标题生成）
-- `OPENAI_BASE_URL`：可选（自定义 OpenAI 兼容网关）
-- `OPENAI_DEFAULT_MODEL`（默认 `gpt-4o-mini`）
+- `ANTHROPIC_API_KEY`：可选（用于会话标题自动生成；未设置则禁用标题生成）
+- `ANTHROPIC_BASE_URL`：可选（自定义 Anthropic API 端点/代理；默认 `https://api.anthropic.com`）
+- `DEFAULT_MODEL`（默认 `claude-sonnet-4-20250514`；会话标题生成也会使用该模型）
 - `MAX_UPLOAD_SIZE_MB`（默认 `100`）
 
 日志（3 个 Python 服务通用）：
@@ -45,7 +45,7 @@
 - `LOG_DIR`（默认 `./logs`）、`LOG_BACKUP_COUNT`（默认 `14`）
 - `LOG_SQL`（默认 `false`）：是否打印 SQLAlchemy SQL（注意敏感信息）
 
-## Executor Manager（FastAPI + APScheduler）
+## Executor Manager (FastAPI + APScheduler)
 
 必需（否则无法启动或无法调度执行）：
 
@@ -55,6 +55,7 @@
 - `EXECUTOR_IMAGE`：Executor 镜像名（Executor Manager 会通过 Docker API 拉起该镜像）。默认建议：`ghcr.io/poco-ai/poco-executor:lite`
 - `EXECUTOR_BROWSER_IMAGE`：可选，启用浏览器/桌面能力时使用的 Executor 镜像（用于 `browser_enabled=true`）。默认建议：`ghcr.io/poco-ai/poco-executor:full`
 - `POCO_BROWSER_VIEWPORT_SIZE`：可选，浏览器视口大小（影响截图与响应式布局），格式如 `1366x768` / `1920x1080`。该值由 Executor Manager 透传给 Executor 容器（仅 `browser_enabled=true` 时）。
+- `EXECUTOR_TIMEZONE`：可选，透传给 Executor 容器的时区（IANA 时区名，如 `Asia/Shanghai`、`UTC`）。默认 `Asia/Shanghai`。
 - `EXECUTOR_PUBLISHED_HOST`：Executor Manager 访问“已映射到宿主机端口”的 Executor 容器时使用的 host（本地裸跑一般是 `localhost`；Compose 内推荐 `host.docker.internal`）
 - `WORKSPACE_ROOT`：工作区根目录（**必须是宿主机路径**，因为会被 bind mount 到 Executor 容器）
 - `S3_ENDPOINT` / `S3_ACCESS_KEY` / `S3_SECRET_KEY` / `S3_BUCKET`：用于导出 workspace 到对象存储（否则相关接口会失败）
@@ -62,7 +63,7 @@
 
 执行模型（跑任务时必需）：
 
-- `ANTHROPIC_AUTH_TOKEN`：Claude API token
+- `ANTHROPIC_API_KEY`：必需
 - `ANTHROPIC_BASE_URL`（默认 `https://api.anthropic.com`）
 - `DEFAULT_MODEL`（默认 `claude-sonnet-4-20250514`）
 
@@ -83,11 +84,11 @@
 - `WORKSPACE_ARCHIVE_DAYS`（默认 `7`）
 - `WORKSPACE_IGNORE_DOT_FILES`（默认 `true`）
 
-## Executor（FastAPI + Claude Agent SDK）
+## Executor (FastAPI + Claude Agent SDK)
 
 必需（跑任务时）：
 
-- `ANTHROPIC_AUTH_TOKEN`：Claude API token
+- `ANTHROPIC_API_KEY`：必需
 - `ANTHROPIC_BASE_URL`：可选（同上）
 - `DEFAULT_MODEL`：必需（`executor/app/core/engine.py` 会读取 `os.environ["DEFAULT_MODEL"]`）
 - `WORKSPACE_PATH`：工作目录挂载点（默认 `/workspace`）
@@ -96,9 +97,10 @@
 
 - `WORKSPACE_GIT_IGNORE`：额外写入到 `.git/info/exclude` 的忽略规则（逗号/换行分隔）
 - `POCO_BROWSER_VIEWPORT_SIZE`：可选，浏览器视口大小（影响截图与响应式布局），格式如 `1366x768` / `1920x1080`（`browser_enabled=true` 时生效）
+- `EXECUTOR_TIMEZONE`：可选，任务执行时使用的时区环境变量（由 Executor Manager 透传，默认 `Asia/Shanghai`）
 - `DEBUG` / `LOG_LEVEL` / `LOG_TO_FILE` 等日志变量（同上）
 
-## Frontend（Next.js）
+## Frontend (Next.js)
 
 Frontend 现在默认通过 Next.js 的 **同源 API 代理**（`/api/v1/* -> Backend`）访问后端，因此后端地址可以在 **运行时（runtime）** 配置。
 

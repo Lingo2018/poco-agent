@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { userInputService } from "@/features/chat/services/user-input-service";
+import { userInputService } from "@/features/chat/api/user-input-api";
 import type { UserInputRequest } from "@/features/chat/types";
 
 interface UseUserInputRequestsReturn {
@@ -30,7 +30,14 @@ export function useUserInputRequests(
     }
     try {
       const result = await userInputService.listPending(sessionId);
-      setRequests(result);
+      const now = Date.now();
+      const filtered = result.filter((request) => {
+        if (!request.expires_at) return true;
+        const ts = new Date(request.expires_at).getTime();
+        if (Number.isNaN(ts)) return true;
+        return ts > now;
+      });
+      setRequests(filtered);
       setError(null);
     } catch (err) {
       setError(err as Error);

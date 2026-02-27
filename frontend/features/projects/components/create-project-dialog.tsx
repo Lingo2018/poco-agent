@@ -92,10 +92,10 @@ export function CreateProjectDialog({
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              取消
+              {t("projectDialogs.cancel")}
             </Button>
             <Button type="submit" disabled={!projectName.trim()}>
-              创建
+              {t("projectDialogs.create")}
             </Button>
           </DialogFooter>
         </form>

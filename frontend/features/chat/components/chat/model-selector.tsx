@@ -9,8 +9,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { AVAILABLE_MODELS } from "@/features/home/model/constants";
+import { AVAILABLE_MODELS } from "@/features/chat/constants/models";
 import type { ModelInfo } from "@/types";
+import { useT } from "@/lib/i18n/client";
 
 interface ModelSelectorProps {
   model: ModelInfo;
@@ -18,12 +19,13 @@ interface ModelSelectorProps {
 }
 
 export function ModelSelector({ model, onChange }: ModelSelectorProps) {
+  const { t } = useT("translation");
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="gap-2">
           <span className="text-base">{model.icon}</span>
-          <span className="font-medium">{model.name}</span>
+          <span className="font-medium font-serif">{model.name}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-72">
@@ -37,7 +39,7 @@ export function ModelSelector({ model, onChange }: ModelSelectorProps) {
             <div className="flex-1">
               <div className="font-medium">{m.name}</div>
               <div className="text-xs text-muted-foreground">
-                {m.description}
+                {t(m.descriptionKey)}
               </div>
             </div>
             {m.id === model.id && <div className="text-primary text-sm">✓</div>}

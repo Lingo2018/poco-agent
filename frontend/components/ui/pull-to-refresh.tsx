@@ -3,6 +3,7 @@
 import { motion, useSpring, useTransform } from "motion/react";
 import { useState, useRef } from "react";
 import { ArrowDown, RefreshCw } from "lucide-react";
+import { useT } from "@/lib/i18n/client";
 
 interface PullToRefreshProps {
   onRefresh: () => Promise<void>;
@@ -16,6 +17,7 @@ export function PullToRefresh({
   children,
   threshold = 80,
 }: PullToRefreshProps) {
+  const { t } = useT("translation");
   const [, setPullDistance] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isThresholdMet, setIsThresholdMet] = useState(false);
@@ -146,10 +148,10 @@ export function PullToRefresh({
             }`}
           >
             {isRefreshing
-              ? "正在刷新..."
+              ? t("pullToRefresh.refreshing")
               : isThresholdMet
-                ? "释放立即刷新"
-                : "下拉刷新"}
+                ? t("pullToRefresh.releaseToRefresh")
+                : t("pullToRefresh.pullToRefresh")}
           </span>
         </div>
       </motion.div>

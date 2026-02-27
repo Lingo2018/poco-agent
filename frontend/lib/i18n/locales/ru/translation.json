@@ -1,0 +1,1607 @@
+{
+  "welcome": "Добро пожаловать в Poco",
+  "description": "Платформа выполнения многосерверных AI-агентов",
+  "home": "Главная",
+  "language": "Язык",
+  "sidebar": {
+    "newTask": "Новая задача",
+    "search": "Поиск",
+    "library": "Возможности",
+    "scheduledTasks": "Запланированные задачи",
+    "projects": "Проекты",
+    "newProject": "Новый проект",
+    "newProjectPrompt": "Введите название проекта:",
+    "addProject": "Добавить проект",
+    "allTasks": "Список задач",
+    "filterTasks": "Фильтр задач",
+    "settings": "Настройки",
+    "deleteTask": "Удалить задачу",
+    "rename": "Переименовать",
+    "moveToProject": "Переместить в проект",
+    "delete": "Удалить",
+    "askTag": "ask",
+    "shareTitle": "Поделитесь Poco с друзьями",
+    "shareDesc": "По 500 баллов каждому",
+    "user": "Пользователь",
+    "defaultUserName": "Пользователь Poco",
+    "removeFromProject": "Убрать из проекта",
+    "batchOperations": "Пакетные операции",
+    "holdToSelect": "Нажмите и удерживайте для выбора",
+    "holdToExitSelect": "Нажмите и удерживайте, чтобы выйти из выбора",
+    "moveToHere": "Переместить сюда",
+    "plan": "Pro-план",
+    "onboarding": "Guided tutorial"
+  },
+  "header": {
+    "workspace": "Poco 1.0",
+    "switchWorkspace": "Переключить рабочее пространство",
+    "switchModel": "Выбрать модель",
+    "notifications": "Уведомления",
+    "more": "Ещё",
+    "repoLink": "Репозиторий проекта",
+    "repoName": "poco-ai/poco-agent"
+  },
+  "hero": {
+    "title": "Чем я могу вам помочь?",
+    "subtitle": "Назначьте задачу или задайте вопрос.",
+    "attachFile": "Добавить вложение",
+    "voiceInput": "Голосовой ввод",
+    "send": "Отправить",
+    "placeholder": "Назначьте задачу или задайте вопрос",
+    "inputPrompts": {
+      "taskDefault": "Поручите Poco любую задачу",
+      "planDefault": "Создайте план задачи вместе с Poco",
+      "shortcutHint": "/ для Slash Command, Shift+Enter для новой строки, Enter для отправки"
+    },
+    "tools": "Подключите ваши инструменты к Poco",
+    "importLocal": "Импорт из локального файла",
+    "importFigma": "Импорт из Figma (скоро)",
+    "connect": "Подключить",
+    "configure": "Настроить",
+    "comingSoon": "Скоро",
+    "modes": {
+      "task": "Задача",
+      "taskHelp": "Выполнить один раз немедленно. Подходит для большинства проблем.",
+      "plan": "Пошагово",
+      "planHelp": "Сначала предложите план выполнения, затем выполните по шагам после подтверждения.",
+      "scheduled": "По расписанию",
+      "scheduledHelp": "Выполняется по расписанию Cron и при необходимости повторно использует рабочее пространство.",
+      "planPlaceholder": "Опишите сложную задачу. Я сначала предложу план, затем выполну после вашего подтверждения…",
+      "planPrefix": "Сначала предложите чёткий план выполнения (шаги с контрольными точками). Пока не выполняйте. После подтверждения выполняйте пошагово.\\n\\nЗадача: {{prompt}}"
+    },
+    "repo": {
+      "toggle": "Настройки репозитория",
+      "dialogTitle": "Настройки репозитория",
+      "urlLabel": "GitHub URL",
+      "urlPlaceholder": "например, https://github.com/org/repo",
+      "branchLabel": "Ветка",
+      "branchPlaceholder": "например, main",
+      "usageLabel": "Использование",
+      "usage": {
+        "session": {
+          "title": "Использовать только для этой задачи (без проекта)",
+          "help": "Лучше всего для быстрого чтения/понимания; проект не создастся"
+        },
+        "createProject": {
+          "title": "Создать проект (долгосрочный)",
+          "help": "Лучше всего для продолжающейся работы; будет сохранено как репозиторий проекта по умолчанию"
+        }
+      },
+      "projectNameLabel": "Название проекта",
+      "projectNamePlaceholder": "например, owner/repo",
+      "tokenKeyLabel": "Ключ окружения токена GitHub (опционально)",
+      "tokenKeyPlaceholder": "например, GITHUB_TOKEN",
+      "tokenKeyHelp": "Используется для клонирования частных репозиториев. Сначала установите значение ключа в переменных окружения.",
+      "goToEnvVars": "Перейти к переменным окружения",
+      "toasts": {
+        "missingGithubUrl": "Пожалуйста, введите GitHub URL",
+        "createProjectFailed": "Не удалось создать проект. Попробуйте снова.",
+        "projectCreated": "Проект создан: {{name}}"
+      }
+    },
+    "browser": {
+      "toggle": "Браузер",
+      "enabledTooltipTitle": "Браузер включен",
+      "enabledTooltipDescription": "Poco будет использовать браузер для просмотра веб-страниц, извлечения информации со страниц и выполнения веб-задач.",
+      "disabledTooltipTitle": "Браузер выключен",
+      "disabledTooltipDescription": "Включите, чтобы Poco мог использовать браузер для просмотра веб-страниц и выполнения веб-задач.",
+      "enabledHint": "Включен"
+    },
+    "runSchedule": {
+      "toggle": "Время выполнения",
+      "dialogTitle": "Время выполнения",
+      "fields": {
+        "mode": "Режим",
+        "scheduledAt": "Выполнить в"
+      },
+      "modes": {
+        "immediate": "Выполнить сейчас",
+        "scheduled": "Выполнить один раз в определённое время",
+        "nightly": "Выполнить один раз ночью"
+      },
+      "timezoneHint": "Часовой пояс: {{timezone}}",
+      "preview": "Будет выполнено: {{summary}}",
+      "summary": {
+        "immediate": "Выполнить сейчас",
+        "scheduled": "{{datetime}} ({{timezone}})",
+        "nightly": "Ночью (ночное окно)"
+      },
+      "badge": {
+        "immediate": "Выполнить сейчас",
+        "scheduled": "Запланиров��но: {{datetime}}",
+        "scheduledEmpty": "Запланировано: не установлено",
+        "nightly": "Ночью"
+      }
+    },
+    "toasts": {
+      "uploadSuccess": "Файл успешно загружен",
+      "uploadFailed": "Не удалось загрузить файл",
+      "actionFailed": "Не удалось выполнить действие, попробуйте снова",
+      "fileTooLarge": "Файл слишком большой, поддерживается максимум 100МБ",
+      "duplicateFileName": "Вложение с именем {{name}} уже существует. Пожалуйста, удалите или переименуйте его."
+    },
+    "mcpSelector": {
+      "title": "Выбрать MCP серверы",
+      "description": "Выберите, какие MCP серверы включить для этой задачи. Неустановленные серверы не будут показаны.",
+      "loading": "Загрузка...",
+      "noServers": "Нет установленных MCP серверов. Сначала установите серверы со страницы MCP.",
+      "selected": "{{count}}/{{total}} серверов выбрано",
+      "cancel": "Отмена",
+      "confirm": "Подтвердить"
+    },
+    "warnings": {
+      "tooManyMcps": "Включено слишком много MCP серверов ({{count}}). Это может замедлить загрузку системы и снизить производительность.",
+      "tooManySkills": "Включено слишком много навыков ({{count}}). Это может замедлить загрузку системы и снизить производительность.",
+      "mcpLimitReached": "Включение этого MCP превысит рекомендуемый лимит (3 сервера). Слишком много MCP может замедлить загрузку системы.",
+      "skillLimitReached": "Включение этого навыка превысит рекомендуемый лимит (5 навыков). Слишком много навыков может замедлить загрузку системы."
+    },
+    "modeLabels": {
+      "task": "Режим задачи",
+      "plan": "Режим плана",
+      "scheduled": "Режим расписания"
+    }
+  },
+  "prompts": {
+    "createSlides": "Создать слайды",
+    "createWebsite": "Создать сайт",
+    "developApp": "Разработать приложение",
+    "design": "Дизайн",
+    "more": "Ещё"
+  },
+  "hints": {
+    "slashCommand": "использовать Slash Command",
+    "send": "Отправить",
+    "newLine": "Новая строка",
+    "separator": ","
+  },
+  "mocks": {
+    "projects": {
+      "newProject": "Новый проект"
+    },
+    "timestamps": {
+      "twoMinutesAgo": "2 минуты назад",
+      "oneHourAgo": "1 час назад",
+      "justNow": "Только что"
+    }
+  },
+  "message": {
+    "status": {
+      "sending": "Отправка",
+      "sent": "Отправлено",
+      "streaming": "Генерация",
+      "completed": "Завершено",
+      "failed": "Ошибка"
+    }
+  },
+  "chat": {
+    "newChat": "Новый чат",
+    "continueChat": "Продолжить чат",
+    "emptyState": "Начать новый разговор",
+    "emptyStateDesc": "Введите сообщение, чтобы начать общение с ИИ-ассистентом",
+    "stopGenerating": "Остановить генерацию",
+    "cancelTask": "Отменить задачу",
+    "cancelTaskConfirm": "Отменить текущую задачу?",
+    "regenerate": "Регенерировать",
+    "model": "Модель",
+    "tokens": "Токены",
+    "tokenInput": "вх",
+    "tokenOutput": "вых",
+    "cost": "Стоимость",
+    "duration": "Продолжительность",
+    "executionTitle": "Выполнение ИИ",
+    "inputPlaceholder": "Enter для отправки, Shift + Enter для новой строки",
+    "askUserTitle": "Требуется ваш ввод",
+    "askUserSubmit": "Отправить",
+    "askUserOtherPlaceholder": "Введите ваш ответ",
+    "askUserOtherOption": "Другое",
+    "askUserRequired": "Пожалуйста, ответьте на все вопросы перед отправкой",
+    "askUserSubmitted": "Ответы отправлены",
+    "askUserFailed": "Не удалось отправить, попробуйте снова",
+    "askUserCompleteTitle": "Готово",
+    "askUserCompleteHint": "Отправляем ответы…",
+    "askUserRetry": "Повторить",
+    "planApprovalTitle": "Утверждение плана",
+    "planApprovalHint": "Пожалуйста, просмотрите план выполнения ниже. Утверждение начнёт выполнение и может изменить файлы / выполнить команды.",
+    "planApprovalApprove": "Утвердить и запустить",
+    "planApprovalReject": "Отклонить",
+    "planApprovalEmpty": "План не предоставлен",
+    "askUserTimeout": "Осталось {{seconds}}с",
+    "askUserPrevious": "Назад",
+    "askUserNext": "Далее",
+    "askUserGoTo": "Вопрос {{index}}",
+    "askUserProgress": "{{current}} / {{total}}",
+    "internalContextInjected": "Внутренний контекст внедрён",
+    "internalContextSubtitle": "Из навыков/системы/инструментов (не ваш ввод)",
+    "internalContextView": "Просмотреть ({{count}})",
+    "internalContextHide": "Скрыть",
+    "internalContextCopy": "Копировать",
+    "thinkingTitle": "Размышление",
+    "toolExecution": "Выполнение инструмента",
+    "subagentTranscript": "Транскрипция субагента",
+    "subagentExecution": "Субагент",
+    "input": "Ввод",
+    "output": "Вывод",
+    "scrollToLatestMessage": "Перейти к последнему сообщению",
+    "userPromptTimelineJump": "Перейти к сообщению пользователя {{index}}",
+    "userPromptTimelineEmpty": "(Пустой запрос)",
+    "expand": "Развернуть",
+    "collapse": "Свернуть",
+    "copyMessage": "Копировать сообщение",
+    "formulaCopied": "Скопировано",
+    "editMessage": "Редактировать сообщение",
+    "quoteModify": "Ответить с цитатой",
+    "exportImage": "Generate conversation image",
+    "exportLongImage": "Export long image",
+    "exportMultiImage": "Export multiple images",
+    "exportImageSuccess": "Conversation image generated",
+    "exportImageMultiSuccess": "Exported {{count}} images",
+    "exportImageEmpty": "No conversation content to export",
+    "exportImageFailed": "Failed to generate conversation image",
+    "statusBar": {
+      "browser": "Браузер",
+      "openDesktop": "Открыть рабочий стол",
+      "desktopPreparing": "Подготовка ссылки на рабочий стол",
+      "skillsConfigured": "Навыки (настроено)",
+      "skillsUsed": "Навыки",
+      "mcpConfigured": "MCP серверы (настроено)",
+      "mcp": "MCP серверы"
+    },
+    "typingWords": [
+      "Accomplishing",
+      "Actioning",
+      "Actualizing",
+      "Baking",
+      "Brewing",
+      "Calculating",
+      "Cerebrating",
+      "Churning",
+      "Clauding",
+      "Coalescing",
+      "Cogitating",
+      "Computing",
+      "Conjuring",
+      "Considering",
+      "Cooking",
+      "Crafting",
+      "Creating",
+      "Crunching",
+      "Deliberating",
+      "Determining",
+      "Doing",
+      "Effecting",
+      "Finagling",
+      "Forging",
+      "Forming",
+      "Generating",
+      "Hatching",
+      "Herding",
+      "Honking",
+      "Hustling",
+      "Ideating",
+      "Inferring",
+      "Manifesting",
+      "Marinating",
+      "Moseying",
+      "Mulling",
+      "Mustering",
+      "Musing",
+      "Noodling",
+      "Percolating",
+      "Pondering",
+      "Processing",
+      "Puttering",
+      "Reticulating",
+      "Ruminating",
+      "Schlepping",
+      "Shucking",
+      "Simmering",
+      "Smooshing",
+      "Spinning",
+      "Stewing",
+      "Synthesizing",
+      "Thinking",
+      "Transmuting",
+      "Vibing",
+      "Working"
+    ],
+    "collapseRightPanel": "Collapse output panel",
+    "expandRightPanel": "Expand output panel",
+    "toolCards": {
+      "tools": {
+        "skill": "Навык",
+        "task": "Запустить задачу",
+        "askUserQuestion": "Спросить пользователя",
+        "bash": "Выполнить команду",
+        "edit": "Изменить файл",
+        "read": "Прочитать файл",
+        "write": "Записать файл",
+        "glob": "Найти файлы по шаблону",
+        "grep": "Поиск текста",
+        "notebookEdit": "Изменить notebook",
+        "webFetch": "Получить веб-страницу",
+        "webSearch": "Поиск в интернете",
+        "todoWrite": "Обновить задачи",
+        "bashOutput": "Вывод команды",
+        "killBash": "Остановить команду",
+        "exitPlanMode": "Выйти из режима плана",
+        "listMcpResources": "Список ресурсов MCP",
+        "readMcpResource": "Прочитать ресурс MCP",
+        "browser": "Браузер",
+        "tool": "Инструмент"
+      },
+      "summary": {
+        "questions": "{{count}} questions",
+        "todos": "{{count}} todos",
+        "items": "{{count}} items"
+      },
+      "fields": {
+        "description": "Description",
+        "prompt": "Prompt",
+        "subagentType": "Subagent",
+        "questions": "Questions",
+        "question": "Question",
+        "options": "Options",
+        "command": "Command",
+        "timeout": "Timeout",
+        "runInBackground": "Background",
+        "glob": "Glob filter",
+        "type": "Type",
+        "outputMode": "Output mode",
+        "ignoreCase": "Ignore case",
+        "showLineNumber": "Line number",
+        "beforeContext": "Before context",
+        "afterContext": "After context",
+        "context": "Context",
+        "headLimit": "Head limit",
+        "multiline": "Multiline",
+        "filePath": "File path",
+        "oldString": "Old text",
+        "newString": "New text",
+        "replaceAll": "Replace all",
+        "newSource": "New source",
+        "content": "Content",
+        "offset": "Offset",
+        "limit": "Limit",
+        "pattern": "Pattern",
+        "path": "Path",
+        "query": "Query",
+        "url": "URL",
+        "statusCode": "Status code",
+        "searchPath": "Search path",
+        "allowedDomains": "Allowed domains",
+        "blockedDomains": "Blocked domains",
+        "filter": "Filter",
+        "href": "Href",
+        "selector": "Selector",
+        "text": "Text",
+        "role": "Role",
+        "name": "Name",
+        "value": "Value",
+        "button": "Button",
+        "key": "Key",
+        "server": "Server",
+        "uri": "URI",
+        "notebookPath": "Notebook path",
+        "editMode": "Edit mode",
+        "cellId": "Cell ID",
+        "cellType": "Cell type",
+        "shellId": "Shell ID",
+        "bashId": "Bash ID",
+        "status": "Status",
+        "killed": "Killed",
+        "exitCode": "Exit code",
+        "approved": "Approved",
+        "answer": "Answer",
+        "output": "Output",
+        "result": "Result",
+        "usage": "Usage",
+        "duration": "Duration",
+        "cost": "Cost",
+        "total": "Total",
+        "message": "Message",
+        "bytes": "Bytes",
+        "replacements": "Replacements",
+        "totalLines": "Total lines",
+        "linesReturned": "Returned lines",
+        "mimeType": "MIME type",
+        "fileSize": "File size",
+        "editType": "Edit type",
+        "finalUrl": "Final URL",
+        "totalResults": "Total results",
+        "totalMatches": "Total matches",
+        "matches": "Matches",
+        "files": "Files",
+        "results": "Results",
+        "resources": "Resources",
+        "stats": "Stats",
+        "contents": "Contents",
+        "multiSelect": "Multi-select"
+      },
+      "text": {
+        "rawOutput": "Raw output",
+        "structured": "Structured data",
+        "empty": "No data"
+      }
+    }
+  },
+  "status": {
+    "pending": "Ожидает",
+    "running": "Выполняется",
+    "completed": "Завершено",
+    "failed": "Ошибка",
+    "canceled": "Отменено",
+    "loading": "Загрузка...",
+    "progress": "Прогресс"
+  },
+  "fileChanges": {
+    "title": "Изменения файлов",
+    "noChanges": "Пока нет изменений файлов",
+    "lines": "строк",
+    "files": "файлов",
+    "added": "Добавлено",
+    "modified": "Изменено",
+    "deleted": "Удалено",
+    "renamed": "Переименовано",
+    "showDiff": "Показать diff",
+    "hideDiff": "Скрыть diff"
+  },
+  "todo": {
+    "title": "Задачи",
+    "pending": "Ожидает",
+    "inProgress": "Выполняется",
+    "completed": "Завершено"
+  },
+  "mcp": {
+    "title": "MCP серверы",
+    "connected": "Подключено",
+    "disconnected": "Отключено",
+    "error": "Ошибка"
+  },
+  "mobile": {
+    "chat": "Чат",
+    "computer": "Компьютер",
+    "artifacts": "Артефакты",
+    "status": "Статус"
+  },
+  "computer": {
+    "title": "Компьютер Poco",
+    "description": "Смотрите шаги браузера и терминала во время выполнения",
+    "status": {
+      "live": "Прямой эфир",
+      "replay": "Повтор"
+    },
+    "tabs": {
+      "browser": "Браузер",
+      "terminal": "Терминал"
+    },
+    "replay": {
+      "empty": "Пока нет шагов повтора",
+      "timeline": "Временная шкала",
+      "noSelection": "(шаг не выбран)",
+      "stepCounter": "{{current}} / {{total}}",
+      "durationMs": "{{ms}} мс",
+      "durationSec": "{{sec}} с",
+      "controls": {
+        "first": "Первый",
+        "prev": "Предыдущий",
+        "play": "Воспроизвести",
+        "pause": "Пауза",
+        "next": "Следующий",
+        "latest": "Последний"
+      },
+      "filter": {
+        "all": "Все",
+        "browser": "Браузер",
+        "terminal": "Терминал"
+      },
+      "limitHint": "Показываются только первые {{limit}} шагов",
+      "liveLabel": "В реальном времени"
+    },
+    "browser": {
+      "screenshotAlt": "Скриншот браузера",
+      "screenshotLoading": "Загрузка скриншота...",
+      "screenshotUnavailable": "Скриншот недоступен",
+      "steps": "Шаги браузера",
+      "noSteps": "Пока нет шагов браузера"
+    },
+    "terminal": {
+      "noSteps": "Пока нет вывода терминала",
+      "unknownCommand": "(неизвестная команда)",
+      "noOutput": "(нет вывода)",
+      "running": "Выполняется...",
+      "exitCode": "Код выхода {{code}}",
+      "killed": "Завершено по тайм-ауту"
+    }
+  },
+  "artifacts": {
+    "empty": {
+      "creating": "Poco создаёт...",
+      "working": "Агент работает над вашей задачей",
+      "noChanges": "Нет изменений файлов",
+      "description": "Изменения файлов, созданные выполнением ИИ, будут показаны здесь"
+    },
+    "viewer": {
+      "loadingEngine": "Загрузка движка предварительного просмотра...",
+      "loadingDoc": "Чтение документа...",
+      "parseError": "Не удалось разобрать файл Excalidraw",
+      "fetchError": "Не удалось получить содержимое документа",
+      "retry": "Повторить",
+      "selectFile": "Пожалуйста, выберите файл справа для предварительного просмотра",
+      "supportedFormats": "Поддерживает PDF, документы Office, распространённые форматы изображений, видео MP4, файлы XMind, файлы .excalidraw и файлы .drawio",
+      "processing": "Обработка файла",
+      "notSupported": "Предварительный просмотр не поддерживается для этого формата",
+      "openInNewWindow": "Открыть в новом окне",
+      "downloadOriginal": "Скачать исходный файл"
+    },
+    "summary": {
+      "total": "Всего",
+      "totalFiles": "файлов",
+      "added": "Добавлено",
+      "modified": "Изменено",
+      "deleted": "Удалено",
+      "renamed": "Переименовано",
+      "totalfiles": "файлов"
+    }
+  },
+  "search": {
+    "placeholder": "Поиск задач, проектов, сообщений...",
+    "tasks": "Задачи",
+    "projects": "Проекты",
+    "messages": "Сообщения",
+    "noResults": "Результаты не найдены"
+  },
+  "library": {
+    "title": "Возможности",
+    "subtitle": "Управление навыками, пресетами и инструментами",
+    "comingSoon": "Скоро",
+    "sidebar": {
+      "title": "Ярлыки возможностей",
+      "description": "Выберите возможность для перехода к её настройке.",
+      "mobile": "Обзор возможностей",
+      "groups": {
+        "core": "Основные",
+        "automation": "Автоматизация",
+        "integrations": "Интеграции",
+        "labs": "Лаборатория"
+      }
+    },
+    "skillsStore": {
+      "title": "Навыки",
+      "description": "Просматривайте и устанавливайте ИИ-навыки от сообщества",
+      "feature1": "Богатая библиотека навыков",
+      "feature2": "Установка в один клик",
+      "feature3": "Пользовательская настройка",
+      "action": "Обзор навыков",
+      "install": "Установить",
+      "uninstall": "Удалить",
+      "installed": "Установлено",
+      "notInstalled": "Не установлено",
+      "hasConfig": "Настраиваемый"
+    },
+    "mcpInstall": {
+      "title": "MCP",
+      "description": "Управление и настройка серверов Model Context Protocol",
+      "feature1": "Быстрое развёртывание MCP",
+      "feature2": "Визуальное управление",
+      "feature3": "Мониторинг в реальном времени",
+      "action": "Управление серверами"
+    },
+    "envVars": {
+      "title": "Переменные окружения",
+      "sidebarTitle": "Переменные окружения",
+      "description": "Храните API-ключи и секреты, используемые навыками и MCP серверами.",
+      "header": {
+        "title": "Переменные окружения",
+        "add": "Добавить переменную"
+      },
+      "copied": "Скопировано в буфер обмена",
+      "copy": "Копировать",
+      "copyError": "Не удалось скопировать",
+      "valuePlaceholder": "Введите значение",
+      "required": "Обязательно",
+      "secretLabel": "Секрет",
+      "save": "Сохранить",
+      "saving": "Сохранение…",
+      "otherTitle": "Существующие переменные",
+      "empty": "Пока нет переменных окружения",
+      "addTitle": "Добавить переменную окружения",
+      "editTitle": "Обновить переменную окружения",
+      "overrideTitle": "Переопределить системную переменную",
+      "addDescription": "Укажите пару ключ/значение и отметьте как секрет, если это API-ключ.",
+      "keyLabel": "Ключ",
+      "valueLabel": "Значение",
+      "valueCreateHint": "Старое значение никогда не показывается. Введите новое значение для установки.",
+      "valueUpdateHint": "Старое значение никогда не показывается. Оставьте пустым для сохранения текущего значения.",
+      "descriptionLabel": "Описание",
+      "descriptionPlaceholder": "Необязательное описание",
+      "secretToggle": "Маскировать значение (API-ключ)",
+      "secretHelp": "Значения окружения никогда не показываются в открытом виде. Вы можете только установить новое значение.",
+      "addButton": "Добавить переменную",
+      "refresh": "Обновить",
+      "systemHint": "Системные переменные показывают только, установлены ли они. Создайте пользовательскую переменную с тем же ключом для переопределения.",
+      "userHint": "Пользовательские переменные никогда не показывают открытый текст в интерфейсе. Введите новое значение для обновления (оставьте пустым для сохранения).",
+      "status": {
+        "set": "Установлено",
+        "unset": "Не установлено",
+        "overridden": "Переопределено пользователем",
+        "overridesSystem": "Переопределяет системную"
+      },
+      "actions": {
+        "override": "Переопределить",
+        "editOverride": "Редактировать пользовательское переопределение",
+        "edit": "Редактировать"
+      },
+      "toasts": {
+        "created": "Переменная окружения создана",
+        "updated": "Переменная окружения обновлена",
+        "deleted": "Переменная окружения удалена",
+        "error": "Не удалось выполнить действие, попробуйте снова",
+        "refreshed": "Переменные окружения обновлены",
+        "keyRequired": "Ключ не может быть пустым",
+        "copied": "Скопировано",
+        "copyFailed": "Не удалось скопировать"
+      },
+      "scopeLabel": "Область",
+      "scope": {
+        "system": "Система",
+        "user": "Пользователь",
+        "global": "Глобальная",
+        "mcp": "MCP"
+      }
+    },
+    "personalization": {
+      "card": {
+        "title": "Персонализация",
+        "description": "Установите постоянные настройки и инструкции для всех ваших задач",
+        "feature1": "Глобальная область пользователя",
+        "feature2": "Пользовательские инструкции",
+        "feature3": "Обновление в любое время, применение при следующем запуске",
+        "action": "Открыть"
+      },
+      "header": {
+        "title": "Персонализация",
+        "refresh": "Обновить",
+        "clear": "Очистить",
+        "save": "Сохранить",
+        "saving": "Сохранение…"
+      },
+      "customInstructions": {
+        "title": "Пользовательские инструкции",
+        "description": "Эти инструкции влияют на то, как агент отвечает и ведёт себя во всех будущих задачах.",
+        "hintScope": "Это глобально для каждого пользователя: новые чаты, продолжающиеся чаты и запланированные задачи будут применять их.",
+        "hintSecrets": "Не храните здесь API-ключи или другие секреты.",
+        "status": {
+          "enabled": "Включено",
+          "disabled": "Отключено"
+        },
+        "editor": {
+          "label": "Содержимое инструкции",
+          "insertTemplate": "Вставить пример",
+          "placeholder": "например, Всегда отвечать на китайском; сохранять профессиональный тон; предпочитать маркированные списки…",
+          "tip": "Совет: отключение означает, что инструкции не применяются. Вы всё равно можете редактировать и сохранить на потом.",
+          "template": "# Пример пользовательских инструкций\n\n## Стиль вывода\n- Всегда отвечать на китайском\n- Предпочитать чёткую структуру и маркированные списки\n\n## Правила кодирования\n- Комментарии к коду должны быть на английском\n- Использовать аннотации типов для Python (3.12+)\n"
+        }
+      },
+      "toasts": {
+        "saved": "Сохранено",
+        "cleared": "Очищено",
+        "refreshed": "Обновлено",
+        "error": "Не удалось выполнить действие, попробуйте снова"
+      }
+    },
+    "slashCommands": {
+      "card": {
+        "title": "Слэш-команды",
+        "description": "Сохраняйте часто используемые / команды с автозаполнением во вводе чата",
+        "feature1": "Личная библиотека команд (глобальная)",
+        "feature2": "Поддержка аргументов и разрешённых инструментов",
+        "feature3": "Введите / для автозаполнения и вставки",
+        "action": "Управление командами"
+      },
+      "header": {
+        "title": "Слэш-команды",
+        "add": "Добавить команду"
+      },
+      "searchPlaceholder": "Поиск команд...",
+      "addCard": "Добавить slash-команду",
+      "summary": "Команды",
+      "enabled": "Включено",
+      "mode": {
+        "raw": "Markdown",
+        "structured": "Структурированный"
+      },
+      "delete": {
+        "title": "Удалить команду?",
+        "description": "После удаления эта команда больше не будет доступна в сессиях."
+      },
+      "dialog": {
+        "createTitle": "Создать команду",
+        "editTitle": "Редактировать команду"
+      },
+      "fields": {
+        "name": "Имя",
+        "nameHint": "без /",
+        "namePlaceholder": "refactor",
+        "enabled": "Включено",
+        "rawMarkdown": "Markdown",
+        "rawMarkdownPlaceholder": "Вставьте полный .md здесь (поддерживается YAML front matter)",
+        "modelIgnoredHint": "Совет: поле модели в YAML front matter будет игнорироваться.",
+        "description": "Описание",
+        "descriptionPlaceholder": "Пример: запустить тесты и проанализировать сбои",
+        "argumentHint": "подсказка-аргумент",
+        "argumentHintPlaceholder": "[test-pattern]",
+        "allowedTools": "разрешённые-инструменты",
+        "allowedToolsPlaceholder": "Read, Grep, Glob",
+        "content": "Содержимое",
+        "contentPlaceholder": "Опишите, что должен делать Claude (Markdown)"
+      },
+      "toasts": {
+        "loadError": "Не удалось загрузить команды",
+        "created": "Команда создана",
+        "updated": "Команда обновлена",
+        "deleted": "Команда удалена",
+        "error": "Не удалось выполнить действие"
+      },
+      "empty": "Пока нет команд"
+    },
+    "subAgents": {
+      "card": {
+        "title": "Субагенты",
+        "description": "Создавайте повторно используемые специализированные субагенты для изоляции контекста и распараллеливания.",
+        "feature1": "Изолированный контекст для сохранения чистоты основного чата",
+        "feature2": "Запуск нескольких субагентов параллельно",
+        "feature3": "Ограничение инструментов/моделей для лучшего контроля",
+        "action": "Управление субагентами"
+      },
+      "header": {
+        "title": "Субагенты",
+        "add": "Добавить субагента"
+      },
+      "searchPlaceholder": "Поиск субагентов...",
+      "addCard": "Добавить субагента",
+      "summary": "Субагенты",
+      "enabled": "Включено",
+      "empty": "Пока нет субагентов",
+      "mode": {
+        "raw": "Markdown",
+        "structured": "Структурированный"
+      },
+      "models": {
+        "inherit": "Наследовать"
+      },
+      "delete": {
+        "title": "Удалить субагента?",
+        "description": "После удаления этот субагент больше не будет доступен в сессиях."
+      },
+      "dialog": {
+        "createTitle": "Создать субагента",
+        "editTitle": "Редактировать субагента"
+      },
+      "fields": {
+        "name": "Имя",
+        "namePlaceholder": "code-reviewer",
+        "enabled": "Включено",
+        "description": "Описание",
+        "descriptionOptional": "Описание (опционально)",
+        "descriptionPlaceholder": "Используется для отзывов качества, безопасности и сопровождаемости.",
+        "model": "Модель",
+        "tools": "Инструменты",
+        "toolsPlaceholder": "Read, Grep, Glob",
+        "toolsHint": "Оставьте пустым для наследования всех доступных инструментов.",
+        "prompt": "Системный промпт",
+        "promptPlaceholder": "Вы экспертный рецензент кода...",
+        "rawMarkdown": "Markdown",
+        "rawMarkdownPlaceholder": "Вставьте полный .md здесь (требуется YAML front matter; имя должно совпадать)",
+        "rawMarkdownHint": "Совет: режим raw помещается в ~/.claude/agents и загружается SDK."
+      },
+      "toasts": {
+        "loadError": "Не удалось загрузить субагентов",
+        "created": "Субагент создан",
+        "updated": "Субагент обновлён",
+        "deleted": "Субагент удалён",
+        "error": "Не удалось выполнить действие"
+      }
+    },
+    "tags": {
+      "system": "Пресет",
+      "user": "Мои навыки"
+    },
+    "actions": {
+      "processing": "Обработка…"
+    },
+    "scheduledTasks": {
+      "title": "Запланированные задачи",
+      "description": "Настройте автоматическое планирование задач и планы выполнения",
+      "feature1": "Поддержка выражений Cron",
+      "feature2": "Отслеживание истории задач",
+      "feature3": "Механизм повтора при сбое",
+      "action": "Создать задачу",
+      "page": {
+        "title": "Запланированные задачи",
+        "create": "Создать задачу",
+        "createTitle": "Создать запланированную задачу",
+        "trigger": "Выполнить",
+        "empty": "Пока нет запланированных задач"
+      },
+      "detail": {
+        "title": "Запланированная задача",
+        "subtitle": "{{schedule}}",
+        "refresh": "Обновить",
+        "edit": "Редактировать",
+        "editTitle": "Редактировать запланированную задачу",
+        "deleteTitle": "Удалить запланированную задачу?",
+        "deleteDescription": "Это остановит будущие триггеры. Существующая история выполнения останется в чат-сессиях.",
+        "notFound": "Запланированная задача не найдена",
+        "enabledOn": "Включено",
+        "enabledOff": "Приостановлено",
+        "schedule": "Расписание",
+        "lastRun": "Последний запуск",
+        "reuseSessionOn": "Повторно использовать (та же сессия/рабочее пространство)",
+        "reuseSessionOff": "Не повторно использовать (новая сессия/рабочее пространство при каждом запуске)",
+        "reuseSessionImmutable": "Не может быть изменено после создания",
+        "openWorkspace": "Открыть сессию",
+        "runsTitle": "История выполнения",
+        "noRuns": "Пока нет выполнений. Выполнение появится после следующего триггера.",
+        "runTriggeredAt": "Запущено в",
+        "runStatus": "Статус",
+        "runDuration": "Продолжительность",
+        "runCost": "Стоимость",
+        "runTokens": "Токены (вх/вых)",
+        "runProgress": "Прогресс",
+        "durationSeconds": "{{seconds}}с",
+        "durationMinutesSeconds": "{{minutes}}м {{seconds}}с",
+        "viewResult": "Просмотреть результат"
+      },
+      "status": {
+        "queued": "В очереди",
+        "claimed": "Занято",
+        "running": "Выполняется",
+        "completed": "Завершено",
+        "failed": "Ошибка",
+        "canceled": "Отменено",
+        "unknown": "Неизвестно"
+      },
+      "fields": {
+        "name": "Имя",
+        "cron": "Выражение Cron",
+        "timezone": "Часовой пояс",
+        "prompt": "Промпт",
+        "enabled": "Включено",
+        "enabledHelp": "Когда отключено, автоматический запуск не происходит, но ручной запуск всё ещё возможен.",
+        "reuseSession": "Повторно использовать сессию/рабочее пространство",
+        "reuseSessionHelp": "Когда включено, то же рабочее пространство повторно используется и созданные файлы сохраняются.",
+        "nextRunAt": "Следующий запуск",
+        "lastStatus": "Последний статус",
+        "actions": "Действия"
+      },
+      "placeholders": {
+        "name": "например, Ежедневная сборка",
+        "prompt": "Что должна делать эта запланированная задача?"
+      },
+      "toasts": {
+        "created": "Запланированная задача создана",
+        "updated": "Запланированная задача обновлена",
+        "deleted": "Запланированная задача удалена",
+        "triggered": "Запущено",
+        "error": "Не удалось выполнить операцию, попробуйте позже"
+      },
+      "schedule": {
+        "dialogTitle": "Настройки запланированной задачи",
+        "repeat": "Расписание",
+        "repeatOptions": {
+          "interval": "Интервал",
+          "daily": "Ежедневно",
+          "weekly": "Еженедельно",
+          "monthly": "Ежемесячно"
+        },
+        "interval": {
+          "every": "Каждые",
+          "unitMinute": "минут(ы)",
+          "unitHour": "час(ов)"
+        },
+        "time": "Время",
+        "weekdays": {
+          "label": "Дни недели",
+          "short": {
+            "0": "Вс",
+            "1": "Пн",
+            "2": "Вт",
+            "3": "Ср",
+            "4": "Чт",
+            "5": "Пт",
+            "6": "Сб"
+          }
+        },
+        "monthDay": "День",
+        "preview": "Будет выполнено: {{summary}}",
+        "advanced": "Дополнительно",
+        "useCron": "Использовать выражение Cron",
+        "useCronHelp": "Когда включено, выражение cron переопределяет расписание выше.",
+        "cronPlaceholder": "например, */5 * * * *",
+        "cronHelp": "Выражение cron (5 полей: мин час день месяц день_недели).",
+        "summary": {
+          "intervalMinutes": "Каждые {{count}} минут(ы)",
+          "intervalHours": "Каждые {{count}} час(ов)",
+          "daily": "Ежедневно в {{time}}",
+          "weekly": "Еженедельно в {{days}} в {{time}}",
+          "monthly": "Ежемесячно {{day}} числа в {{time}}",
+          "cron": "Cron: {{cron}}"
+        }
+      }
+    },
+    "more": {
+      "title": "Ещё",
+      "description": "Исследуйте больше функций и расширений",
+      "feature1": "Маркетплейс пресетов",
+      "feature2": "Руководства по интеграции",
+      "feature3": "Документация API",
+      "action": "Узнать больше"
+    },
+    "skillsPage": {
+      "header": {
+        "title": "Навыки",
+        "subtitle": "Исследуйте и управляйте возможностями ИИ"
+      },
+      "searchPlaceholder": "Поиск навыков...",
+      "addCard": "Добавить навык",
+      "items": {
+        "webSearch": {
+          "name": "Веб-поиск",
+          "description": "Выполняйте веб-поиск в реальном времени для получения актуальной информации из интернета."
+        },
+        "codeExecution": {
+          "name": "Выполнение кода",
+          "description": "Безопасно выполняйте код Python в изолированной среде для вычислений или анализа данных."
+        },
+        "imageGeneration": {
+          "name": "Генерация изображений",
+          "description": "Генерируйте высококачественные изображения из текстовых описаний, используя передовые модели ИИ."
+        },
+        "textAnalysis": {
+          "name": "Анализ текста",
+          "description": "Анализируйте тональность, объекты и синтаксис текстового содержимого."
+        },
+        "dataVisualization": {
+          "name": "Визуализация данных",
+          "description": "Создавайте диаграммы и графики из наборов данных для лучшего понимания."
+        }
+      }
+    },
+    "skillsManager": {
+      "stats": {
+        "available": "Доступно",
+        "installed": "Установлено",
+        "enabled": "Включено"
+      },
+      "section": {
+        "title": "Навыки"
+      },
+      "scope": {
+        "system": "Система",
+        "user": "Пользователь"
+      },
+      "fields": {
+        "id": "id",
+        "source": "Источник"
+      },
+      "actions": {
+        "install": "Установить",
+        "uninstall": "Удалить"
+      },
+      "toasts": {
+        "loadError": "Не удалось загрузить навыки",
+        "actionError": "Не удалось выполнить операцию, попробуйте позже",
+        "installed": "Навык установлен",
+        "uninstalled": "Навык удалён",
+        "enabled": "Навык включён",
+        "disabled": "Навык отключён",
+        "actionFailed": "Не удалось выполнить операцию, попробуйте позже"
+      },
+      "empty": "Пока нет навыков",
+      "unknownSkill": "Неизвестный навык"
+    },
+    "skillsImport": {
+      "title": "Импорт навыков",
+      "tabs": {
+        "zip": "Загрузить Zip",
+        "github": "GitHub URL",
+        "command": "Импорт через npx-команду"
+      },
+      "fields": {
+        "zip": "Zip-файл",
+        "githubUrl": "URL публичного репозитория GitHub",
+        "nameOverride": "Имя навыка"
+      },
+      "placeholders": {
+        "githubUrl": "https://github.com/owner/repo",
+        "name": "например, my-skill",
+        "command": "npx skills add https://github.com/owner/repo --skill my-skill"
+      },
+      "hints": {
+        "github": "По умолчанию main/master (только публичные репозитории github.com)",
+        "nameRequired": "SKILL.md находится в корне архива; требуется имя",
+        "command": "Вставьте команду add — мы автоматически извлечем GitHub URL и --skill."
+      },
+      "actions": {
+        "back": "Назад",
+        "discover": "Обнаружить",
+        "discovering": "Обнаружение...",
+        "commit": "Импортировать и установить",
+        "committing": "Импортирование..."
+      },
+      "preview": {
+        "found": "Найдено",
+        "items": "определений навыков",
+        "overwrite": "перезапишет",
+        "overwriteItems": "существующих навыков",
+        "willOverwrite": "Перезаписать",
+        "root": "Корень",
+        "path": "Путь",
+        "unnamed": "Безымянный",
+        "pagination": {
+          "range": "Показано {{from}}-{{to}} из {{total}}",
+          "page": "Страница {{page}} / {{pages}}",
+          "prev": "Предыдущая",
+          "next": "Следующая"
+        },
+        "selection": {
+          "selectPage": "Выбрать страницу",
+          "clearPage": "Очистить выбор страницы",
+          "selectAll": "Выбрать все",
+          "clearAll": "Очистить весь выбор"
+        }
+      },
+      "result": {
+        "title": "Результат импорта",
+        "success": "Успех",
+        "failed": "Ошибка"
+      },
+      "toasts": {
+        "missingZip": "Пожалуйста, выберите zip-файл",
+        "missingGithubUrl": "Пожалуйста, введите GitHub URL",
+        "discovered": "Обнаружено. Пожалуйста, подтвердите, что импортировать.",
+        "discoverError": "Не удалось обнаружить, попробуйте позже",
+        "committed": "Импорт выполнен успешно",
+        "commitError": "Не удалось импортировать, попробуйте позже",
+        "partialFailed": "Не удалось импортировать некоторые навыки. Пожалуйста, просмотрите детали.",
+        "commitTimeout": "Истекло время ожидания импорта, попробуйте позже",
+        "invalidCommand": "Не удалось разобрать команду. Укажите URL с github.com."
+      },
+      "progress": {
+        "title": "Прогресс импорта",
+        "value": "Прогресс",
+        "jobId": "ID задания"
+      }
+    },
+    "pluginsPage": {
+      "searchPlaceholder": "Поиск пресетов...",
+      "addCard": "Добавить пресет"
+    },
+    "mcpLibrary": {
+      "header": {
+        "title": "MCP серверы",
+        "subtitle": "Управление интеграциями Model Context Protocol",
+        "settings": "Глобальные настройки",
+        "add": "Добавить MCP"
+      },
+      "searchPlaceholder": "Поиск серверов...",
+      "addCard": "Добавить MCP",
+      "status": {
+        "enabled": "Включено",
+        "disabled": "Отключено"
+      },
+      "envRequired": "Требуются ключи окружения",
+      "descriptionFallback": "Описание не предоставлено",
+      "empty": "Нет доступных MCP пресетов",
+      "actions": {
+        "enable": "Включить",
+        "disable": "Отключить",
+        "uninstall": "Удалить",
+        "settings": "Настроить",
+        "configure": "Настроить MCP сервер"
+      },
+      "dialog": {
+        "title": "Название MCP (уникальное)",
+        "displayName": "Отображаемое имя",
+        "jsonConfig": "Полная конфигурация JSON",
+        "required": "Обязательно"
+      },
+      "sections": {
+        "status": "Статус сервера",
+        "statusHint": "Переключить соединение для этого MCP сервера",
+        "envVars": "Переменные окружения",
+        "envVarsHint": "Укажите API-ключи или секреты, требуемые этим пресетом"
+      },
+      "fields": {
+        "transport": "Транспорт",
+        "category": "Категория",
+        "version": "Версия",
+        "source": "Источник"
+      },
+      "toasts": {
+        "enabled": "MCP сервер включён",
+        "disabled": "MCP сервер отключён",
+        "uninstalled": "MCP сервер удалён",
+        "error": "Не удалось выполнить операцию, попробуйте снова",
+        "actionFailed": "Не удалось выполнить операцию, попробуйте снова",
+        "created": "MCP сервер создан",
+        "updated": "MCP сервер обновлён"
+      }
+    },
+    "sources": {
+      "github": "GitHub",
+      "zip": "ZIP",
+      "system": "Система",
+      "manual": "Вручную",
+      "unknown": "Неизвестно"
+    },
+    "pluginsManager": {
+      "toasts": {
+        "exclusiveEnabled": "(Другие пресеты отключены)"
+      }
+    },
+    "presets": {
+      "title": "Пресеты",
+      "description": "Управление повторно используемыми пресетами возможностей"
+    },
+    "presetsPage": {
+      "header": {
+        "title": "Пресеты"
+      }
+    }
+  },
+  "task": {
+    "renameDescription": "Введите новое имя задачи",
+    "nameLabel": "Имя задачи",
+    "namePlaceholder": "Введите имя задачи",
+    "toasts": {
+      "renamed": "Задача переименована",
+      "renameFailed": "Не удалось переименовать задачу"
+    }
+  },
+  "project": {
+    "subtitle": "{{count}} задач",
+    "titleWithCount": "{{name}} · {{count}} задач",
+    "share": "Поделиться проектом",
+    "settings": "Настройки проекта",
+    "rename": "Переименовать проект",
+    "renameDescription": "Введите новое имя проекта",
+    "nameLabel": "Имя проекта",
+    "namePlaceholder": "Введите имя проекта",
+    "delete": "Удалить проект",
+    "deleteDescription": "Удаление этого проекта переместит все его задачи обратно в основной список.",
+    "deleteConfirm": "Удалить"
+  },
+  "userMenu": {
+    "credits": "Кредиты",
+    "home": "Главная",
+    "settings": "Настройки",
+    "logout": "Выйти"
+  },
+  "pending": {
+    "queued": "В очереди",
+    "pending": "Ожидает",
+    "modify": "Изменить",
+    "send": "Отправить немедленно",
+    "delete": "Удалить"
+  },
+  "common": {
+    "cancel": "Отмена",
+    "create": "Создать",
+    "delete": "Удалить",
+    "deleted": "Удалено",
+    "edit": "Изменить",
+    "save": "Сохранить",
+    "saving": "Сохранение...",
+    "confirm": "Подтвердить",
+    "enabled": "Включено",
+    "disabled": "Отключено"
+  },
+  "pagination": {
+    "previous": "Предыдущая",
+    "next": "Следующая",
+    "page": "Страница {{page}}",
+    "of": "/ {{total}}",
+    "rowsPerPage": "Строк на странице",
+    "items": "элементов"
+  },
+  "settings": {
+    "dialogTitle": "Настройки",
+    "sidebar": {
+      "account": "Аккаунт",
+      "settings": "Настройки",
+      "models": "Модели",
+      "usage": "Использование",
+      "shortcuts": "Shortcuts"
+    },
+    "upgrade": "Обновить",
+    "credits": "Кредиты",
+    "freeCredits": "Бесплатные кредиты",
+    "dailyRefresh": "Ежедневное обновление кредитов",
+    "dailyRefreshHint": "Обновляется до {{max}} каждый день в {{time}}",
+    "generalSettings": "Общие настройки",
+    "darkMode": "Тёмная тема",
+    "backend": "Бэкенд",
+    "modelConfigTitle": "Конфигурация моделей",
+    "modelGlm": "GLM-4.7",
+    "modelGlmDescription": "Включить модель GLM для выполнения задач",
+    "apiKeys": "API-ключи",
+    "openAiApiKey": "API-ключ OpenAI",
+    "openAiApiKeyHint": "Используется для моделей, совместимых с OpenAI.",
+    "openAiApiKeyPlaceholder": "Введите ваш API-ключ OpenAI",
+    "openAiBaseUrl": "OpenAI Base URL",
+    "openAiBaseUrlHint": "Переопределить стандартный endpoint OpenAI.",
+    "openAiBaseUrlPlaceholder": "https://api.openai.com/v1",
+    "anthropicApiKey": "API-ключ Anthropic",
+    "anthropicApiKeyHint": "Используется для моделей, совместимых с Anthropic.",
+    "anthropicApiKeyPlaceholder": "Введите ваш API-ключ Anthropic",
+    "anthropicBaseUrl": "Anthropic Base URL",
+    "anthropicBaseUrlHint": "Переопределить стандартный endpoint Anthropic.",
+    "anthropicBaseUrlPlaceholder": "https://api.anthropic.com",
+    "claudeCode": "Claude Code",
+    "language": "Язык",
+    "english": "English",
+    "simplifiedChinese": "简体中文",
+    "noUsageData": "Пока нет данных об использовании",
+    "getHelp": "Получить помощь",
+    "getHelpUrl": "https://github.com/poco-ai/poco-agent/issues",
+    "theme": "Тема",
+    "systemMode": "Системный режим",
+    "lightMode": "Светлая тема",
+    "claude": "Claude",
+    "french": "Français",
+    "japanese": "日本語",
+    "german": "Deutsch",
+    "russian": "Русский",
+    "shortcuts": {
+      "title": "Keyboard Shortcuts",
+      "description": "Read-only shortcut reference for the current app version.",
+      "currentPlatform": "Current: {{platform}}",
+      "alternatePlatform": "Also on {{platform}}",
+      "or": "or",
+      "platform": {
+        "mac": "macOS",
+        "windows": "Windows"
+      },
+      "items": {
+        "toggleMainSidebar": {
+          "action": "Toggle main sidebar",
+          "hint": "Collapse or expand the primary left sidebar."
+        },
+        "togglePlanMode": {
+          "action": "Switch mode (planning)",
+          "hint": "Cycle composer mode while the main input is focused."
+        },
+        "switchPromptHistory": {
+          "action": "Browse prompt history",
+          "hint": "Use in chat input to recall previous prompts."
+        },
+        "slashCommand": {
+          "action": "Slash command",
+          "hint": "Type / to open slash command suggestions."
+        },
+        "search": {
+          "action": "Global search",
+          "hint": "Open or close global search dialog."
+        },
+        "toggleOutputPanel": {
+          "action": "Toggle output panel",
+          "hint": "Collapse or expand computer/artifacts panel in chat."
+        },
+        "jumpUserPrompts": {
+          "action": "Jump user prompts",
+          "hint": "When output panel is collapsed, use J/K to jump between user messages."
+        },
+        "openSettings": {
+          "action": "Open settings",
+          "hint": "Open the settings dialog."
+        }
+      }
+    }
+  },
+  "validation": {
+    "projectNameRequired": "Пожалуйста, введите имя проекта",
+    "selectProject": "Пожалуйста, выберите проект",
+    "missingTaskId": "Отсутствует ID задачи",
+    "taskContentRequired": "Пожалуйста, введите содержимое задачи",
+    "selectExecutionTime": "Пожалуйста, выберите время выполнения",
+    "nightlyNoTime": "Ночное выполнение не поддерживает установку времени выполнения",
+    "missingSessionId": "Отсутствует ID сессии",
+    "missingToolUseId": "Отсутствует ID использования инструмента",
+    "messageContentRequired": "Пожалуйста, введите содержимое сообщения",
+    "sessionNameRequired": "Пожалуйста, введите имя сессии",
+    "sessionNameTooLong": "Имя сессии слишком длинное"
+  },
+  "user": {
+    "plan": {
+      "free": "Бесплатно"
+    },
+    "credits": {
+      "unlimited": "Безлимитно"
+    }
+  },
+  "fileSidebar": {
+    "title": "Список файлов",
+    "fileList": "Список файлов",
+    "downloadAll": "Скачать все",
+    "noFiles": "Пока нет файлов",
+    "downloadStarted": "Начинается загрузка архива рабочего пространства",
+    "downloadStart": "Начинается загрузка архива рабочего пространства",
+    "archiveNotAvailable": "Файл архива пока недоступен",
+    "archiveUnavailable": "Файл архива пока недоступен",
+    "downloadFailed": "Не удалось загрузить"
+  },
+  "pullToRefresh": {
+    "refreshing": "Обновление...",
+    "releaseToRefresh": "Отпустите для обновления",
+    "pullToRefresh": "Потяните для обновления"
+  },
+  "usageTooltip": {
+    "currentSession": "Текущая сессия:",
+    "duration": "Продолжительность:",
+    "tokens": "Токены",
+    "usageStatistics": "Статистика использования",
+    "usageStats": "Статистика использования:",
+    "today": "Сегодня:",
+    "thisWeek": "Эта неделя:",
+    "thisMonth": "Этот месяц:",
+    "durationFormat": "{{mins}}м {{secs}}с"
+  },
+  "cardNav": {
+    "turnOffAll": "Выключить все",
+    "turnOnAll": "Включить все",
+    "noMcpInstalled": "MCP не установлен",
+    "noSkillsInstalled": "Навыки не установлены",
+    "noPluginsInstalled": "Пресеты не установлены",
+    "oneClickClose": "Выключить все",
+    "notInstalledMcp": "MCP не установлен",
+    "notInstalledSkill": "Навыки не установлены",
+    "apps": "Приложения",
+    "comingSoon": "Скоро",
+    "clickForDetails": "Нажмите для деталей",
+    "connectTools": "Подключите ваши инструменты к Poco"
+  },
+  "fileChange": {
+    "previewDisabled": "Выполняется, просмотр недоступен",
+    "executingNoPreview": "Выполняется, просмотр недоступен",
+    "previewFile": "Просмотр файла",
+    "linesAdded": "строк добавлено",
+    "linesDeleted": "строк удалено",
+    "totalChanges": "{{count}} изменений строк",
+    "viewDiff": "Просмотреть diff"
+  },
+  "computerPanel": {
+    "all": "Все"
+  },
+  "chatPanel": {
+    "fileAttachment": "[+{{count}} файлов]",
+    "skillsUsed": "Использованные навыки",
+    "conversationHistory": "История разговора",
+    "loading": "Загрузка...",
+    "noHistory": "Пока нет истории",
+    "session": "Сессия",
+    "status": "Статус:"
+  },
+  "artifactsPanel": {
+    "documentPreview": "Просмотр документа",
+    "workspacePreview": "Просмотр файлов рабочего пространства",
+    "sidebarOpen": "Боковая панель открыта",
+    "sidebarClosed": "Боковая панель закрыта",
+    "sidebarClose": "Закрыть боковую панель",
+    "fileChanges": "Изменения файлов",
+    "totalFiles": "файлов"
+  },
+  "mcpGrid": {
+    "availableServers": "Доступно серверов: {{count}}",
+    "enabledServers": "Включено: {{count}}",
+    "turnOffAll": "Выключить все",
+    "noMcpServers": "Пока нет MCP серверов",
+    "system": "Система",
+    "user": "Пользователь",
+    "uninstall": "Удалить",
+    "settings": "Настройки"
+  },
+  "skillsGrid": {
+    "turnOffAll": "Выключить все"
+  },
+  "mcpSettings": {
+    "configureServer": "Настроить MCP сервер",
+    "fullJsonConfig": "Полная конфигурация JSON",
+    "mcpName": "Имя MCP",
+    "jsonConfig": "Полная конфигурация JSON",
+    "invalidJson": "Неверная JSON-конфигурация",
+    "nameRequired": "Требуется имя",
+    "saveFailed": "Не удалось сохранить MCP-сервер"
+  },
+  "queryActions": {
+    "taskNameRequired": "Пожалуйста, введите имя задачи",
+    "renameFailed": "Не удалось переименовать",
+    "creditUnlimited": "Безлимитные кредиты"
+  },
+  "chatInput": {
+    "connect": "Подключить",
+    "cancelTask": "Отменить задачу"
+  },
+  "chatContainer": {
+    "loading": "Загрузка..."
+  },
+  "projectDialogs": {
+    "cancel": "Отмена",
+    "create": "Создать",
+    "selectProject": "Выберите проект для перемещения этой задачи",
+    "noProject": "Нет проекта",
+    "move": "Переместить"
+  },
+  "connectors": {
+    "title": "Коннекторы",
+    "apps": "Приложения",
+    "search": "Поиск коннекторов",
+    "inDevelopment": "В разработке",
+    "details": "Детали",
+    "connectNow": "Подключить сейчас",
+    "connected": "Подключено",
+    "enabled": "Включено",
+    "coreCapabilities": "Основные возможности",
+    "gmail": {
+      "description": "Создание черновиков писем, поиск разговоров, быстрая генерация сводок"
+    },
+    "gcal": {
+      "description": "Просмотр расписаний, оптимизация времени и управления активностью"
+    },
+    "gdrive": {
+      "description": "Быстрый доступ к файлам, интеллектуальный поиск контента, Poco помогает более эффективно управлять документами"
+    },
+    "outlookMail": {
+      "description": "Бесшовное создание, поиск и управление письмами Outlook в Poco"
+    },
+    "github": {
+      "description": "Управление репозиториями кода, совместная разработка и ревью кода"
+    },
+    "slack": {
+      "description": "Чтение и запись разговоров Slack в Poco"
+    },
+    "notion": {
+      "description": "Поиск и обновление контента, автоматизация рабочих процессов"
+    },
+    "filesystem": {
+      "description": "Разрешить чтение и запись файлов в локальной файловой системе"
+    },
+    "postgres": {
+      "description": "Доступ к базе данных только для чтения для PostgreSQL"
+    },
+    "sentry": {
+      "description": "Получение и анализ отчётов об ошибках из Sentry"
+    },
+    "webSearch": {
+      "description": "Выполняйте веб-поиск в реальном времени для получения актуальной информации."
+    },
+    "codeInterpreter": {
+      "description": "Безопасно выполняйте код Python в изолированной среде."
+    }
+  },
+  "connectorCapabilities": {
+    "automation": {
+      "title": "Рабочие процессы автоматизации",
+      "description": "Событийно-управляемый запуск для сложных потоков задач"
+    },
+    "assistant": {
+      "title": "Умный помощник по сотрудничеству",
+      "description": "ИИ глубоко понимает контекст и предоставляет предложения"
+    },
+    "security": {
+      "title": "Система управления безопасностью",
+      "description": "Шифрование корпоративного уровня для обеспечения безопасности данных"
+    },
+    "search": {
+      "title": "Глобальный поисковый индекс",
+      "description": "Кроссплатформенный запрос с миллисекундным откликом"
+    }
+  },
+  "mcpHeader": {
+    "mcpManagement": "Управление MCP серверами",
+    "searchPlaceholder": "Поиск серверов...",
+    "addMcp": "Добавить MCP"
+  },
+  "skillsHeader": {
+    "skillsManagement": "Управление навыками"
+  },
+  "models": {
+    "defaultTag": "По умолчанию",
+    "claudeSonnet45": {
+      "description": "Баланс скорости и интеллекта"
+    },
+    "claudeOpus45": {
+      "description": "Самая мощная модель"
+    },
+    "gpt4Turbo": {
+      "description": "Быстрый и эффективный"
+    }
+  },
+  "creditsPopover": {
+    "proPlan": "Pro план",
+    "credits": "Кредиты",
+    "unlimited": "Безлимитно",
+    "freeCredits": "Бесплатные кредиты",
+    "dailyRefresh": "Ежедневное обновление кредитов",
+    "dailyRefreshHint": "Обновляется до 9999 каждый день в 00:00",
+    "viewUsage": "Просмотреть использование"
+  },
+  "actions": {
+    "processing": "Обработка..."
+  },
+  "filesidebar": {
+    "title": "Список файлов"
+  },
+  "onboarding": {
+    "close": "Close tutorial",
+    "skip": "Skip",
+    "back": "Back",
+    "next": "Next",
+    "done": "Finish",
+    "progress": "Step {{current}} / {{total}}",
+    "targetUnavailable": "This area is collapsed or unavailable right now. Continue to the next step.",
+    "letsStart": "Let's get started.",
+    "steps": {
+      "welcome": {
+        "title": "Welcome to Poco",
+        "description": "This quick tutorial highlights the core areas you will use most often. You can reopen it anytime from the sidebar quick menu."
+      },
+      "workspace": {
+        "title": "Main workspace",
+        "description": "Your main content appears here, including task creation, chat execution, and capability management pages."
+      },
+      "newTask": {
+        "title": "Create a new task",
+        "description": "Use this button to quickly start a fresh task and jump into execution."
+      },
+      "projects": {
+        "title": "Projects section",
+        "description": "Create, rename, and manage projects here to organize work by project."
+      },
+      "capabilities": {
+        "title": "Capabilities entry",
+        "description": "Start from the sidebar entry, then open the Skills page for detailed management."
+      },
+      "modeToggle": {
+        "title": "Pick a run mode",
+        "description": "Switch between Task, Step-by-step, and Scheduled modes before sending your prompt."
+      },
+      "composer": {
+        "title": "Task composer",
+        "description": "Write instructions, attach files, set repository options, and launch execution from here."
+      },
+      "quickMenu": {
+        "title": "Quick settings menu",
+        "description": "Use this menu for language/theme/backend preferences, and restart this tutorial anytime."
+      },
+      "taskList": {
+        "title": "Task list",
+        "description": "This list lets you revisit all unassigned tasks and quickly reopen any recent execution session."
+      },
+      "skillsDetail": {
+        "title": "Skills page",
+        "description": "This is the Skills view inside Capabilities, where you browse and manage skills."
+      }
+    }
+  }
+}

@@ -3,24 +3,24 @@ import os
 import re
 import time
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 from claude_agent_sdk import ClaudeAgentOptions
 from claude_agent_sdk.client import ClaudeSDKClient
 from claude_agent_sdk.types import (
     AgentDefinition as SdkAgentDefinition,
+)
+from claude_agent_sdk.types import (
     HookContext,
     HookInput,
     HookMatcher,
     PermissionResultAllow,
     PermissionResultDeny,
+    SdkPluginConfig,
     SyncHookJSONOutput,
 )
 from dotenv import load_dotenv
 
-from app.core.workspace import WorkspaceManager
-from app.core.user_input import UserInputClient
-from app.hooks.base import ExecutionContext
-from app.hooks.manager import HookManager
 from app.core.observability.request_context import (
     generate_request_id,
     generate_trace_id,
@@ -29,6 +29,11 @@ from app.core.observability.request_context import (
     set_request_id,
     set_trace_id,
 )
+from app.core.user_input import UserInputClient
+from app.core.workspace import WorkspaceManager
+from app.hooks.base import ExecutionContext
+from app.hooks.manager import HookManager
+from app.prompts import build_prompt_appendix
 from app.schemas.request import TaskConfig
 from app.schemas.state import BrowserState
 from app.utils.browser import format_viewport_size, parse_viewport_size
@@ -95,7 +100,17 @@ class AgentExecutor:
                 if input_hint:
                     prompt = f"{input_hint}\n\n{prompt}"
 
-                prompt = f"{prompt}\n\nCurrent working directory: {ctx.cwd}"
+                prompt_appendix = build_prompt_appendix(
+                    browser_enabled=config.browser_enabled
+                )
+                if prompt_appendix:
+                    prompt = f"{prompt}\n\n{prompt_appendix}"
+
+                prompt = f"{prompt}\n\nPlease reply in the same language as the user's input unless explicitly requested otherwise."
+                prompt = (
+                    f"{prompt}\n\nCurrent working directory: {ctx.cwd}."
+                    "All operations must be performed within this directory only."
+                )
 
             async def dummy_hook(
                 input_data: HookInput, tool_use_id: str | None, context: HookContext
@@ -254,9 +269,16 @@ class AgentExecutor:
                         description=description,
                         prompt=definition.prompt,
                         tools=definition.tools,
-                        model=definition.model,
+                        # Subagent model overrides are intentionally unsupported.
+                        model=None,
                     )
                 agents = resolved or None
+
+            plugins = self._discover_plugins()
+
+            selected_model = (config.model or "").strip()
+            if not selected_model:
+                selected_model = os.environ["DEFAULT_MODEL"]
 
             options = ClaudeAgentOptions(
                 cwd=ctx.cwd,
@@ -277,10 +299,11 @@ class AgentExecutor:
                 ],
                 mcp_servers=mcp_servers,
                 permission_mode=normalized_permission_mode,
-                model=os.environ["DEFAULT_MODEL"],
+                model=selected_model,
                 can_use_tool=can_use_tool,
                 hooks={"PreToolUse": [HookMatcher(matcher=None, hooks=[dummy_hook])]},
                 agents=agents,
+                plugins=plugins,
             )
 
             async with ClaudeSDKClient(options=options) as client:
@@ -330,6 +353,30 @@ class AgentExecutor:
                 lines.append(f"- {display}")
         lines.append("Do not modify files under inputs/ unless the user asks.")
         return "\n".join(lines)
+
+    def _discover_plugins(self) -> list[SdkPluginConfig]:
+        """Discover staged plugins under /workspace/.claude_data/plugins.
+
+        Plugins are staged by Executor Manager into the workspace. The SDK expects the plugin
+        root directory (containing `.claude-plugin/plugin.json`).
+        """
+        root = Path(self.workspace.root_path) / ".claude_data" / "plugins"
+        if not root.exists() or not root.is_dir():
+            return []
+
+        configs: list[SdkPluginConfig] = []
+        try:
+            for entry in sorted(root.iterdir(), key=lambda p: p.name.lower()):
+                if not entry.is_dir() or entry.is_symlink():
+                    continue
+                manifest = entry / ".claude-plugin" / "plugin.json"
+                if not manifest.exists() or not manifest.is_file():
+                    continue
+                configs.append(SdkPluginConfig(type="local", path=str(entry)))
+        except Exception:
+            return []
+
+        return configs
 
     @staticmethod
     def _inject_playwright_mcp(mcp_servers: dict) -> dict:

@@ -3,6 +3,7 @@
 import * as React from "react";
 import { ChevronDown, ChevronUp, Copy, Check, Pencil } from "lucide-react";
 import { FileCard } from "@/components/shared/file-card";
+import { RepoCard } from "@/components/shared/repo-card";
 import { Button } from "@/components/ui/button";
 import type { MessageBlock, InputFile } from "@/features/chat/types";
 import { useT } from "@/lib/i18n/client";
@@ -12,10 +13,14 @@ const MAX_LINES = 5;
 export function UserMessage({
   content,
   attachments,
+  repoUrl,
+  gitBranch,
   onEdit,
 }: {
   content: string | MessageBlock[];
   attachments?: InputFile[];
+  repoUrl?: string | null;
+  gitBranch?: string | null;
   onEdit?: (content: string) => void;
 }) {
   const { t } = useT("translation");
@@ -41,6 +46,10 @@ export function UserMessage({
   };
 
   const textContent = parseContent(content);
+  const trimmedRepoUrl = (repoUrl || "").trim();
+  const trimmedGitBranch = (gitBranch || "").trim();
+  const hasRepo = trimmedRepoUrl.length > 0;
+  const hasAttachments = Boolean(attachments && attachments.length > 0);
 
   // Copy handler
   const onCopy = async () => {
@@ -81,27 +90,51 @@ export function UserMessage({
   }, [textContent]);
 
   return (
-    <div className="flex flex-col items-end w-full gap-2">
-      {attachments && attachments.length > 0 && (
-        <div className="max-w-[85%] flex flex-wrap justify-end gap-2">
-          {attachments.map((file, i) => (
-            <FileCard key={i} file={file} className="w-48" showRemove={false} />
+    <div className="flex w-full min-w-0 flex-col items-end gap-2">
+      {(hasRepo || hasAttachments) && (
+        <div className="flex w-full min-w-0 max-w-[85%] flex-wrap justify-end gap-2">
+          {hasRepo ? (
+            <RepoCard
+              url={trimmedRepoUrl}
+              branch={trimmedGitBranch || null}
+              className="w-full max-w-48"
+              showRemove={false}
+              onOpen={() => {
+                const raw = trimmedRepoUrl;
+                const openUrl = /^https?:\/\//i.test(raw)
+                  ? raw
+                  : `https://${raw}`;
+                try {
+                  window.open(openUrl, "_blank", "noopener,noreferrer");
+                } catch (error) {
+                  console.warn("[UserMessage] Failed to open repo url", error);
+                }
+              }}
+            />
+          ) : null}
+          {attachments?.map((file, i) => (
+            <FileCard
+              key={i}
+              file={file}
+              className="w-full max-w-48"
+              showRemove={false}
+            />
           ))}
         </div>
       )}
       {textContent && (
-        <div className="max-w-[85%] flex flex-col items-end gap-2 group">
-          <div className="bg-muted text-foreground rounded-lg px-4 py-2 w-full">
+        <div className="group flex min-w-0 max-w-[85%] flex-col items-end gap-2">
+          <div className="w-fit min-w-0 max-w-full overflow-hidden rounded-lg bg-muted px-4 py-2 text-foreground">
             <p
               ref={observerRef}
-              className={`text-base whitespace-pre-wrap break-words break-all ${
+              className={`text-base whitespace-pre-wrap break-words break-all [overflow-wrap:anywhere] ${
                 shouldCollapse && !isExpanded ? "line-clamp-5" : ""
               }`}
             >
               {textContent}
             </p>
           </div>
-          <div className="flex items-center justify-between w-full gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center justify-between w-full gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
             {shouldCollapse && (
               <button
                 onClick={() => setIsExpanded(!isExpanded)}

@@ -7,6 +7,7 @@
     "newTask": "新建任务",
     "search": "搜索",
     "library": "能力",
+    "openMain": "打开主侧边栏",
     "scheduledTasks": "定时任务",
     "projects": "项目",
     "newProject": "新建项目",
@@ -19,15 +20,23 @@
     "rename": "重命名",
     "moveToProject": "移动到项目",
     "delete": "删除",
+    "askTag": "ask",
     "shareTitle": "与好友分享 Poco",
     "shareDesc": "各得 500 积分",
     "user": "用户",
+    "defaultUserName": "Poco 用户",
     "removeFromProject": "移出项目",
-    "plan": "专业版"
+    "batchOperations": "批量操作",
+    "holdToSelect": "长按进入批量选择",
+    "holdToExitSelect": "长按退出批量选择",
+    "moveToHere": "移动到这里",
+    "plan": "专业版",
+    "onboarding": "新手教程"
   },
   "header": {
     "workspace": "Poco 1.0",
     "switchWorkspace": "切换工作区",
+    "switchModel": "切换模型",
     "notifications": "通知",
     "more": "更多",
     "repoLink": "项目仓库",
@@ -40,6 +49,11 @@
     "voiceInput": "语音输入",
     "send": "发送",
     "placeholder": "分配一个任务或提出任何问题",
+    "inputPrompts": {
+      "taskDefault": "给 Poco 分配任何任务",
+      "planDefault": "与 Poco 一起创建任务计划",
+      "shortcutHint": "/ 使用 Slash Command，shift+enter 换行，enter 发送"
+    },
     "tools": "将你的工具连接到 Poco",
     "importLocal": "从本地文件导入",
     "importFigma": "从 Figma 导入 (即将推出)",
@@ -55,6 +69,11 @@
       "scheduledHelp": "按 Cron 自动触发执行，可复用工作区。",
       "planPlaceholder": "描述一个复杂任务，我会先输出执行计划，等你确认后再开始执行…",
       "planPrefix": "请先输出一个清晰可执行的计划（分步骤、带检查点），不要直接执行。等我确认后，再按步骤执行。\\n\\n任务：{{prompt}}"
+    },
+    "modeLabels": {
+      "task": "任务模式",
+      "plan": "计划模式",
+      "scheduled": "定时模式"
     },
     "repo": {
       "toggle": "仓库设置",
@@ -87,7 +106,12 @@
       }
     },
     "browser": {
-      "toggle": "浏览器"
+      "toggle": "浏览器",
+      "enabledTooltipTitle": "浏览器已开启",
+      "enabledTooltipDescription": "Poco 会使用浏览器查看网页、提取页面信息，并完成网页相关操作。",
+      "disabledTooltipTitle": "浏览器已关闭",
+      "disabledTooltipDescription": "开启后，Poco 可以通过浏览器查看网页并执行网页相关任务。",
+      "enabledHint": "已开启"
     },
     "runSchedule": {
       "toggle": "发送时间",
@@ -146,6 +170,7 @@
     "more": "更多"
   },
   "hints": {
+    "slashCommand": "使用 Slash Command",
     "send": "发送",
     "newLine": "换行",
     "separator": "，"
@@ -193,6 +218,9 @@
     "askUserRequired": "请回答所有问题后再提交",
     "askUserSubmitted": "已提交答案",
     "askUserFailed": "提交失败，请重试",
+    "askUserCompleteTitle": "已完成",
+    "askUserCompleteHint": "正在提交答案…",
+    "askUserRetry": "重试",
     "planApprovalTitle": "计划审批",
     "planApprovalHint": "请确认下面的执行计划。确认后将开始执行并可能修改文件/运行命令。",
     "planApprovalApprove": "批准执行",
@@ -208,16 +236,28 @@
     "internalContextView": "查看（{{count}}）",
     "internalContextHide": "收起",
     "internalContextCopy": "复制",
-    "thinkingTitle": "思考过程",
+    "thinkingTitle": "思考",
     "toolExecution": "工具执行",
     "subagentTranscript": "子代理过程",
+    "subagentExecution": "子代理",
     "input": "输入",
     "output": "输出",
     "scrollToLatestMessage": "跳转到最新消息",
+    "userPromptTimelineJump": "跳转到第 {{index}} 条用户消息",
+    "userPromptTimelineEmpty": "（空输入）",
     "expand": "展开",
     "collapse": "收起",
     "copyMessage": "复制消息",
+    "formulaCopied": "已复制",
     "editMessage": "编辑消息",
+    "quoteModify": "引用修改",
+    "exportImage": "生成对话长图",
+    "exportLongImage": "导出长图",
+    "exportMultiImage": "导出多图",
+    "exportImageSuccess": "已生成对话长图",
+    "exportImageMultiSuccess": "已导出 {{count}} 张图片",
+    "exportImageEmpty": "暂无可导出的对话内容",
+    "exportImageFailed": "生成对话长图失败",
     "statusBar": {
       "browser": "浏览器",
       "openDesktop": "打开桌面",
@@ -225,7 +265,185 @@
       "skillsConfigured": "技能配置",
       "skillsUsed": "技能使用",
       "mcpConfigured": "MCP 服务器配置",
-      "mcp": "MCP 服务器"
+      "mcp": "MCP 服务器",
+      "pluginsConfigured": "预设配置"
+    },
+    "typingWords": [
+      "Accomplishing",
+      "Actioning",
+      "Actualizing",
+      "Baking",
+      "Brewing",
+      "Calculating",
+      "Cerebrating",
+      "Churning",
+      "Clauding",
+      "Coalescing",
+      "Cogitating",
+      "Computing",
+      "Conjuring",
+      "Considering",
+      "Cooking",
+      "Crafting",
+      "Creating",
+      "Crunching",
+      "Deliberating",
+      "Determining",
+      "Doing",
+      "Effecting",
+      "Finagling",
+      "Forging",
+      "Forming",
+      "Generating",
+      "Hatching",
+      "Herding",
+      "Honking",
+      "Hustling",
+      "Ideating",
+      "Inferring",
+      "Manifesting",
+      "Marinating",
+      "Moseying",
+      "Mulling",
+      "Mustering",
+      "Musing",
+      "Noodling",
+      "Percolating",
+      "Pondering",
+      "Processing",
+      "Puttering",
+      "Reticulating",
+      "Ruminating",
+      "Schlepping",
+      "Shucking",
+      "Simmering",
+      "Smooshing",
+      "Spinning",
+      "Stewing",
+      "Synthesizing",
+      "Thinking",
+      "Transmuting",
+      "Vibing",
+      "Working"
+    ],
+    "collapseRightPanel": "收起产物面板",
+    "expandRightPanel": "展开产物面板",
+    "toolCards": {
+      "tools": {
+        "skill": "技能",
+        "task": "任务",
+        "askUserQuestion": "询问用户",
+        "bash": "执行命令",
+        "edit": "编辑文件",
+        "read": "读取文件",
+        "write": "写入文件",
+        "glob": "匹配文件",
+        "grep": "文本搜索",
+        "notebookEdit": "编辑 Notebook",
+        "webFetch": "获取网页",
+        "webSearch": "网页搜索",
+        "todoWrite": "更新待办",
+        "bashOutput": "命令输出",
+        "killBash": "终止命令",
+        "exitPlanMode": "退出规划模式",
+        "listMcpResources": "列出 MCP 资源",
+        "readMcpResource": "读取 MCP 资源",
+        "browser": "浏览器",
+        "tool": "工具"
+      },
+      "summary": {
+        "questions": "{{count}} 个问题",
+        "todos": "{{count}} 个待办",
+        "items": "{{count}} 项"
+      },
+      "fields": {
+        "description": "描述",
+        "prompt": "提示词",
+        "subagentType": "子代理",
+        "questions": "问题",
+        "question": "问题",
+        "options": "选项",
+        "command": "命令",
+        "timeout": "超时",
+        "runInBackground": "后台执行",
+        "glob": "Glob 过滤",
+        "type": "类型",
+        "outputMode": "输出模式",
+        "ignoreCase": "忽略大小写",
+        "showLineNumber": "显示行号",
+        "beforeContext": "前文",
+        "afterContext": "后文",
+        "context": "上下文",
+        "headLimit": "结果上限",
+        "multiline": "多行模式",
+        "filePath": "文件路径",
+        "oldString": "原文本",
+        "newString": "新文本",
+        "replaceAll": "全部替换",
+        "newSource": "新源码",
+        "content": "内容",
+        "offset": "偏移",
+        "limit": "限制",
+        "pattern": "模式",
+        "path": "路径",
+        "query": "查询",
+        "url": "URL",
+        "statusCode": "状态码",
+        "searchPath": "搜索路径",
+        "allowedDomains": "允许域名",
+        "blockedDomains": "屏蔽域名",
+        "filter": "过滤条件",
+        "href": "Href",
+        "selector": "选择器",
+        "text": "文本",
+        "role": "角色",
+        "name": "名称",
+        "value": "值",
+        "button": "按钮",
+        "key": "按键",
+        "server": "服务器",
+        "uri": "URI",
+        "notebookPath": "Notebook 路径",
+        "editMode": "编辑模式",
+        "cellId": "单元 ID",
+        "cellType": "单元类型",
+        "shellId": "Shell ID",
+        "bashId": "Bash ID",
+        "status": "状态",
+        "killed": "已终止",
+        "exitCode": "退出码",
+        "approved": "已批准",
+        "answer": "答案",
+        "output": "输出",
+        "result": "结果",
+        "usage": "用量",
+        "duration": "耗时",
+        "cost": "费用",
+        "total": "总计",
+        "message": "消息",
+        "bytes": "字节数",
+        "replacements": "替换次数",
+        "totalLines": "总行数",
+        "linesReturned": "返回行数",
+        "mimeType": "MIME 类型",
+        "fileSize": "文件大小",
+        "editType": "编辑类型",
+        "finalUrl": "最终 URL",
+        "totalResults": "结果总数",
+        "totalMatches": "匹配总数",
+        "matches": "匹配项",
+        "files": "文件",
+        "results": "结果",
+        "resources": "资源",
+        "stats": "统计",
+        "contents": "内容",
+        "multiSelect": "多选"
+      },
+      "text": {
+        "rawOutput": "原始输出",
+        "structured": "结构化数据",
+        "empty": "无数据"
+      }
     }
   },
   "status": {
@@ -268,7 +486,7 @@
     "status": "状态"
   },
   "computer": {
-    "title": "Poco 电脑",
+    "title": "电脑",
     "description": "运行中查看浏览器与终端过程",
     "status": {
       "live": "实时同步",
@@ -298,7 +516,8 @@
         "browser": "浏览器",
         "terminal": "终端"
       },
-      "limitHint": "仅展示前 {{limit}} 步"
+      "limitHint": "仅展示前 {{limit}} 步",
+      "liveLabel": "实时"
     },
     "browser": {
       "screenshotAlt": "浏览器截图",
@@ -326,10 +545,11 @@
     "viewer": {
       "loadingEngine": "正在加载预览引擎...",
       "loadingDoc": "正在读取文档...",
+      "parseError": "无法解析 Excalidraw 文件",
       "fetchError": "无法获取文档内容",
       "retry": "重试",
       "selectFile": "请从右侧选择文件进行预览",
-      "supportedFormats": "支持 PDF、Office 文档及常见图片格式",
+      "supportedFormats": "支持 PDF、Office 文档、常见图片格式、MP4 视频、XMind 文件、.excalidraw 文件和 .drawio 文件",
       "processing": "文件处理中",
       "notSupported": "该格式暂不支持预览",
       "openInNewWindow": "新窗口打开",
@@ -341,7 +561,8 @@
       "modified": "修改",
       "deleted": "删除",
       "renamed": "重命名",
-      "lineChanges": "行变更"
+      "totalFiles": "个文件",
+      "totalfiles": "个文件"
     }
   },
   "search": {
@@ -353,8 +574,22 @@
   },
   "library": {
     "title": "能力",
-    "subtitle": "管理您的技能、插件和工具",
+    "subtitle": "管理您的技能、预设和工具",
     "comingSoon": "即将推出",
+    "mobile": {
+      "back": "返回能力列表"
+    },
+    "sidebar": {
+      "title": "能力导航",
+      "description": "选择要查看的能力设置",
+      "mobile": "浏览能力",
+      "groups": {
+        "core": "核心",
+        "automation": "自动化",
+        "integrations": "集成",
+        "labs": "实验室"
+      }
+    },
     "skillsStore": {
       "title": "Skills",
       "description": "浏览和安装社区贡献的 AI 技能",
@@ -376,9 +611,18 @@
       "feature3": "实时监控",
       "action": "管理服务器"
     },
+    "pluginsStore": {
+      "title": "预设",
+      "description": "浏览并安装能力预设"
+    },
     "envVars": {
       "title": "环境变量",
+      "sidebarTitle": "环境配置",
       "description": "集中管理技能和 MCP 服务器使用的 API Key 与密钥。",
+      "header": {
+        "title": "环境变量",
+        "add": "添加变量"
+      },
       "copied": "已复制到剪贴板",
       "copy": "复制",
       "copyError": "复制失败",
@@ -487,6 +731,8 @@
         "title": "Slash Commands",
         "add": "添加命令"
       },
+      "searchPlaceholder": "搜索命令...",
+      "addCard": "新增一个 Slash Command",
       "summary": "可用命令",
       "enabled": "已启用",
       "mode": {
@@ -524,7 +770,8 @@
         "updated": "命令已更新",
         "deleted": "命令已删除",
         "error": "操作失败"
-      }
+      },
+      "empty": "暂无命令"
     },
     "subAgents": {
       "card": {
@@ -540,6 +787,7 @@
         "add": "添加子代理"
       },
       "searchPlaceholder": "搜索子代理...",
+      "addCard": "新增一个子代理",
       "summary": "子代理",
       "enabled": "已启用",
       "empty": "暂无子代理",
@@ -601,7 +849,7 @@
         "title": "定时任务",
         "create": "创建任务",
         "createTitle": "创建定时任务",
-        "trigger": "立即执行",
+        "trigger": "执行",
         "empty": "暂无定时任务"
       },
       "detail": {
@@ -713,7 +961,7 @@
     "more": {
       "title": "更多",
       "description": "探索更多功能和扩展",
-      "feature1": "插件市场",
+      "feature1": "预设市场",
       "feature2": "集成指南",
       "feature3": "API 文档",
       "action": "了解更多"
@@ -723,6 +971,8 @@
         "title": "Skills",
         "subtitle": "探索和管理 AI 能力"
       },
+      "searchPlaceholder": "搜索技能...",
+      "addCard": "新增一个 Skill",
       "items": {
         "webSearch": {
           "name": "Web Search web搜索",
@@ -746,6 +996,10 @@
         }
       }
     },
+    "pluginsPage": {
+      "searchPlaceholder": "搜索预设...",
+      "addCard": "新增一个 Plugin"
+    },
     "skillsManager": {
       "stats": {
         "available": "可用技能",
@@ -760,7 +1014,8 @@
         "user": "个人"
       },
       "fields": {
-        "id": "id"
+        "id": "id",
+        "source": "来源"
       },
       "actions": {
         "install": "安装",
@@ -772,15 +1027,18 @@
         "installed": "技能已安装",
         "uninstalled": "技能已卸载",
         "enabled": "技能已启用",
-        "disabled": "技能已停用"
+        "disabled": "技能已停用",
+        "actionFailed": "操作失败，请稍后再试"
       },
-      "empty": "暂无技能"
+      "empty": "暂无技能",
+      "unknownSkill": "未知技能"
     },
     "skillsImport": {
       "title": "导入技能",
       "tabs": {
         "zip": "上传压缩包",
-        "github": "GitHub 地址"
+        "github": "GitHub 地址",
+        "command": "npx 命令导入"
       },
       "fields": {
         "zip": "Zip 文件",
@@ -789,11 +1047,13 @@
       },
       "placeholders": {
         "githubUrl": "https://github.com/owner/repo",
-        "name": "例如：my-skill"
+        "name": "例如：my-skill",
+        "command": "npx skills add https://github.com/owner/repo --skill my-skill"
       },
       "hints": {
         "github": "默认尝试 main/master 分支（仅支持 github.com 公共仓库）",
-        "nameRequired": "检测到 SKILL.md 位于根目录，必须手动填写技能名称"
+        "nameRequired": "检测到 SKILL.md 位于根目录，必须手动填写技能名称",
+        "command": "粘贴 add 命令后将自动解析 GitHub 地址和 --skill 参数。"
       },
       "actions": {
         "back": "返回",
@@ -836,15 +1096,123 @@
         "discoverError": "解析失败，请稍后重试",
         "committed": "技能导入成功",
         "commitError": "导入失败，请稍后重试",
-        "partialFailed": "部分技能导入失败，请查看详情"
+        "partialFailed": "部分技能导入失败，请查看详情",
+        "commitTimeout": "导入超时，请稍后重试",
+        "invalidCommand": "无法解析命令，请确保包含 github.com 地址。"
+      },
+      "progress": {
+        "title": "导入进度",
+        "value": "进度",
+        "jobId": "任务 ID"
+      }
+    },
+    "pluginsManager": {
+      "stats": {
+        "enabled": "已启用"
+      },
+      "scope": {
+        "system": "系统",
+        "user": "个人"
+      },
+      "fields": {
+        "id": "id",
+        "source": "来源"
+      },
+      "actions": {
+        "install": "安装",
+        "uninstall": "卸载"
+      },
+      "toasts": {
+        "loadError": "加载预设列表失败",
+        "actionError": "操作失败，请稍后再试",
+        "installed": "预设已安装",
+        "uninstalled": "预设已卸载",
+        "enabled": "预设已启用",
+        "disabled": "预设已停用",
+        "actionFailed": "操作失败，请稍后再试",
+        "exclusiveEnabled": "（同时关闭其他预设）"
+      },
+      "empty": "暂无预设",
+      "unknownPlugin": "未知预设"
+    },
+    "pluginsImport": {
+      "title": "导入预设",
+      "description": "上传预设 zip，或从 GitHub 公共仓库导入。",
+      "relativePath": "相对路径",
+      "tabs": {
+        "zip": "上传压缩包",
+        "github": "GitHub 地址"
+      },
+      "fields": {
+        "zip": "Zip 文件",
+        "githubUrl": "GitHub 公共仓库地址",
+        "nameOverride": "预设名称"
+      },
+      "placeholders": {
+        "githubUrl": "https://github.com/owner/repo",
+        "name": "例如：my-preset"
+      },
+      "hints": {
+        "github": "默认为 main/master 分支，仅支持公开 GitHub 仓库"
+      },
+      "actions": {
+        "back": "返回",
+        "discover": "解析",
+        "discovering": "解析中...",
+        "commit": "导入并安装",
+        "committing": "导入中..."
+      },
+      "preview": {
+        "found": "发现",
+        "items": "个预设定义",
+        "overwrite": "将覆盖",
+        "overwriteItems": "个同名预设",
+        "willOverwrite": "将覆盖",
+        "root": "根目录",
+        "path": "路径",
+        "unnamed": "未命名",
+        "pagination": {
+          "page": "第 {{page}} / {{pages}} 页",
+          "prev": "上一页",
+          "next": "下一页"
+        },
+        "selection": {
+          "selectPage": "全选本页",
+          "clearPage": "取消本页全选",
+          "selectAll": "全选全部",
+          "clearAll": "取消全选"
+        }
+      },
+      "result": {
+        "title": "导入结果",
+        "success": "成功",
+        "failed": "失败"
+      },
+      "toasts": {
+        "missingZip": "请选择一个 zip 文件",
+        "missingGithubUrl": "请输入 GitHub 地址",
+        "discovered": "解析成功，请确认要导入的预设",
+        "discoverError": "解析失败，请稍后重试",
+        "committed": "预设导入成功",
+        "commitError": "导入失败，请稍后重试",
+        "partialFailed": "部分预设导入失败，请查看详情",
+        "commitTimeout": "导入超时，请稍后重试"
+      },
+      "progress": {
+        "title": "导入进度",
+        "value": "进度",
+        "jobId": "任务 ID"
       }
     },
     "mcpLibrary": {
       "header": {
         "title": "MCP 服务器",
         "subtitle": "管理所有 Model Context Protocol 集成",
-        "settings": "全局设置"
+        "settings": "全局设置",
+        "add": "添加MCP"
       },
+      "searchPlaceholder": "搜索服务器...",
+      "addCard": "新增一个 MCP",
       "status": {
         "enabled": "已启用",
         "disabled": "未启用"
@@ -881,7 +1249,26 @@
         "enabled": "已启用",
         "disabled": "已停用",
         "uninstalled": "已卸载",
-        "error": "操作失败，请稍后重试"
+        "error": "操作失败，请稍后重试",
+        "actionFailed": "操作失败，请稍后重试",
+        "created": "MCP 服务器已创建",
+        "updated": "MCP 服务器已更新"
+      }
+    },
+    "sources": {
+      "github": "GitHub",
+      "zip": "ZIP",
+      "system": "系统",
+      "manual": "手动",
+      "unknown": "未知"
+    },
+    "presets": {
+      "title": "预设",
+      "description": "管理可复用的能力预设"
+    },
+    "presetsPage": {
+      "header": {
+        "title": "预设"
       }
     }
   },
@@ -896,6 +1283,7 @@
   },
   "project": {
     "subtitle": "{{count}} 个任务",
+    "titleWithCount": "{{name}} · {{count}} 个任务",
     "share": "分享项目",
     "settings": "项目设置",
     "rename": "重命名项目",
@@ -921,11 +1309,16 @@
   },
   "common": {
     "cancel": "取消",
+    "close": "关闭",
     "create": "创建",
     "delete": "删除",
+    "deleted": "已删除",
     "save": "保存",
     "confirm": "确定",
-    "enabled": "已开启"
+    "enabled": "已开启",
+    "disabled": "已禁用",
+    "edit": "编辑",
+    "saving": "保存中..."
   },
   "pagination": {
     "previous": "上一页",
@@ -934,5 +1327,393 @@
     "of": "/ {{total}} 页",
     "rowsPerPage": "每页显示",
     "items": "条"
+  },
+  "settings": {
+    "dialogTitle": "设置",
+    "sidebar": {
+      "account": "账户",
+      "settings": "设置",
+      "models": "模型",
+      "usage": "使用情况",
+      "shortcuts": "快捷键"
+    },
+    "upgrade": "升级",
+    "credits": "积分",
+    "freeCredits": "免费积分",
+    "dailyRefresh": "每日刷新积分",
+    "dailyRefreshHint": "每天 {{time}} 刷新为 {{max}}",
+    "generalSettings": "通用设置",
+    "darkMode": "深色模式",
+    "backend": "后端",
+    "modelConfigTitle": "模型配置",
+    "modelGlm": "GLM-4.7",
+    "modelGlmDescription": "启用 GLM 模型用于任务执行",
+    "apiKeys": "API Key",
+    "openAiApiKey": "OpenAI API Key",
+    "openAiApiKeyHint": "用于 OpenAI 兼容模型。",
+    "openAiApiKeyPlaceholder": "请输入 OpenAI API Key",
+    "openAiBaseUrl": "OpenAI Base URL",
+    "openAiBaseUrlHint": "覆盖默认 OpenAI API 地址。",
+    "openAiBaseUrlPlaceholder": "https://api.openai.com/v1",
+    "anthropicApiKey": "Anthropic API Key",
+    "anthropicApiKeyHint": "用于 Anthropic 兼容模型。",
+    "anthropicApiKeyPlaceholder": "请输入 Anthropic API Key",
+    "anthropicBaseUrl": "Anthropic Base URL",
+    "anthropicBaseUrlHint": "覆盖默认 Anthropic API 地址。",
+    "anthropicBaseUrlPlaceholder": "https://api.anthropic.com",
+    "claudeCode": "Claude Code",
+    "language": "语言",
+    "english": "English",
+    "simplifiedChinese": "简体中文",
+    "noUsageData": "暂无使用数据",
+    "getHelp": "获取帮助",
+    "getHelpUrl": "https://github.com/poco-ai/poco-agent/issues",
+    "theme": "主题",
+    "systemMode": "跟随系统",
+    "lightMode": "浅色模式",
+    "claude": "Claude",
+    "french": "Français",
+    "japanese": "日本語",
+    "german": "Deutsch",
+    "russian": "Русский",
+    "shortcuts": {
+      "title": "快捷键",
+      "description": "当前版本快捷键只读列表。",
+      "currentPlatform": "当前平台：{{platform}}",
+      "alternatePlatform": "在 {{platform}} 上为",
+      "or": "或",
+      "platform": {
+        "mac": "macOS",
+        "windows": "Windows"
+      },
+      "items": {
+        "toggleMainSidebar": {
+          "action": "收起/展开主侧边栏",
+          "hint": "控制左侧主导航栏显示与隐藏。"
+        },
+        "togglePlanMode": {
+          "action": "切换模式（planning）",
+          "hint": "主输入框聚焦时循环切换模式。"
+        },
+        "switchPromptHistory": {
+          "action": "切换历史 prompt",
+          "hint": "在聊天输入框中浏览之前发送的内容。"
+        },
+        "slashCommand": {
+          "action": "Slash Command",
+          "hint": "输入 / 打开 slash command 提示。"
+        },
+        "search": {
+          "action": "全局搜索",
+          "hint": "打开或关闭全局搜索面板。"
+        },
+        "toggleOutputPanel": {
+          "action": "收起/展开产物界面",
+          "hint": "在聊天页收起或展开电脑/产物面板。"
+        },
+        "jumpUserPrompts": {
+          "action": "跳转用户消息",
+          "hint": "当产物面板收起时，使用 J/K 在用户消息之间快速跳转。"
+        },
+        "openSettings": {
+          "action": "打开设置",
+          "hint": "打开设置弹窗。"
+        }
+      }
+    }
+  },
+  "validation": {
+    "projectNameRequired": "请输入项目名称",
+    "selectProject": "请选择项目",
+    "missingTaskId": "缺少任务 ID",
+    "taskContentRequired": "请输入任务内容",
+    "selectExecutionTime": "请选择执行时间",
+    "nightlyNoTime": "夜间执行不支持设置执行时间",
+    "missingSessionId": "缺少会话 ID",
+    "missingToolUseId": "缺少工具调用 ID",
+    "messageContentRequired": "请输入消息内容",
+    "sessionNameRequired": "请输入会话名称",
+    "sessionNameTooLong": "会话名称过长"
+  },
+  "user": {
+    "plan": {
+      "free": "免费"
+    },
+    "credits": {
+      "unlimited": "无限"
+    }
+  },
+  "fileSidebar": {
+    "title": "文件列表",
+    "fileList": "文件列表",
+    "downloadAll": "下载全部",
+    "noFiles": "暂无文件",
+    "downloadStarted": "开始下载工作区归档",
+    "downloadStart": "开始下载工作区归档",
+    "archiveNotAvailable": "归档文件暂不可用",
+    "archiveUnavailable": "归档文件暂不可用",
+    "downloadFailed": "下载失败"
+  },
+  "pullToRefresh": {
+    "refreshing": "正在刷新...",
+    "releaseToRefresh": "释放立即刷新",
+    "pullToRefresh": "下拉刷新"
+  },
+  "usageTooltip": {
+    "currentSession": "本次会话:",
+    "duration": "耗时:",
+    "usageStats": "使用统计:",
+    "today": "今日:",
+    "thisWeek": "本周:",
+    "thisMonth": "本月:",
+    "durationFormat": "{{mins}}分{{secs}}秒",
+    "tokens": "Tokens",
+    "usageStatistics": "使用统计"
+  },
+  "cardNav": {
+    "oneClickClose": "一键关闭",
+    "turnOnAll": "一键开启",
+    "notInstalledMcp": "未安装 MCP",
+    "notInstalledSkill": "未安装技能",
+    "noPluginsInstalled": "未安装预设",
+    "fallbackMcp": "MCP #{{id}}",
+    "fallbackSkill": "技能 #{{id}}",
+    "fallbackPreset": "预设 #{{id}}",
+    "mcp": "MCP",
+    "skills": "技能",
+    "plugins": "预设",
+    "apps": "应用",
+    "comingSoon": "即将推出",
+    "clickForDetails": "点击查看详情",
+    "connectTools": "将您的工具连接到 Poco",
+    "turnOffAll": "一键关闭",
+    "noMcpInstalled": "未安装 MCP",
+    "noSkillsInstalled": "未安装技能"
+  },
+  "fileChange": {
+    "previewDisabled": "执行中，暂不可预览",
+    "executingNoPreview": "执行中，暂不可预览",
+    "previewFile": "预览文件",
+    "linesAdded": "行新增",
+    "linesDeleted": "行删除",
+    "totalChanges": "共 {{count}} 行变更",
+    "viewDiff": "查看差异"
+  },
+  "computerPanel": {
+    "all": "全部"
+  },
+  "chatPanel": {
+    "fileAttachment": "[+{{count}} 文件]",
+    "skillsUsed": "技能使用",
+    "conversationHistory": "对话历史",
+    "loading": "加载中...",
+    "noHistory": "暂无历史记录",
+    "session": "会话",
+    "status": "状态:"
+  },
+  "artifactsPanel": {
+    "documentPreview": "文档预览",
+    "workspacePreview": "工作区文件预览",
+    "sidebarOpen": "侧边栏打开",
+    "sidebarClosed": "侧边栏关闭",
+    "sidebarClose": "侧边栏关闭",
+    "fileChanges": "文件变更",
+    "totalFiles": "个文件"
+  },
+  "mcpGrid": {
+    "availableServers": "可用服务器: {{count}}",
+    "enabledServers": "已启用: {{count}}",
+    "turnOffAll": "全部关闭",
+    "noMcpServers": "暂无 MCP 服务器",
+    "system": "系统",
+    "user": "个人",
+    "uninstall": "卸载",
+    "settings": "设置"
+  },
+  "skillsGrid": {
+    "turnOffAll": "全部关闭"
+  },
+  "pluginsGrid": {
+    "turnOffAll": "全部关闭"
+  },
+  "mcpSettings": {
+    "mcpName": "MCP 名称",
+    "jsonConfig": "完整的 JSON 配置",
+    "configureServer": "配置 MCP 服务器",
+    "fullJsonConfig": "完整的 JSON 配置",
+    "invalidJson": "JSON 配置格式错误",
+    "nameRequired": "名称不能为空",
+    "saveFailed": "保存 MCP 服务器失败"
+  },
+  "queryActions": {
+    "taskNameRequired": "请输入任务名称",
+    "renameFailed": "重命名失败",
+    "creditUnlimited": "余量无限"
+  },
+  "chatInput": {
+    "connect": "连接",
+    "cancelTask": "取消任务"
+  },
+  "chatContainer": {
+    "loading": "加载中..."
+  },
+  "projectDialogs": {
+    "cancel": "取消",
+    "create": "创建",
+    "selectProject": "选择一个项目以移动此任务",
+    "noProject": "无项目",
+    "move": "移动"
+  },
+  "connectors": {
+    "gmail": {
+      "description": "撰写邮件，搜索会话并快速生成摘要"
+    },
+    "gcal": {
+      "description": "查看日程安排，优化时间与活动管理"
+    },
+    "gdrive": {
+      "description": "快速访问文件、智能搜索内容，并让 Poco 协助你更高效地管理文档"
+    },
+    "outlookMail": {
+      "description": "在 Poco 中无缝写作、搜索并管理你的 Outlook 电子邮件"
+    },
+    "github": {
+      "description": "管理代码仓库，协作开发与代码审查"
+    },
+    "slack": {
+      "description": "在 Poco 中读写 Slack 对话"
+    },
+    "notion": {
+      "description": "搜索和更新内容，实现自动化流程"
+    },
+    "filesystem": {
+      "description": "允��在本地文件系统上读取和写入文件"
+    },
+    "postgres": {
+      "description": "PostgreSQL 的只读数据库访问"
+    },
+    "sentry": {
+      "description": "从 Sentry 检索和分析错误报告"
+    },
+    "webSearch": {
+      "description": "执行实时网络搜索以获取最新信息。"
+    },
+    "codeInterpreter": {
+      "description": "在沙箱环境中安全地执行 Python 代码。"
+    },
+    "title": "连接器",
+    "apps": "应用",
+    "search": "搜索连接器",
+    "inDevelopment": "开发中",
+    "details": "详情",
+    "connectNow": "立即连接",
+    "connected": "已连接",
+    "enabled": "已启用",
+    "coreCapabilities": "核心能力"
+  },
+  "connectorCapabilities": {
+    "automation": {
+      "title": "自动化流程",
+      "description": "基于事件驱动，触发复杂任务流"
+    },
+    "assistant": {
+      "title": "智能协作助手",
+      "description": "AI 深入理解上下文，提供建议"
+    },
+    "security": {
+      "title": "安全管理系统",
+      "description": "采用企业级加密，确保数据安全"
+    },
+    "search": {
+      "title": "全局搜索索引",
+      "description": "跨平台查询，毫秒级召回对话"
+    }
+  },
+  "mcpHeader": {
+    "mcpManagement": "MCP 服务器管理",
+    "searchPlaceholder": "搜索服务器...",
+    "addMcp": "添加MCP"
+  },
+  "skillsHeader": {
+    "skillsManagement": "Skills 管理"
+  },
+  "models": {
+    "defaultTag": "默认",
+    "claudeSonnet45": {
+      "description": "平衡速度和智能"
+    },
+    "claudeOpus45": {
+      "description": "最强大的模型"
+    },
+    "gpt4Turbo": {
+      "description": "快速高效"
+    }
+  },
+  "creditsPopover": {
+    "proPlan": "专业版",
+    "credits": "积分",
+    "unlimited": "余量无限",
+    "freeCredits": "免费积分",
+    "dailyRefresh": "每日刷新积分",
+    "dailyRefreshHint": "每天 00:00 刷新为 9999",
+    "viewUsage": "查看使用情况"
+  },
+  "actions": {
+    "processing": "处理中..."
+  },
+  "filesidebar": {
+    "title": "文件列表"
+  },
+  "onboarding": {
+    "close": "关闭教程",
+    "skip": "跳过",
+    "back": "上一步",
+    "next": "下一步",
+    "done": "完成",
+    "progress": "第 {{current}} / {{total}} 步",
+    "targetUnavailable": "当前区域可能已折叠或暂不可见，可继续下一步。",
+    "letsStart": "让我们开始吧",
+    "steps": {
+      "welcome": {
+        "title": "欢迎使用 Poco",
+        "description": "这个新手教程会快速介绍最常用的核心区域。你可以随时在桌面端侧边栏快捷菜单或移动端设置页中重新打开。"
+      },
+      "workspace": {
+        "title": "主工作区",
+        "description": "主要内容都会显示在这里，包括任务创建、执行会话和能力管理页面。"
+      },
+      "newTask": {
+        "title": "新建任务",
+        "description": "点击这里可以快速创建一个新任务并进入执行流程。"
+      },
+      "projects": {
+        "title": "项目区域",
+        "description": "在这里创建、重命名和管理项目，用于按项目组织你的工作。"
+      },
+      "capabilities": {
+        "title": "能力入口",
+        "description": "先从侧边栏进入能力中心入口，再进入技能页面查看详情。"
+      },
+      "modeToggle": {
+        "title": "选择执行模式",
+        "description": "发送前可在任务模式、分步模式和定时模式之间切换。"
+      },
+      "composer": {
+        "title": "任务编辑区",
+        "description": "在这里输入指令、添加附件、配置仓库并发起执行。"
+      },
+      "quickMenu": {
+        "title": "快捷设置菜单",
+        "description": "可在此调整语言/主题/后端偏好，并随时重新开始本教程。"
+      },
+      "taskList": {
+        "title": "任务清单",
+        "description": "这里会展示未归档到项目的任务，你可以快速回看并重新进入最近的执行会话。"
+      },
+      "skillsDetail": {
+        "title": "技能页面（Skills）",
+        "description": "这里是能力中心的 Skills 页面，用来浏览、启用和管理技能。"
+      }
+    }
   }
 }

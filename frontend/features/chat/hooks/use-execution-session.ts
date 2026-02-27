@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { getExecutionSessionAction } from "@/features/chat/actions/query-actions";
 import { useAdaptivePolling } from "./use-adaptive-polling";
 import type { ExecutionSession } from "@/features/chat/types";
-import { playTaskCompleteSound } from "@/lib/utils/sound";
+import { playCompletionSound } from "@/lib/utils/sound";
 
 interface UseExecutionSessionOptions {
   /**
@@ -136,9 +136,9 @@ export function useExecutionSession({
   // Poll only when session is active (or initial load)
   const isSessionActive =
     !!sessionId &&
-    (!session || ["accepted", "running"].includes(session.status));
+    (!session || ["pending", "running"].includes(session.status));
 
-  // Log when polling stops and trigger callback
+  // Trigger callback when polling stops.
   const hasStoppedRef = useRef(false);
   const prevStatusRef = useRef<string | null>(null);
 
@@ -155,16 +155,10 @@ export function useExecutionSession({
   useEffect(() => {
     if (
       session &&
-      ["completed", "failed", "stopped", "canceled", "cancelled"].includes(
-        session.status,
-      )
+      ["completed", "failed", "canceled"].includes(session.status)
     ) {
       // Trigger callback only once when polling stops
       if (!hasStoppedRef.current && onPollingStop) {
-        console.log(
-          `%c[Polling] Stopped for session ${sessionId} (Status: ${session.status})`,
-          "color: #f59e0b; font-weight: bold;",
-        );
         hasStoppedRef.current = true;
 
         // Only play sound if the status actually transitioned to completed
@@ -172,14 +166,14 @@ export function useExecutionSession({
         if (
           session.status === "completed" &&
           prevStatusRef.current !== null &&
-          ["accepted", "running"].includes(prevStatusRef.current)
+          ["pending", "running"].includes(prevStatusRef.current)
         ) {
-          playTaskCompleteSound();
+          playCompletionSound();
         }
 
         onPollingStop();
       }
-    } else if (session && ["accepted", "running"].includes(session.status)) {
+    } else if (session && ["pending", "running"].includes(session.status)) {
       // Reset ref when session becomes active again
       hasStoppedRef.current = false;
     }
@@ -188,7 +182,7 @@ export function useExecutionSession({
     if (session) {
       prevStatusRef.current = session.status;
     }
-  }, [session, sessionId, onPollingStop]);
+  }, [session, onPollingStop]);
 
   const { currentInterval, errorCount, trigger } = useAdaptivePolling({
     callback: fetchSession,

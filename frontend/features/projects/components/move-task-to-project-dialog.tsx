@@ -62,7 +62,9 @@ export function MoveTaskToProjectDialog({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{t("sidebar.moveToProject")}</DialogTitle>
-          <DialogDescription>选择一个项目以移动此任务</DialogDescription>
+          <DialogDescription>
+            {t("projectDialogs.selectProject")}
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <ScrollArea className="max-h-[200px]">
@@ -82,7 +84,7 @@ export function MoveTaskToProjectDialog({
                 `}
               >
                 <Folder className="size-4 shrink-0" />
-                <span>无项目</span>
+                <span>{t("projectDialogs.noProject")}</span>
               </button>
 
               {/* 项目列表 */}
@@ -110,10 +112,10 @@ export function MoveTaskToProjectDialog({
         </div>
         <DialogFooter>
           <Button type="button" variant="outline" onClick={handleCancel}>
-            取消
+            {t("projectDialogs.cancel")}
           </Button>
           <Button type="button" onClick={handleMove}>
-            移动
+            {t("projectDialogs.move")}
           </Button>
         </DialogFooter>
       </DialogContent>
