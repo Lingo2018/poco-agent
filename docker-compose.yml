@@ -132,6 +132,8 @@ services:
       EXECUTOR_TIMEZONE: ${EXECUTOR_TIMEZONE:-Asia/Shanghai}
       # Manager accesses executor containers through published host ports.
       EXECUTOR_PUBLISHED_HOST: ${EXECUTOR_PUBLISHED_HOST:-host.docker.internal}
+      # Docker network for spawned executor containers (must match compose network name).
+      EXECUTOR_DOCKER_NETWORK: ${EXECUTOR_DOCKER_NETWORK:-poco-agent_default}
 
       WORKSPACE_ROOT: ${PWD}/tmp_workspace
 
