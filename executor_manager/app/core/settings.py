@@ -114,6 +114,9 @@ class Settings(BaseSettings):
     executor_published_host: str = Field(
         default="localhost", alias="EXECUTOR_PUBLISHED_HOST"
     )
+    executor_docker_network: str = Field(
+        default="poco-agent_default", alias="EXECUTOR_DOCKER_NETWORK"
+    )
     workspace_root: str = Field(
         default="/var/lib/opencowork/workspaces", alias="WORKSPACE_ROOT"
     )

@@ -185,6 +185,7 @@ class ContainerPool:
             auto_remove=True,
             labels=labels,
             extra_hosts={"host.docker.internal": "host-gateway"},
+            network=self.settings.executor_docker_network,
         )
         logger.info(
             "timing",
