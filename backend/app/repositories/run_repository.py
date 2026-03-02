@@ -5,6 +5,7 @@ from sqlalchemy import exists, select, update
 from sqlalchemy.orm import Session, aliased
 
 from app.models.agent_run import AgentRun
+from app.models.agent_session import AgentSession
 
 
 class RunRepository:
@@ -125,11 +126,20 @@ class RunRepository:
             .where(running_or_claimed.status.in_(["claimed", "running"]))
         )
 
+        # Exclude runs whose session has been soft-deleted
+        session_deleted = exists(
+            select(1)
+            .select_from(AgentSession)
+            .where(AgentSession.id == AgentRun.session_id)
+            .where(AgentSession.is_deleted.is_(True))
+        )
+
         stmt = (
             select(AgentRun)
             .where(AgentRun.status == "queued")
             .where(AgentRun.scheduled_at <= now)
             .where(~has_active_run)
+            .where(~session_deleted)
             .order_by(AgentRun.scheduled_at.asc(), AgentRun.created_at.asc())
             .with_for_update(skip_locked=True)
             .limit(1)
