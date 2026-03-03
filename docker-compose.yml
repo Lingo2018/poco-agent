@@ -53,6 +53,20 @@ services:
         done
         mc mb -p "rustfs/$$S3_BUCKET" || true
 
+  litellm:
+    build:
+      context: .
+      dockerfile: litellm.Dockerfile
+    restart: unless-stopped
+    environment:
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-poco-litellm}
+    volumes:
+      - ./litellm_config.yaml:/app/config.yaml
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    ports:
+      - "${LITELLM_PORT:-4000}:4000"
+
   backend:
     # Default to pulling from GHCR; override via BACKEND_IMAGE if needed.
     image: ${BACKEND_IMAGE:-ghcr.io/poco-ai/poco-backend:latest}
