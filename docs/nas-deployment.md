@@ -103,6 +103,49 @@ grep -A20 "litellm:" docker-compose.yml | grep -q "HTTPS_PROXY" || echo "警告:
 
 ---
 
+## 问题4：Executor 镜像拉取失败（DNS 超时）
+
+### 症状
+任务卡在 "Hatching" 状态，executor-manager 日志显示：
+```
+docker.errors.APIError: 500 Server Error ... dial tcp: lookup ghcr.io on 8.8.4.4:53: i/o timeout
+```
+
+### 原因
+NAS 网络环境无法访问 ghcr.io，executor-manager 尝试拉取 `ghcr.io/poco-ai/poco-executor:full` 镜像时 DNS 解析超时。
+
+### 解决方案
+使用本地构建的镜像，手动创建 tag：
+```bash
+docker tag poco-executor:local ghcr.io/poco-ai/poco-executor:full
+docker tag poco-executor:local ghcr.io/poco-ai/poco-executor:lite
+```
+
+或使用 NAS 专用启动脚本 `start-nas.sh`（会自动处理）。
+
+---
+
+## NAS 启动脚本使用说明
+
+NAS 环境推荐使用 `start-nas.sh` 脚本，它会自动处理镜像 tag 问题。
+
+### 使用场景
+
+| 场景 | 命令 |
+|------|------|
+| 首次部署 / 更新本地镜像后 | `./start-nas.sh` |
+| 日常重启服务 | `docker compose up -d` |
+| 修改 .env 配置后生效 | `docker compose up -d --force-recreate` |
+
+### 脚本说明
+
+- `./scripts/quickstart.sh` - 官方脚本，会从 ghcr.io 拉取镜像（需要网络通畅）
+- `./start-nas.sh` - NAS 专用脚本，使用本地镜像，跳过网络拉取
+
+**NAS 上统一用 `./start-nas.sh` 启动即可。**
+
+---
+
 ## 代理配置总结
 
 | 服务 | 是否需要代理 | 原因 |

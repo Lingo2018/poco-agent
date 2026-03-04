@@ -880,6 +880,14 @@ else
   print_success "$(msg "info.anthropic_configured")"
 fi
 
+# NAS environment: ensure local images have correct tags (network may not reach ghcr.io)
+if docker images --format '{{.Repository}}:{{.Tag}}' | grep -q "^poco-executor:local$"; then
+  docker tag poco-executor:local ghcr.io/poco-ai/poco-executor:full 2>/dev/null && \
+    print_info "Tagged poco-executor:local -> ghcr.io/poco-ai/poco-executor:full"
+  docker tag poco-executor:local ghcr.io/poco-ai/poco-executor:lite 2>/dev/null && \
+    print_info "Tagged poco-executor:local -> ghcr.io/poco-ai/poco-executor:lite"
+fi
+
 echo ""
 print_success "$(msg "success.bootstrap")"
 echo ""
