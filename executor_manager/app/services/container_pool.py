@@ -168,6 +168,10 @@ class ContainerPool:
             "HTTPS_PROXY": self.settings.api_proxy or "",
             "HTTP_PROXY": self.settings.api_proxy or "",
             "NO_PROXY": "litellm,backend,localhost,127.0.0.1,172.16.0.0/12,10.0.0.0/8",
+            "all_proxy": self.settings.api_proxy or "",
+            "https_proxy": self.settings.api_proxy or "",
+            "http_proxy": self.settings.api_proxy or "",
+            "no_proxy": "litellm,backend,localhost,127.0.0.1,172.16.0.0/12,10.0.0.0/8",
         }
         anthropic_api_key = (self.settings.anthropic_api_key or "").strip()
         if anthropic_api_key:
