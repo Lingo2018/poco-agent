@@ -99,6 +99,34 @@ class RunRepository:
         return result.rowcount
 
     @staticmethod
+    def cancel_stale_runs(
+        session_db: Session,
+        session_id: uuid.UUID,
+    ) -> int:
+        """Cancel stale runs (claimed or running) for a session.
+
+        When a user sends a new message to a session that has stale runs
+        stuck in 'claimed' or 'running' status, we need to cancel them
+        so the new run can be scheduled.
+
+        Returns:
+            Number of canceled runs.
+        """
+        now = datetime.now(timezone.utc)
+        stmt = (
+            update(AgentRun)
+            .where(AgentRun.session_id == session_id)
+            .where(AgentRun.status.in_(["claimed", "running"]))
+            .values(
+                status="canceled",
+                finished_at=now,
+                last_error="Canceled: new run queued for the same session",
+            )
+        )
+        result = session_db.connection().execute(stmt)
+        return result.rowcount
+
+    @staticmethod
     def claim_next(
         session_db: Session,
         worker_id: str,

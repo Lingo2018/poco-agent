@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
@@ -16,6 +17,8 @@ from app.repositories.user_plugin_install_repository import UserPluginInstallRep
 from app.repositories.user_skill_install_repository import UserSkillInstallRepository
 from app.schemas.session import TaskConfig
 from app.schemas.task import TaskEnqueueRequest, TaskEnqueueResponse
+
+logger = logging.getLogger(__name__)
 
 
 class TaskService:
@@ -208,6 +211,14 @@ class TaskService:
             # Clear previous execution state so the UI doesn't show stale file changes
             # while a new run is queued/starting.
             db_session.state_patch = {}
+            # Cancel any stale runs (claimed or running) so the new run can be scheduled.
+            # This handles cases where previous runs got stuck due to executor crashes,
+            # network issues, or incomplete cleanups.
+            canceled_count = RunRepository.cancel_stale_runs(db, db_session.id)
+            if canceled_count > 0:
+                logger.warning(
+                    f"Canceled {canceled_count} stale run(s) for session {db_session.id}"
+                )
             if project_id is not None and db_session.project_id != project_id:
                 raise AppException(
                     error_code=ErrorCode.BAD_REQUEST,
