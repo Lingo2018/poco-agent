@@ -279,6 +279,14 @@ class AgentExecutor:
             selected_model = (config.model or "").strip()
             if not selected_model:
                 selected_model = os.environ["DEFAULT_MODEL"]
+            logger.info(
+                "model_selection",
+                extra={
+                    "config_model": config.model,
+                    "selected_model": selected_model,
+                    "env_default_model": os.environ.get("DEFAULT_MODEL"),
+                },
+            )
 
             options = ClaudeAgentOptions(
                 cwd=ctx.cwd,
