@@ -187,7 +187,7 @@ class ContainerPool:
             volumes={workspace_volume: {"bind": "/workspace", "mode": "rw"}},
             ports=ports,
             detach=True,
-            auto_remove=False,  # TODO: set back to True after debugging
+            auto_remove=True,
             labels=labels,
             extra_hosts={"host.docker.internal": "host-gateway"},
             network=self.settings.executor_docker_network,
