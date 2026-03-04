@@ -334,3 +334,38 @@ Before submitting frontend changes:
 - Callback endpoints use token-based authentication
 - Git operations support GitHub and GitLab platforms
 - All services can run independently for local development
+
+## NAS Deployment Notes
+
+When deploying on NAS (e.g., Synology), pay attention to proxy configuration:
+
+### Proxy Configuration Rules
+
+| Service | Needs Proxy | Reason |
+|---------|-------------|--------|
+| Executor | ❌ No | Connects to LiteLLM via Docker internal network |
+| LiteLLM | ✅ Yes | Needs proxy to access OpenRouter API (region restriction) |
+| Backend | ❌ No | Internal API only |
+
+### Key Configuration Points
+
+1. **`.env` file**: Keep `API_PROXY` commented out (executor doesn't need proxy)
+2. **`litellm_config.yaml`**: Must include `general_settings` to disable authentication
+3. **`docker-compose.yml`**: LiteLLM service needs `HTTPS_PROXY`/`HTTP_PROXY`/`ALL_PROXY` environment variables
+
+### Pre-merge Checklist
+
+Before merging upstream changes, verify these configurations are preserved:
+
+```bash
+# API_PROXY should be commented
+grep "^API_PROXY" .env && echo "WARNING: API_PROXY not commented!"
+
+# litellm_config.yaml should have general_settings
+grep -q "general_settings" litellm_config.yaml || echo "WARNING: Missing general_settings!"
+
+# docker-compose.yml litellm should have proxy
+grep -A20 "litellm:" docker-compose.yml | grep -q "HTTPS_PROXY" || echo "WARNING: LiteLLM missing proxy!"
+```
+
+See `docs/nas-deployment.md` for detailed troubleshooting guide.
