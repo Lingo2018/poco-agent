@@ -59,9 +59,10 @@ services:
       dockerfile: litellm.Dockerfile
     restart: unless-stopped
     environment:
-      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       # Empty default disables authentication (Claude Agent SDK uses x-api-key header which LiteLLM doesn't recognize)
       LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_BASE_URL: ${ANTHROPIC_BASE_URL:-https://api.anthropic.com}
     volumes:
       - ./litellm_config.yaml:/app/config.yaml
     command: ["--config", "/app/config.yaml", "--port", "4000"]
